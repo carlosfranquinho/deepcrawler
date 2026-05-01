@@ -621,7 +621,7 @@
       pos: { x: 10, y: 10 }, levels: new Map(),
       alive: true, xp: 0, lvl: 1,
       armor: arch.armor, charisma: arch.charisma,
-      atk: [...arch.atk], inv: [], points: 0,
+      atk: [...arch.atk], inv: new Array(9).fill(null), points: 0,
     };
 
     const lvl = getLevel(1);
@@ -727,9 +727,9 @@
       return true;
     }
     if (t === Tile.DoorLocked) {
-      const keyIdx = state.inv.findIndex(it => it.typeId === "key");
+      const keyIdx = state.inv.findIndex(it => it && it.typeId === "key");
       if (keyIdx !== -1) {
-        state.inv.splice(keyIdx, 1);
+        state.inv[keyIdx] = null;
         lvl.tiles[idx(nx, ny)] = Tile.DoorOpen;
         state.points += 5;
         sfx.door();
@@ -747,14 +747,15 @@
 
     const it = lvl.items.find(ii => ii.pos.x === nx && ii.pos.y === ny) || null;
     if (it) {
-      if (state.inv.length < 9) {
-        state.inv.push({ id: it.id, typeId: it.typeId, name: it.name });
+      const freeSlot = state.inv.findIndex(x => x === null);
+      if (freeSlot !== -1) {
+        state.inv[freeSlot] = { id: it.id, typeId: it.typeId, name: it.name, cssClass: it.cssClass };
         lvl.items = lvl.items.filter(x => x.id !== it.id);
         state.points += 5;
         sfx.pickup();
         pushLog(`Apanhaste **${it.name}** (+5 pontos).`, "info");
       } else {
-        pushLog("Inventário cheio (máx. 9).", "bad");
+        pushLog("Inventário cheio (máx. 9 slots). Larga um item primeiro.", "bad");
       }
     }
 
@@ -779,6 +780,24 @@
     return true;
   }
 
+  
+  function itemDrop(slotIdx) {
+    if (!state.alive) return false;
+    const item = state.inv[slotIdx];
+    if (!item) return false;
+    
+    const lvl = getLevel(state.depth);
+    if (lvl.items.some(i => i.pos.x === state.pos.x && i.pos.y === state.pos.y)) {
+      pushLog("Já existe um item no chão. Move-te primeiro.", "bad");
+      return false;
+    }
+    
+    lvl.items.push({ ...item, pos: { x: state.pos.x, y: state.pos.y } });
+    state.inv[slotIdx] = null;
+    sfx.pickup(); // reuse pickup sound for dropping
+    pushLog(`Largaste **${item.name}**.`, "info");
+    return true;
+  }
   function itemUse(slotIdx) {
     if (!state.alive) return false;
     const item = state.inv[slotIdx];
@@ -804,7 +823,7 @@
       pushLog(`Usaste um amuleto (+**1** carisma → **${state.charisma * 10}%** de esquiva, +15 pontos).`, "good");
     } else { return false; }
 
-    state.inv.splice(slotIdx, 1);
+    state.inv[slotIdx] = null;
     return true;
   }
 
@@ -1004,16 +1023,22 @@
       e.preventDefault();
     if (!state) return;
     let acted = false;
-    switch (e.key) {
-      case "ArrowUp":    case "w": case "W": acted = playerTryMove(0, -1); break;
-      case "ArrowDown":  case "s": case "S": acted = playerTryMove(0,  1); break;
-      case "ArrowLeft":  case "a": case "A": acted = playerTryMove(-1, 0); break;
-      case "ArrowRight": case "d": case "D": acted = playerTryMove( 1, 0); break;
-      case " ": acted = playerWait(); break;
-      case "1": case "2": case "3": case "4": case "5":
-      case "6": case "7": case "8": case "9":
-        acted = itemUse(Number(e.key) - 1); break;
-      default: return;
+    
+    if (e.code && e.code.startsWith("Digit") && e.code.length === 6) {
+      const num = Number(e.code[5]);
+      if (num >= 1 && num <= 9) {
+        if (e.shiftKey) acted = itemDrop(num - 1);
+        else acted = itemUse(num - 1);
+      }
+    } else {
+      switch (e.key) {
+        case "ArrowUp":    case "w": case "W": acted = playerTryMove(0, -1); break;
+        case "ArrowDown":  case "s": case "S": acted = playerTryMove(0,  1); break;
+        case "ArrowLeft":  case "a": case "A": acted = playerTryMove(-1, 0); break;
+        case "ArrowRight": case "d": case "D": acted = playerTryMove( 1, 0); break;
+        case " ": acted = playerWait(); break;
+        default: return;
+      }
     }
     doTurn(acted);
   }
