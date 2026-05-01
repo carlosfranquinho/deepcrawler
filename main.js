@@ -466,7 +466,7 @@
     combatRng = mulberry32(seed ^ 0xDEADBEEF);
 
     // Arquétipo aleatório baseado na seed
-    const archRng = mulberry32(seed ^ 0xARCH1234);
+    const archRng = mulberry32(seed ^ 0xA1C1234);
     const arch    = choose(archRng, PLAYER_ARCHETYPES);
 
     state = {
