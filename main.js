@@ -535,6 +535,7 @@
     if (t === Tile.Corpse)     return "tileCorpse";
     if (t === Tile.DoorClosed) return "tileDoorClosed";
     if (t === Tile.DoorOpen)   return "tileDoorOpen";
+    if (t === Tile.DoorLocked) return "tileDoorLocked";
     return "tileFloor";
   }
 
