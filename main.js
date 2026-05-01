@@ -165,15 +165,16 @@
         for (let x = room.x; x < room.x + room.w; x++) {
           const p = { x, y };
           if (!isPerimeterCell(p, room) || tiles[idx(x, y)] !== Tile.Floor) continue;
-          let hasInside = false, hasOutside = false;
-          for (const n of neighbors4(p)) {
-            if (!inBounds(n.x, n.y)) continue;
-            const nt = tiles[idx(n.x, n.y)];
-            const inside = posInRoom(n, room);
-            if (inside && nt === Tile.Floor && !isPerimeterCell(n, room)) hasInside = true;
-            if (!inside && nt === Tile.Floor) hasOutside = true;
-          }
-          if (hasInside && hasOutside) candidates.push(p);
+          const tN = inBounds(x, y - 1) ? tiles[idx(x, y - 1)] : Tile.Wall;
+          const tS = inBounds(x, y + 1) ? tiles[idx(x, y + 1)] : Tile.Wall;
+          const tE = inBounds(x + 1, y) ? tiles[idx(x + 1, y)] : Tile.Wall;
+          const tW = inBounds(x - 1, y) ? tiles[idx(x - 1, y)] : Tile.Wall;
+
+          // A valid doorway must be exactly between two walls
+          const isHorizDoor = (tN === Tile.Wall && tS === Tile.Wall && tE === Tile.Floor && tW === Tile.Floor);
+          const isVertDoor = (tE === Tile.Wall && tW === Tile.Wall && tN === Tile.Floor && tS === Tile.Floor);
+
+          if (isHorizDoor || isVertDoor) candidates.push(p);
         }
       }
       const count = clamp(roll(rng, 1, 2), 1, 2);
@@ -256,9 +257,25 @@
 
     placeDoors(tiles, rooms, rng);
 
+    // ── Escolher sala de início ANTES de trancar portas ────────────────────
+    // (para garantir que nenhuma porta da sala inicial fica trancada)
+    const startRoom = choose(rng, rooms);
+
+    // Portas da sala inicial — nunca podem ser trancadas
+    const startRoomDoorIndices = new Set();
+    for (let i = 0; i < tiles.length; i++) {
+      if (tiles[i] !== Tile.DoorClosed) continue;
+      const px = i % LEVEL_W, py = (i / LEVEL_W) | 0;
+      // Uma porta "pertence" à sala inicial se ela ou um vizinho imediato está dentro da sala
+      if (posInRoom({ x: px, y: py }, startRoom)) { startRoomDoorIndices.add(i); continue; }
+      for (const n of neighbors4({ x: px, y: py })) {
+        if (posInRoom(n, startRoom)) { startRoomDoorIndices.add(i); break; }
+      }
+    }
+
     const doorIndices = [];
     for (let i = 0; i < tiles.length; i++) {
-      if (tiles[i] === Tile.DoorClosed) doorIndices.push(i);
+      if (tiles[i] === Tile.DoorClosed && !startRoomDoorIndices.has(i)) doorIndices.push(i);
     }
     const numLocked = Math.min(doorIndices.length, clamp(Math.floor(depth / 3), 1, 3));
     for (let i = 0; i < numLocked; i++) {
@@ -269,11 +286,9 @@
       tiles[doorIndices[i]] = Tile.DoorLocked;
     }
 
-
-    // Exclusões: tiles adjacentes a portas — escadas nunca ficam imediatamente à frente de uma porta
+    // Exclusões: tiles adjacentes a portas
     const nearDoor = doorExclusions(tiles);
 
-    const startRoom = choose(rng, rooms);
     const playerStart = safeFloor(rng, startRoom, nearDoor);
 
     const otherRooms = rooms.filter(r => r !== startRoom);
@@ -1193,7 +1208,9 @@
   function onKeyDown(e) {
     if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
     if (e.key === "Tab") return;
-    if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "w", "a", "s", "d", "W", "A", "S", "D", " ", "1", "2", "3", "4", "5", "6", "7", "8", "9"].includes(e.key))
+    if (["ArrowUp","ArrowDown","ArrowLeft","ArrowRight","w","a","s","d","W","A","S","D"," ",
+         "y","u","b","n","Y","U","B","N",
+         "1","2","3","4","5","6","7","8","9"].includes(e.key))
       e.preventDefault();
     if (!state) return;
     let acted = false;
@@ -1207,11 +1224,17 @@
       }
     } else {
       switch (e.key) {
-        case "ArrowUp": case "w": case "W": acted = playerTryMove(0, -1); break;
-        case "ArrowDown": case "s": case "S": acted = playerTryMove(0, 1); break;
-        case "ArrowLeft": case "a": case "A": acted = playerTryMove(-1, 0); break;
-        case "ArrowRight": case "d": case "D": acted = playerTryMove(1, 0); break;
-        case " ": acted = playerWait(); break;
+        // Cardinal
+        case "ArrowUp":    case "w": case "W": case "8": acted = playerTryMove( 0, -1); break;
+        case "ArrowDown":  case "s": case "S": case "2": acted = playerTryMove( 0,  1); break;
+        case "ArrowLeft":  case "a": case "A": case "4": acted = playerTryMove(-1,  0); break;
+        case "ArrowRight": case "d": case "D": case "6": acted = playerTryMove( 1,  0); break;
+        // Diagonal — numpad + VI-keys
+        case "7": case "y": case "Y": acted = playerTryMove(-1, -1); break; // ↖
+        case "9": case "u": case "U": acted = playerTryMove( 1, -1); break; // ↗
+        case "1": case "b": case "B": acted = playerTryMove(-1,  1); break; // ↙
+        case "3": case "n": case "N": acted = playerTryMove( 1,  1); break; // ↘
+        case " ": case "5": acted = playerWait(); break;
         default: return;
       }
     }
@@ -1247,15 +1270,20 @@
     muteBtn.textContent = soundMuted ? "Sem som" : "Som";
   });
 
-  ["dpadUp", "dpadDown", "dpadLeft", "dpadRight", "dpadWait"].forEach(id => {
+  ["dpadUp","dpadDown","dpadLeft","dpadRight",
+   "dpadUL","dpadUR","dpadDL","dpadDR","dpadWait"].forEach(id => {
     el(id).addEventListener("click", () => {
       if (!state) return;
       let acted = false;
-      if (id === "dpadUp") acted = playerTryMove(0, -1);
-      else if (id === "dpadDown") acted = playerTryMove(0, 1);
-      else if (id === "dpadLeft") acted = playerTryMove(-1, 0);
-      else if (id === "dpadRight") acted = playerTryMove(1, 0);
-      else if (id === "dpadWait") acted = playerWait();
+      if      (id === "dpadUp")    acted = playerTryMove( 0, -1);
+      else if (id === "dpadDown")  acted = playerTryMove( 0,  1);
+      else if (id === "dpadLeft")  acted = playerTryMove(-1,  0);
+      else if (id === "dpadRight") acted = playerTryMove( 1,  0);
+      else if (id === "dpadUL")    acted = playerTryMove(-1, -1);
+      else if (id === "dpadUR")    acted = playerTryMove( 1, -1);
+      else if (id === "dpadDL")    acted = playerTryMove(-1,  1);
+      else if (id === "dpadDR")    acted = playerTryMove( 1,  1);
+      else if (id === "dpadWait")  acted = playerWait();
       doTurn(acted);
     });
   });

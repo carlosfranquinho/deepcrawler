@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./styles.css?v=5" />
-    <link rel="stylesheet" href="./monsters.css?v=3" />
+    <link rel="stylesheet" href="./monsters.css?v=4" />
   </head>
   <body>
     <div class="app">
@@ -47,13 +47,21 @@
             <div id="log" class="log" aria-live="polite" style="height: 180px;"></div>
           </div>
           <div class="dpad" aria-label="Controlos de direção">
-            <div class="dpadRow"><button class="dpadBtn" id="dpadUp">▲</button></div>
+            <div class="dpadRow">
+              <button class="dpadBtn dpadDiag" id="dpadUL">↖</button>
+              <button class="dpadBtn" id="dpadUp">▲</button>
+              <button class="dpadBtn dpadDiag" id="dpadUR">↗</button>
+            </div>
             <div class="dpadRow">
               <button class="dpadBtn" id="dpadLeft">◀</button>
               <button class="dpadBtn dpadCenter" id="dpadWait">·</button>
               <button class="dpadBtn" id="dpadRight">▶</button>
             </div>
-            <div class="dpadRow"><button class="dpadBtn" id="dpadDown">▼</button></div>
+            <div class="dpadRow">
+              <button class="dpadBtn dpadDiag" id="dpadDL">↙</button>
+              <button class="dpadBtn" id="dpadDown">▼</button>
+              <button class="dpadBtn dpadDiag" id="dpadDR">↘</button>
+            </div>
           </div>
         </section>
 

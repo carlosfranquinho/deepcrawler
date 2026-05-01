@@ -181,12 +181,15 @@ body{
 }
 
 .tileWall{
-  background-color:rgba(30,41,59,.75);
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Crect x='1' y='1' width='16' height='16' rx='3' fill='%231e293b' opacity='0.90'/%3E%3Cpath d='M3 6h12M3 10h12M6 3v12M12 3v12' stroke='%23334155' stroke-width='1.5' opacity='0.65'/%3E%3C/svg%3E");
+  background-color:#111827;
+  background-size:cover;
+  /* Stone brick wall: 3 rows, alternating offset, highlight+shadow per brick, crack */
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Crect width='18' height='18' fill='%23111827'/%3E%3Crect x='1' y='1' width='7' height='5' fill='%231e2a3e'/%3E%3Crect x='1' y='1' width='7' height='1' fill='%23283548' opacity='.9'/%3E%3Crect x='1' y='5' width='7' height='1' fill='%230c1220' opacity='.9'/%3E%3Crect x='9' y='1' width='8' height='5' fill='%231c2840'/%3E%3Crect x='9' y='1' width='8' height='1' fill='%23283548' opacity='.9'/%3E%3Crect x='9' y='5' width='8' height='1' fill='%230c1220' opacity='.9'/%3E%3Crect x='1' y='7' width='4' height='5' fill='%231d293d'/%3E%3Crect x='1' y='7' width='4' height='1' fill='%23283548' opacity='.9'/%3E%3Crect x='1' y='11' width='4' height='1' fill='%230c1220' opacity='.9'/%3E%3Crect x='6' y='7' width='7' height='5' fill='%231e2a3e'/%3E%3Crect x='6' y='7' width='7' height='1' fill='%23293649' opacity='.9'/%3E%3Crect x='6' y='11' width='7' height='1' fill='%230c1220' opacity='.9'/%3E%3Crect x='14' y='7' width='3' height='5' fill='%231c2840'/%3E%3Crect x='14' y='7' width='3' height='1' fill='%23283548' opacity='.9'/%3E%3Crect x='14' y='11' width='3' height='1' fill='%230c1220' opacity='.9'/%3E%3Crect x='1' y='13' width='7' height='4' fill='%231e2a3e'/%3E%3Crect x='1' y='13' width='7' height='1' fill='%23283548' opacity='.9'/%3E%3Crect x='9' y='13' width='8' height='4' fill='%231c2840'/%3E%3Crect x='9' y='13' width='8' height='1' fill='%23283548' opacity='.9'/%3E%3Cpath d='M11 2L12.5 4L11 6' stroke='%2308101c' stroke-width='.6' fill='none' opacity='.8'/%3E%3C/svg%3E");
 }
 .tileFloor{
-  background-color:rgba(15,23,42,.65);
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Crect x='1' y='1' width='16' height='16' rx='3' fill='%230f172a' opacity='0.80'/%3E%3Ccircle cx='6' cy='7' r='1' fill='%2338bdf8' opacity='0.20'/%3E%3Ccircle cx='12' cy='11' r='1' fill='%23e2e8f0' opacity='0.15'/%3E%3Ccircle cx='9' cy='13' r='1' fill='%23818cf8' opacity='0.15'/%3E%3C/svg%3E");
+  background-color:#0a0f1a;
+  /* Stone flagstone floor: 4 irregular flags with mortar lines and subtle cracks */
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Crect width='18' height='18' fill='%230a0f1a'/%3E%3Crect x='1' y='1' width='8' height='7' fill='%230f172a' rx='.2'/%3E%3Crect x='1' y='1' width='8' height='1' fill='%23162035' opacity='.5'/%3E%3Crect x='10' y='1' width='7' height='7' fill='%230e1628' rx='.2'/%3E%3Crect x='10' y='1' width='7' height='1' fill='%23162035' opacity='.4'/%3E%3Crect x='1' y='9' width='5' height='8' fill='%230f172a' rx='.2'/%3E%3Crect x='1' y='9' width='5' height='1' fill='%23162035' opacity='.5'/%3E%3Crect x='7' y='9' width='10' height='8' fill='%230d1526' rx='.2'/%3E%3Crect x='7' y='9' width='10' height='1' fill='%23162035' opacity='.4'/%3E%3Cpath d='M4 3L3 5' stroke='%23060d18' stroke-width='.4' opacity='.5'/%3E%3Cpath d='M14 13L15 15' stroke='%23060d18' stroke-width='.4' opacity='.4'/%3E%3C/svg%3E");
 }
 .tilePlayer{
   background-color:rgba(56,189,248,.25);
@@ -801,6 +804,8 @@ body{
   transform:scale(0.90);
 }
 .dpadCenter{font-size:26px;color:var(--muted)}
+.dpadDiag{font-size:18px;opacity:0.65;}
+.dpadDiag:active{opacity:1;}
 
 @media (max-width: 980px){
   .dpad{display:flex}
