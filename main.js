@@ -12,7 +12,7 @@
     Corpse: "%", DoorClosed: "+", DoorOpen: "/", DoorLocked: "X",
   };
 
-  const SUPABASE_URL = "https://nyfoxreoogblnqptpomz.supabase.co/scores";
+  const SUPABASE_URL = "https://nyfoxreoogblnqptpomz.supabase.co";
   const SUPABASE_KEY = "sb_publishable_2RFiYJ5GGivIBfJNsp_LLw_qWkxe0s1";
 
   /** @typedef {{x:number,y:number}} Pos */
