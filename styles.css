@@ -190,54 +190,49 @@ body{
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Cpath d='M9 15V7' stroke='%2334d399' stroke-width='2.5' stroke-linecap='round'/%3E%3Cpath d='M5.5 8.5 9 5l3.5 3.5' fill='none' stroke='%2334d399' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Crect x='3' y='2' width='12' height='2' rx='1' fill='%2334d399' opacity='0.8'/%3E%3C/svg%3E");
   animation: floatStairs 2.5s infinite ease-in-out;
 }
+.tileEnemyG, .tileEnemyO, .tileEnemyS, .tileEnemySK, .tileEnemyV, .tileEnemyTR, .tileEnemyD {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 18px;
+  position: relative;
+  z-index: 5;
+}
 .tileEnemyG{
   background-color:rgba(251,191,36,.15);
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Cpath d='M4 13c0-4 2.5-7 5-7s5 3 5 7' fill='%23fbbf24'/%3E%3Ccircle cx='7' cy='9' r='1.2' fill='%230f172a' opacity='0.8'/%3E%3Ccircle cx='11' cy='9' r='1.2' fill='%230f172a' opacity='0.8'/%3E%3Cpath d='M5.5 5l2.5 2M12.5 5l-2.5 2' stroke='%23f59e0b' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E");
+  color: #fbbf24;
   animation: breatheDanger 3s infinite ease-in-out;
-  z-index: 5;
-  position: relative;
 }
 .tileEnemyO{
   background-color:rgba(248,113,113,.15);
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Crect x='3' y='4' width='12' height='11' rx='3' fill='%23f87171'/%3E%3Cpath d='M5.5 6.5l2.5 2M12.5 6.5l-2.5 2' stroke='%23fecaca' stroke-width='1.6' stroke-linecap='round'/%3E%3Cpath d='M6 12h6' stroke='%230f172a' stroke-width='2' stroke-linecap='round' opacity='0.7'/%3E%3C/svg%3E");
+  color: #f87171;
   animation: breatheDanger 3.2s infinite ease-in-out;
-  z-index: 5;
-  position: relative;
 }
 .tileEnemyS{
   background-color:rgba(167,139,250,.15);
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Cpath d='M3 13c0-4.5 3-8 6-8s6 3.5 6 8c0 2-1.5 3-3 3H6C4.5 16 3 15 3 13Z' fill='%23a78bfa'/%3E%3Ccircle cx='7' cy='10' r='1.2' fill='%23ddd6fe' opacity='0.9'/%3E%3Ccircle cx='11' cy='10' r='1.2' fill='%23ddd6fe' opacity='0.9'/%3E%3C/svg%3E");
+  color: #a78bfa;
   animation: breatheDanger 2.8s infinite ease-in-out;
-  z-index: 5;
-  position: relative;
 }
 .tileEnemySK{
   background-color:rgba(226,232,240,.15);
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Ccircle cx='9' cy='7' r='4' fill='%23e2e8f0'/%3E%3Cpath d='M7 11h4v4H7z' fill='%23e2e8f0'/%3E%3Ccircle cx='7.5' cy='7' r='1.2' fill='%230f172a'/%3E%3Ccircle cx='10.5' cy='7' r='1.2' fill='%230f172a'/%3E%3C/svg%3E");
+  color: #e2e8f0;
   animation: breatheDanger 3.5s infinite ease-in-out;
-  z-index: 5;
-  position: relative;
 }
 .tileEnemyV{
   background-color:rgba(225,29,72,.15);
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Cpath d='M4 14L9 3l5 11z' fill='%23e11d48'/%3E%3Ccircle cx='7.5' cy='10' r='1.2' fill='%230f172a'/%3E%3Ccircle cx='10.5' cy='10' r='1.2' fill='%230f172a'/%3E%3C/svg%3E");
+  color: #e11d48;
   animation: breatheDanger 2.9s infinite ease-in-out;
-  z-index: 5;
-  position: relative;
 }
 .tileEnemyTR{
   background-color:rgba(21,128,61,.15);
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Crect x='2' y='4' width='14' height='12' rx='2' fill='%2315803d'/%3E%3Cpath d='M6 8h2v2H6zm4 0h2v2h-2z' fill='%230f172a'/%3E%3C/svg%3E");
+  color: #22c55e;
   animation: breatheDanger 3.4s infinite ease-in-out;
-  z-index: 5;
-  position: relative;
 }
 .tileEnemyD{
   background-color:rgba(153,27,27,.15);
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Cpath d='M9 2L2 8v8h14V8z' fill='%23b91c1c'/%3E%3Cpath d='M7 9l1 1-1 1M11 9l-1 1 1 1' stroke='%230f172a' stroke-width='2'/%3E%3C/svg%3E");
+  color: #ef4444;
   animation: breatheDanger 2.7s infinite ease-in-out;
-  z-index: 5;
-  position: relative;
 }
 
 .tileCorpse{
@@ -368,8 +363,8 @@ body{
   opacity: 0.05;
 }
 .cell.fogExplored{
-  filter: grayscale(0.7) brightness(0.4);
-  opacity: 0.5;
+  filter: brightness(0.9);
+  opacity: 0.9;
 }
 .cell.fogVisible{
   opacity: 1;
