@@ -1,8 +1,10 @@
 (() => {
   "use strict";
 
-  const GRID_W    = 21;
-  const GRID_H    = 21;
+  const LEVEL_W   = 61;
+  const VIEW_W    = 21;
+  const LEVEL_H   = 61;
+  const VIEW_H    = 21;
   const ARMOR_MAX = 5;
 
   const Tile = {
@@ -39,8 +41,8 @@
   let combatRng;
 
   function clamp(n, a, b) { return Math.max(a, Math.min(b, n)); }
-  function idx(x, y)      { return y * GRID_W + x; }
-  function inBounds(x, y) { return x >= 0 && y >= 0 && x < GRID_W && y < GRID_H; }
+  function idx(x, y)      { return y * LEVEL_W + x; }
+  function inBounds(x, y) { return x >= 0 && y >= 0 && x < LEVEL_W && y < LEVEL_H; }
 
   function mulberry32(seed) {
     let a = seed >>> 0;
@@ -73,8 +75,8 @@
   function isBlockingTile(t) { return t === Tile.Wall || t === Tile.DoorClosed; }
 
   function ensureBorderWalls(tiles) {
-    for (let x = 0; x < GRID_W; x++) { tiles[idx(x, 0)] = Tile.Wall; tiles[idx(x, GRID_H-1)] = Tile.Wall; }
-    for (let y = 0; y < GRID_H; y++) { tiles[idx(0, y)] = Tile.Wall; tiles[idx(GRID_W-1, y)] = Tile.Wall; }
+    for (let x = 0; x < LEVEL_W; x++) { tiles[idx(x, 0)] = Tile.Wall; tiles[idx(x, LEVEL_H-1)] = Tile.Wall; }
+    for (let y = 0; y < LEVEL_H; y++) { tiles[idx(0, y)] = Tile.Wall; tiles[idx(LEVEL_W-1, y)] = Tile.Wall; }
   }
 
   function rectsOverlap(a, b, pad = 0) {
@@ -146,7 +148,7 @@
     for (let i = 0; i < tiles.length; i++) {
       if (tiles[i] !== Tile.DoorClosed) continue;
       ex.add(i);
-      const px = i % GRID_W, py = (i / GRID_W) | 0;
+      const px = i % LEVEL_W, py = (i / LEVEL_W) | 0;
       for (const n of neighbors4({ x: px, y: py }))
         if (inBounds(n.x, n.y)) ex.add(idx(n.x, n.y));
     }
@@ -182,14 +184,14 @@
     const seed = mixSeed(baseSeed, depth);
     const rng  = mulberry32(seed);
 
-    const tiles = new Array(GRID_W * GRID_H).fill(Tile.Wall);
+    const tiles = new Array(LEVEL_W * LEVEL_H).fill(Tile.Wall);
     ensureBorderWalls(tiles);
 
     const rooms = [];
-    const targetRooms = clamp(5 + Math.floor(depth * 0.15), 5, 9);
+    const targetRooms = clamp(15 + Math.floor(depth * 0.5), 15, 30);
     for (let tries = 0; tries < 500 && rooms.length < targetRooms; tries++) {
       const w = roll(rng, 6, 9), h = roll(rng, 6, 9);
-      const x = roll(rng, 1, GRID_W-w-2), y = roll(rng, 1, GRID_H-h-2);
+      const x = roll(rng, 1, LEVEL_W-w-2), y = roll(rng, 1, LEVEL_H-h-2);
       const room = { x, y, w, h, cx: (x+((w/2)|0))|0, cy: (y+((h/2)|0))|0 };
       if (rooms.some(r => rectsOverlap(r, room, 2))) continue;
       carveRoom(tiles, room);
@@ -230,8 +232,16 @@
     tiles[idx(playerStart.x, playerStart.y)] = Tile.Floor;
 
     // Itens
+    const chunkId = Math.floor((depth - 1) / 10);
+    const chunkRng = mulberry32(baseSeed ^ chunkId ^ 0x9A7E);
+    const d1 = roll(chunkRng, 1, 10);
+    const d2 = roll(chunkRng, 1, 10);
+    const depthInChunk = ((depth - 1) % 10) + 1;
+    const isSpecialLevel = (depthInChunk === d1 || depthInChunk === d2);
+    let specialsSpawned = 0;
+
     const items = [];
-    const itemCount = clamp(2 + Math.floor(depth * 0.15), 2, 6);
+    const itemCount = clamp(4 + Math.floor(depth * 0.3), 4, 12);
     const occItems = new Set([...nearDoor, idx(playerStart.x, playerStart.y), idx(down.x, down.y), idx(up.x, up.y)]);
     for (let i = 0; i < itemCount; i++) {
       let pos = null;
@@ -242,7 +252,13 @@
         occItems.add(ii); pos = p; break;
       }
       if (!pos) break;
-      const tp = choose(rng, [ITEM_TYPES.potion, ITEM_TYPES.armor, ITEM_TYPES.charm]);
+      
+      let tp = ITEM_TYPES.potion;
+      if (isSpecialLevel && specialsSpawned < 1 && rng() < 0.6) {
+        tp = choose(rng, [ITEM_TYPES.armor, ITEM_TYPES.charm]);
+        specialsSpawned++;
+      }
+      
       items.push({ id: `${depth}-${seed}-it-${i}-${tp.id}`, typeId: tp.id, name: tp.name, cssClass: tp.cssClass, pos });
     }
 
@@ -262,7 +278,7 @@
 
     // Inimigos
     const enemies = [];
-    const enemyCount = clamp(4 + Math.floor(depth * 0.35), 4, 14);
+    const enemyCount = clamp(12 + Math.floor(depth * 0.8), 12, 35);
     const occEnemies = new Set([...nearDoor, idx(playerStart.x, playerStart.y), idx(down.x, down.y), idx(up.x, up.y)]);
     for (let i = 0; i < enemyCount; i++) {
       let pos = null;
@@ -280,7 +296,7 @@
       });
     }
 
-    return { depth, seed, tiles, playerStart, up, down, enemies, items, explored: new Uint8Array(GRID_W * GRID_H) };
+    return { depth, seed, tiles, playerStart, up, down, enemies, items, explored: new Uint8Array(LEVEL_W * LEVEL_H) };
   }
 
   // ── Sons (Web Audio API) ─────────────────────────────────────────────────────
@@ -365,7 +381,7 @@
   const scoresEl        = el("scores");
 
   const cells = [];
-  for (let i = 0; i < GRID_W * GRID_H; i++) {
+  for (let i = 0; i < VIEW_W * VIEW_H; i++) {
     const c = document.createElement("div");
     c.className = "cell tileFloor";
     cells.push(c);
@@ -665,7 +681,7 @@
   }
 
   function computeFov(level, origin, radius) {
-    const visible = new Uint8Array(GRID_W * GRID_H);
+    const visible = new Uint8Array(LEVEL_W * LEVEL_H);
     const r2 = radius * radius;
     for (let y = origin.y - radius; y <= origin.y + radius; y++) {
       for (let x = origin.x - radius; x <= origin.x + radius; x++) {
@@ -685,14 +701,14 @@
 
   function bfsNextStep(level, from, to, blocked) {
     const startI = idx(from.x, from.y), goalI = idx(to.x, to.y);
-    const prev = new Int32Array(GRID_W * GRID_H).fill(-1);
-    const q    = new Int32Array(GRID_W * GRID_H);
+    const prev = new Int32Array(LEVEL_W * LEVEL_H).fill(-1);
+    const q    = new Int32Array(LEVEL_W * LEVEL_H);
     let qh = 0, qt = 0;
     q[qt++] = startI; prev[startI] = startI;
     while (qh < qt) {
       const curI = q[qh++];
       if (curI === goalI) break;
-      const cx = curI % GRID_W, cy = (curI / GRID_W) | 0;
+      const cx = curI % LEVEL_W, cy = (curI / LEVEL_W) | 0;
       for (const [nx, ny] of [[cx+1,cy],[cx-1,cy],[cx,cy+1],[cx,cy-1]]) {
         if (!inBounds(nx, ny)) continue;
         const ni = idx(nx, ny);
@@ -703,7 +719,7 @@
     if (prev[goalI] === -1) return null;
     let cur = goalI, p = prev[cur];
     while (p !== startI && p !== cur) { cur = p; p = prev[cur]; }
-    return { x: cur % GRID_W, y: (cur / GRID_W) | 0 };
+    return { x: cur % LEVEL_W, y: (cur / LEVEL_W) | 0 };
   }
 
   function enemiesTurn() {
@@ -783,27 +799,48 @@
 
     const visible = computeFov(lvl, state.pos, 8);
 
-    for (let y = 0; y < GRID_H; y++) {
-      for (let x = 0; x < GRID_W; x++) {
-        const i   = idx(x, y);
-        const fog = visible[i] ? "fogVisible" : lvl.explored[i] ? "fogExplored" : "fogHidden";
-        cells[i].className = `cell ${cellForTile(lvl.tiles[i])} ${fog}`;
-        cells[i].textContent = "";
+    let startX = state.pos.x - Math.floor(VIEW_W / 2);
+    let startY = state.pos.y - Math.floor(VIEW_H / 2);
+    
+    startX = clamp(startX, 0, LEVEL_W - VIEW_W);
+    startY = clamp(startY, 0, LEVEL_H - VIEW_H);
+
+    for (let vy = 0; vy < VIEW_H; vy++) {
+      for (let vx = 0; vx < VIEW_W; vx++) {
+        const lx = startX + vx;
+        const ly = startY + vy;
+        const vi = vy * VIEW_W + vx;
+        const li = idx(lx, ly);
+        
+        const fog = visible[li] ? "fogVisible" : lvl.explored[li] ? "fogExplored" : "fogHidden";
+        cells[vi].className = `cell ${cellForTile(lvl.tiles[li])} ${fog}`;
+        cells[vi].textContent = "";
       }
     }
+
     for (const it of lvl.items) {
-      const i = idx(it.pos.x, it.pos.y);
-      if (!visible[i]) continue;
-      cells[i].className = `cell ${it.cssClass} fogVisible`;
+      if (it.pos.x >= startX && it.pos.x < startX + VIEW_W && it.pos.y >= startY && it.pos.y < startY + VIEW_H) {
+        const li = idx(it.pos.x, it.pos.y);
+        const vi = (it.pos.y - startY) * VIEW_W + (it.pos.x - startX);
+        if (!visible[li]) continue;
+        cells[vi].className = `cell ${it.cssClass} fogVisible`;
+      }
     }
+    
     for (const e of lvl.enemies) {
       if (e.hp <= 0) continue;
-      const i = idx(e.pos.x, e.pos.y);
-      if (!visible[i]) continue;
-      cells[i].className = `cell ${e.cssClass}`;
+      if (e.pos.x >= startX && e.pos.x < startX + VIEW_W && e.pos.y >= startY && e.pos.y < startY + VIEW_H) {
+        const li = idx(e.pos.x, e.pos.y);
+        const vi = (e.pos.y - startY) * VIEW_W + (e.pos.x - startX);
+        if (!visible[li]) continue;
+        cells[vi].className = `cell ${e.cssClass}`;
+      }
     }
-    const pi = idx(state.pos.x, state.pos.y);
-    cells[pi].className = "cell tilePlayer";
+    
+    if (state.pos.x >= startX && state.pos.x < startX + VIEW_W && state.pos.y >= startY && state.pos.y < startY + VIEW_H) {
+      const vi = (state.pos.y - startY) * VIEW_W + (state.pos.x - startX);
+      cells[vi].className = "cell tilePlayer";
+    }
 
     renderInventory();
   }
