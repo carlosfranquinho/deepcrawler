@@ -910,8 +910,8 @@
         const li = idx(e.pos.x, e.pos.y);
         const vi = (e.pos.y - startY) * VIEW_W + (e.pos.x - startX);
         if (!visible[li]) continue;
-        cells[vi].className = `cell ${e.cssClass}`;
-        cells[vi].textContent = e.glyph;
+        cells[vi].className = `cell ${e.cssClass} tileEnemy-${e.typeId}`;
+        cells[vi].textContent = "";
       }
     }
     

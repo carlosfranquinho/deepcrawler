@@ -1,0 +1,224 @@
+.tileEnemy-ratazana_de_esgoto {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Cpath%20d%3D%27M2%209l3-2c1-3%207-3%208%200l3%202-2%203c0%203-3%204-6%204s-6-1-6-4z%27%20fill%3D%27%23fbbf24%27/%3E%3Ccircle%20cx%3D%277%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3Ccircle%20cx%3D%2711%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3Cpath%20d%3D%27M6%2012l1-2h4l1%202%27%20stroke%3D%27%230f172a%27%20stroke-width%3D%271%27%20fill%3D%27none%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-morcego_das_cavernas {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Cpath%20d%3D%27M4%207l2-4%203%202%203-2%202%204v4c0%203-2%205-5%205s-5-2-5-5z%27%20fill%3D%27%23fbbf24%27/%3E%3Ccircle%20cx%3D%277%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3Ccircle%20cx%3D%2711%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-chacal {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Cpath%20d%3D%27M4%207l2-4%203%202%203-2%202%204v4c0%203-2%205-5%205s-5-2-5-5z%27%20fill%3D%27%23fbbf24%27/%3E%3Ccircle%20cx%3D%277%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3Ccircle%20cx%3D%2711%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-gnomo_das_trevas {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Cpath%20d%3D%27M2%209l3-2c1-3%207-3%208%200l3%202-2%203c0%203-3%204-6%204s-6-1-6-4z%27%20fill%3D%27%23fbbf24%27/%3E%3Ccircle%20cx%3D%277%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3Ccircle%20cx%3D%2711%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3Cpath%20d%3D%27M6%2012l1-2h4l1%202%27%20stroke%3D%27%230f172a%27%20stroke-width%3D%271%27%20fill%3D%27none%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-homunculo {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Cpath%20d%3D%27M2%209l3-2c1-3%207-3%208%200l3%202-2%203c0%203-3%204-6%204s-6-1-6-4z%27%20fill%3D%27%23fbbf24%27/%3E%3Ccircle%20cx%3D%277%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3Ccircle%20cx%3D%2711%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3Cpath%20d%3D%27M6%2012l1-2h4l1%202%27%20stroke%3D%27%230f172a%27%20stroke-width%3D%271%27%20fill%3D%27none%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-raposa {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Cpath%20d%3D%27M4%207l2-4%203%202%203-2%202%204v4c0%203-2%205-5%205s-5-2-5-5z%27%20fill%3D%27%23fbbf24%27/%3E%3Ccircle%20cx%3D%277%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3Ccircle%20cx%3D%2711%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-formiga_gigante {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Crect%20x%3D%273%27%20y%3D%273%27%20width%3D%2712%27%20height%3D%2712%27%20rx%3D%272%27%20fill%3D%27%23fbbf24%27/%3E%3Cpath%20d%3D%27M5%207h8v2H5z%27%20fill%3D%27%230f172a%27/%3E%3Cpath%20d%3D%27M6%2012h6%27%20stroke%3D%27%230f172a%27%20stroke-width%3D%271.5%27%20stroke-linecap%3D%27round%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-bolha_acida {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Cpath%20d%3D%27M3%2013c0-4.5%203-8%206-8s6%203.5%206%208c0%202-1.5%203-3%203H6C4.5%2016%203%2015%203%2013Z%27%20fill%3D%27%23fbbf24%27/%3E%3Ccircle%20cx%3D%277%27%20cy%3D%2710%27%20r%3D%271.2%27%20fill%3D%27%230f172a%27%20opacity%3D%270.9%27/%3E%3Ccircle%20cx%3D%2711%27%20cy%3D%2710%27%20r%3D%271.2%27%20fill%3D%27%230f172a%27%20opacity%3D%270.9%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-lagarto_das_rochas {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Cpath%20d%3D%27M2%209l3-2c1-3%207-3%208%200l3%202-2%203c0%203-3%204-6%204s-6-1-6-4z%27%20fill%3D%27%23fbbf24%27/%3E%3Ccircle%20cx%3D%277%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3Ccircle%20cx%3D%2711%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3Cpath%20d%3D%27M6%2012l1-2h4l1%202%27%20stroke%3D%27%230f172a%27%20stroke-width%3D%271%27%20fill%3D%27none%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-luz_amarela {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Cpath%20d%3D%27M2%209l3-2c1-3%207-3%208%200l3%202-2%203c0%203-3%204-6%204s-6-1-6-4z%27%20fill%3D%27%23fbbf24%27/%3E%3Ccircle%20cx%3D%277%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3Ccircle%20cx%3D%2711%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3Cpath%20d%3D%27M6%2012l1-2h4l1%202%27%20stroke%3D%27%230f172a%27%20stroke-width%3D%271%27%20fill%3D%27none%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-lobo_selvagem {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Cpath%20d%3D%27M4%207l2-4%203%202%203-2%202%204v4c0%203-2%205-5%205s-5-2-5-5z%27%20fill%3D%27%23fbbf24%27/%3E%3Ccircle%20cx%3D%277%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3Ccircle%20cx%3D%2711%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-goblin {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Cpath%20d%3D%27M2%209l3-2c1-3%207-3%208%200l3%202-2%203c0%203-3%204-6%204s-6-1-6-4z%27%20fill%3D%27%23fbbf24%27/%3E%3Ccircle%20cx%3D%277%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3Ccircle%20cx%3D%2711%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3Cpath%20d%3D%27M6%2012l1-2h4l1%202%27%20stroke%3D%27%230f172a%27%20stroke-width%3D%271%27%20fill%3D%27none%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-serpente {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Cpath%20d%3D%27M2%209l3-2c1-3%207-3%208%200l3%202-2%203c0%203-3%204-6%204s-6-1-6-4z%27%20fill%3D%27%23fbbf24%27/%3E%3Ccircle%20cx%3D%277%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3Ccircle%20cx%3D%2711%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3Cpath%20d%3D%27M6%2012l1-2h4l1%202%27%20stroke%3D%27%230f172a%27%20stroke-width%3D%271%27%20fill%3D%27none%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-orc {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Cpath%20d%3D%27M2%209l3-2c1-3%207-3%208%200l3%202-2%203c0%203-3%204-6%204s-6-1-6-4z%27%20fill%3D%27%23fbbf24%27/%3E%3Ccircle%20cx%3D%277%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3Ccircle%20cx%3D%2711%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3Cpath%20d%3D%27M6%2012l1-2h4l1%202%27%20stroke%3D%27%230f172a%27%20stroke-width%3D%271%27%20fill%3D%27none%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-perfurador_de_rocha {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Crect%20x%3D%273%27%20y%3D%273%27%20width%3D%2712%27%20height%3D%2712%27%20rx%3D%272%27%20fill%3D%27%23f87171%27/%3E%3Cpath%20d%3D%27M5%207h8v2H5z%27%20fill%3D%27%230f172a%27/%3E%3Cpath%20d%3D%27M6%2012h6%27%20stroke%3D%27%230f172a%27%20stroke-width%3D%271.5%27%20stroke-linecap%3D%27round%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-geleia_ocre {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Cpath%20d%3D%27M3%2013c0-4.5%203-8%206-8s6%203.5%206%208c0%202-1.5%203-3%203H6C4.5%2016%203%2015%203%2013Z%27%20fill%3D%27%23f87171%27/%3E%3Ccircle%20cx%3D%277%27%20cy%3D%2710%27%20r%3D%271.2%27%20fill%3D%27%230f172a%27%20opacity%3D%270.9%27/%3E%3Ccircle%20cx%3D%2711%27%20cy%3D%2710%27%20r%3D%271.2%27%20fill%3D%27%230f172a%27%20opacity%3D%270.9%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-besta_chifruda {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Cpath%20d%3D%27M4%207l2-4%203%202%203-2%202%204v4c0%203-2%205-5%205s-5-2-5-5z%27%20fill%3D%27%23f87171%27/%3E%3Ccircle%20cx%3D%277%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3Ccircle%20cx%3D%2711%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-urso_coruja {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Cpath%20d%3D%27M4%207l2-4%203%202%203-2%202%204v4c0%203-2%205-5%205s-5-2-5-5z%27%20fill%3D%27%23f87171%27/%3E%3Ccircle%20cx%3D%277%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3Ccircle%20cx%3D%2711%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-tigre_dentes_de_sabre {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Cpath%20d%3D%27M4%207l2-4%203%202%203-2%202%204v4c0%203-2%205-5%205s-5-2-5-5z%27%20fill%3D%27%23f87171%27/%3E%3Ccircle%20cx%3D%277%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3Ccircle%20cx%3D%2711%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-geleia_azul {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Cpath%20d%3D%27M3%2013c0-4.5%203-8%206-8s6%203.5%206%208c0%202-1.5%203-3%203H6C4.5%2016%203%2015%203%2013Z%27%20fill%3D%27%23f87171%27/%3E%3Ccircle%20cx%3D%277%27%20cy%3D%2710%27%20r%3D%271.2%27%20fill%3D%27%230f172a%27%20opacity%3D%270.9%27/%3E%3Ccircle%20cx%3D%2711%27%20cy%3D%2710%27%20r%3D%271.2%27%20fill%3D%27%230f172a%27%20opacity%3D%270.9%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-soldado_anao {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Cpath%20d%3D%27M2%209l3-2c1-3%207-3%208%200l3%202-2%203c0%203-3%204-6%204s-6-1-6-4z%27%20fill%3D%27%23f87171%27/%3E%3Ccircle%20cx%3D%277%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3Ccircle%20cx%3D%2711%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3Cpath%20d%3D%27M6%2012l1-2h4l1%202%27%20stroke%3D%27%230f172a%27%20stroke-width%3D%271%27%20fill%3D%27none%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-duende_ladrao {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Cpath%20d%3D%27M2%209l3-2c1-3%207-3%208%200l3%202-2%203c0%203-3%204-6%204s-6-1-6-4z%27%20fill%3D%27%23f87171%27/%3E%3Ccircle%20cx%3D%277%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3Ccircle%20cx%3D%2711%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3Cpath%20d%3D%27M6%2012l1-2h4l1%202%27%20stroke%3D%27%230f172a%27%20stroke-width%3D%271%27%20fill%3D%27none%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-mumia_humana {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Ccircle%20cx%3D%279%27%20cy%3D%277%27%20r%3D%274%27%20fill%3D%27%23f87171%27/%3E%3Cpath%20d%3D%27M7%2011h4v3H7z%27%20fill%3D%27%23f87171%27/%3E%3Ccircle%20cx%3D%277.5%27%20cy%3D%277%27%20r%3D%271.2%27%20fill%3D%27%230f172a%27/%3E%3Ccircle%20cx%3D%2710.5%27%20cy%3D%277%27%20r%3D%271.2%27%20fill%3D%27%230f172a%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-mimico {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Cpath%20d%3D%27M2%209l3-2c1-3%207-3%208%200l3%202-2%203c0%203-3%204-6%204s-6-1-6-4z%27%20fill%3D%27%23f87171%27/%3E%3Ccircle%20cx%3D%277%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3Ccircle%20cx%3D%2711%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3Cpath%20d%3D%27M6%2012l1-2h4l1%202%27%20stroke%3D%27%230f172a%27%20stroke-width%3D%271%27%20fill%3D%27none%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-gnomo_feiticeiro {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Cpath%20d%3D%27M9%202L2%208v8h14V8z%27%20fill%3D%27%23e2e8f0%27/%3E%3Cpath%20d%3D%27M7%209l1%201-1%201M11%209l-1%201%201%201%27%20stroke%3D%27%230f172a%27%20stroke-width%3D%271.5%27/%3E%3Cpath%20d%3D%27M5%204l1%203M13%204l-1%203%27%20stroke%3D%27%23e2e8f0%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-ogre {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Crect%20x%3D%273%27%20y%3D%273%27%20width%3D%2712%27%20height%3D%2712%27%20rx%3D%272%27%20fill%3D%27%23e2e8f0%27/%3E%3Cpath%20d%3D%27M5%207h8v2H5z%27%20fill%3D%27%230f172a%27/%3E%3Cpath%20d%3D%27M6%2012h6%27%20stroke%3D%27%230f172a%27%20stroke-width%3D%271.5%27%20stroke-linecap%3D%27round%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-inseto_eletrico {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Ccircle%20cx%3D%279%27%20cy%3D%279%27%20r%3D%273%27%20fill%3D%27%23e2e8f0%27/%3E%3Cpath%20d%3D%27M3%209h12M9%203v12M5%205l8%208M5%2013l8-8%27%20stroke%3D%27%23e2e8f0%27%20stroke-width%3D%271.5%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-limo_verde {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Cpath%20d%3D%27M3%2013c0-4.5%203-8%206-8s6%203.5%206%208c0%202-1.5%203-3%203H6C4.5%2016%203%2015%203%2013Z%27%20fill%3D%27%23e2e8f0%27/%3E%3Ccircle%20cx%3D%277%27%20cy%3D%2710%27%20r%3D%271.2%27%20fill%3D%27%230f172a%27%20opacity%3D%270.9%27/%3E%3Ccircle%20cx%3D%2711%27%20cy%3D%2710%27%20r%3D%271.2%27%20fill%3D%27%230f172a%27%20opacity%3D%270.9%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-gigante_das_colinas {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Crect%20x%3D%273%27%20y%3D%273%27%20width%3D%2712%27%20height%3D%2712%27%20rx%3D%272%27%20fill%3D%27%23e2e8f0%27/%3E%3Cpath%20d%3D%27M5%207h8v2H5z%27%20fill%3D%27%230f172a%27/%3E%3Cpath%20d%3D%27M6%2012h6%27%20stroke%3D%27%230f172a%27%20stroke-width%3D%271.5%27%20stroke-linecap%3D%27round%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-brutamontes {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Crect%20x%3D%273%27%20y%3D%273%27%20width%3D%2712%27%20height%3D%2712%27%20rx%3D%272%27%20fill%3D%27%2322c55e%27/%3E%3Cpath%20d%3D%27M5%207h8v2H5z%27%20fill%3D%27%230f172a%27/%3E%3Cpath%20d%3D%27M6%2012h6%27%20stroke%3D%27%230f172a%27%20stroke-width%3D%271.5%27%20stroke-linecap%3D%27round%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-troll {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Crect%20x%3D%273%27%20y%3D%273%27%20width%3D%2712%27%20height%3D%2712%27%20rx%3D%272%27%20fill%3D%27%2322c55e%27/%3E%3Cpath%20d%3D%27M5%207h8v2H5z%27%20fill%3D%27%230f172a%27/%3E%3Cpath%20d%3D%27M6%2012h6%27%20stroke%3D%27%230f172a%27%20stroke-width%3D%271.5%27%20stroke-linecap%3D%27round%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-elemental_do_fogo {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Cpath%20d%3D%27M2%209l3-2c1-3%207-3%208%200l3%202-2%203c0%203-3%204-6%204s-6-1-6-4z%27%20fill%3D%27%2322c55e%27/%3E%3Ccircle%20cx%3D%277%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3Ccircle%20cx%3D%2711%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3Cpath%20d%3D%27M6%2012l1-2h4l1%202%27%20stroke%3D%27%230f172a%27%20stroke-width%3D%271%27%20fill%3D%27none%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-basilisco {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Cpath%20d%3D%27M2%209l3-2c1-3%207-3%208%200l3%202-2%203c0%203-3%204-6%204s-6-1-6-4z%27%20fill%3D%27%2322c55e%27/%3E%3Ccircle%20cx%3D%277%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3Ccircle%20cx%3D%2711%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3Cpath%20d%3D%27M6%2012l1-2h4l1%202%27%20stroke%3D%27%230f172a%27%20stroke-width%3D%271%27%20fill%3D%27none%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-sombra_veloz {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Cpath%20d%3D%27M2%209l3-2c1-3%207-3%208%200l3%202-2%203c0%203-3%204-6%204s-6-1-6-4z%27%20fill%3D%27%2322c55e%27/%3E%3Ccircle%20cx%3D%277%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3Ccircle%20cx%3D%2711%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3Cpath%20d%3D%27M6%2012l1-2h4l1%202%27%20stroke%3D%27%230f172a%27%20stroke-width%3D%271%27%20fill%3D%27none%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-capitao_de_patrulha {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Cpath%20d%3D%27M2%209l3-2c1-3%207-3%208%200l3%202-2%203c0%203-3%204-6%204s-6-1-6-4z%27%20fill%3D%27%2322c55e%27/%3E%3Ccircle%20cx%3D%277%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3Ccircle%20cx%3D%2711%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3Cpath%20d%3D%27M6%2012l1-2h4l1%202%27%20stroke%3D%27%230f172a%27%20stroke-width%3D%271%27%20fill%3D%27none%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-carnical {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Ccircle%20cx%3D%279%27%20cy%3D%277%27%20r%3D%274%27%20fill%3D%27%2322c55e%27/%3E%3Cpath%20d%3D%27M7%2011h4v3H7z%27%20fill%3D%27%2322c55e%27/%3E%3Ccircle%20cx%3D%277.5%27%20cy%3D%277%27%20r%3D%271.2%27%20fill%3D%27%230f172a%27/%3E%3Ccircle%20cx%3D%2710.5%27%20cy%3D%277%27%20r%3D%271.2%27%20fill%3D%27%230f172a%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-vampiro {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Cpath%20d%3D%27M9%202L2%208v8h14V8z%27%20fill%3D%27%23e11d48%27/%3E%3Cpath%20d%3D%27M7%209l1%201-1%201M11%209l-1%201%201%201%27%20stroke%3D%27%230f172a%27%20stroke-width%3D%271.5%27/%3E%3Cpath%20d%3D%27M5%204l1%203M13%204l-1%203%27%20stroke%3D%27%23e11d48%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-necromante {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Cpath%20d%3D%27M2%209l3-2c1-3%207-3%208%200l3%202-2%203c0%203-3%204-6%204s-6-1-6-4z%27%20fill%3D%27%23e11d48%27/%3E%3Ccircle%20cx%3D%277%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3Ccircle%20cx%3D%2711%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%230f172a%27/%3E%3Cpath%20d%3D%27M6%2012l1-2h4l1%202%27%20stroke%3D%27%230f172a%27%20stroke-width%3D%271%27%20fill%3D%27none%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-espectro {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Ccircle%20cx%3D%279%27%20cy%3D%277%27%20r%3D%274%27%20fill%3D%27%23e11d48%27/%3E%3Cpath%20d%3D%27M7%2011h4v3H7z%27%20fill%3D%27%23e11d48%27/%3E%3Ccircle%20cx%3D%277.5%27%20cy%3D%277%27%20r%3D%271.2%27%20fill%3D%27%230f172a%27/%3E%3Ccircle%20cx%3D%2710.5%27%20cy%3D%277%27%20r%3D%271.2%27%20fill%3D%27%230f172a%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-dragao {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Cpath%20d%3D%27M9%202L2%208v8h14V8z%27%20fill%3D%27%23e11d48%27/%3E%3Cpath%20d%3D%27M7%209l1%201-1%201M11%209l-1%201%201%201%27%20stroke%3D%27%230f172a%27%20stroke-width%3D%271.5%27/%3E%3Cpath%20d%3D%27M5%204l1%203M13%204l-1%203%27%20stroke%3D%27%23e11d48%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-balrog {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Cpath%20d%3D%27M9%202L2%208v8h14V8z%27%20fill%3D%27%23e11d48%27/%3E%3Cpath%20d%3D%27M7%209l1%201-1%201M11%209l-1%201%201%201%27%20stroke%3D%27%230f172a%27%20stroke-width%3D%271.5%27/%3E%3Cpath%20d%3D%27M5%204l1%203M13%204l-1%203%27%20stroke%3D%27%23e11d48%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-medusa {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Cpath%20d%3D%27M9%202L2%208v8h14V8z%27%20fill%3D%27%23ef4444%27/%3E%3Cpath%20d%3D%27M7%209l1%201-1%201M11%209l-1%201%201%201%27%20stroke%3D%27%230f172a%27%20stroke-width%3D%271.5%27/%3E%3Cpath%20d%3D%27M5%204l1%203M13%204l-1%203%27%20stroke%3D%27%23ef4444%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-feiticeiro_das_trevas {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Cpath%20d%3D%27M9%202L2%208v8h14V8z%27%20fill%3D%27%23ef4444%27/%3E%3Cpath%20d%3D%27M7%209l1%201-1%201M11%209l-1%201%201%201%27%20stroke%3D%27%230f172a%27%20stroke-width%3D%271.5%27/%3E%3Cpath%20d%3D%27M5%204l1%203M13%204l-1%203%27%20stroke%3D%27%23ef4444%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-vlad_o_empalador {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Cpath%20d%3D%27M9%202L2%208v8h14V8z%27%20fill%3D%27%23ef4444%27/%3E%3Cpath%20d%3D%27M7%209l1%201-1%201M11%209l-1%201%201%201%27%20stroke%3D%27%230f172a%27%20stroke-width%3D%271.5%27/%3E%3Cpath%20d%3D%27M5%204l1%203M13%204l-1%203%27%20stroke%3D%27%23ef4444%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.tileEnemy-devorador_de_almas {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Cpath%20d%3D%27M9%202L2%208v8h14V8z%27%20fill%3D%27%23ef4444%27/%3E%3Cpath%20d%3D%27M7%209l1%201-1%201M11%209l-1%201%201%201%27%20stroke%3D%27%230f172a%27%20stroke-width%3D%271.5%27/%3E%3Cpath%20d%3D%27M5%204l1%203M13%204l-1%203%27%20stroke%3D%27%23ef4444%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27/%3E%3C/svg%3E");
+  background-size: cover;
+}

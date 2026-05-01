@@ -8,14 +8,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./monsters.css" />
   </head>
   <body>
     <div class="app">
-      <header class="header">
+      <header class="header" style="flex-wrap: wrap;">
         <div class="title">
           <h1>DeepCrawler</h1>
-          <p>Roguelike por turnos numa masmorra procedural infinitamente profunda.<br>
-          <span class="muted" style="font-size: 13px;">Dica: clica na grelha para focar os controlos do teclado.</span></p>
+          <p>Roguelike por turnos numa masmorra procedural infinitamente profunda.</p>
         </div>
 
         <div class="hud">
@@ -35,24 +35,26 @@
             <button id="helpBtn" class="btn btnGhost" aria-expanded="false">Ajuda</button>
           </div>
         </div>
+        <div style="flex-basis: 100%; text-align: center; margin-top: 16px;">
+          <span class="muted" style="font-size: 13px;">Dica: clica na grelha para focar os controlos do teclado.</span>
+        </div>
       </header>
 
       <main class="main">
         <section class="panel">
           <div id="grid" class="grid" role="application" aria-label="Grelha do jogo"></div>
-          <div class="logPanel" style="box-shadow: none; border: none; padding: 0; margin-top: 16px; background: transparent;">
-            <h2>Registo</h2>
-            <div id="log" class="log" aria-live="polite" style="height: 200px;"></div>
-          </div>
+          <section class="invPanel" style="margin-top: 16px;">
+            <h2>Inventário</h2>
+            <div id="inv" class="inv" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;"></div>
+            <p class="muted invHint">Carrega em <b>1–9</b> para usar um item.</p>
+          </section>
         </section>
 
         <aside class="sidebar">
-          
-          <section class="invPanel">
-            <h2>Inventário</h2>
-            <div id="inv" class="inv"></div>
-            <p class="muted invHint">Carrega em <b>1–9</b> para usar um item.</p>
-          </section>
+          <div class="logPanel" style="box-shadow: none; border: none; padding: 0; background: transparent;">
+            <h2>Registo</h2>
+            <div id="log" class="log" aria-live="polite" style="height: 400px;"></div>
+          </div>
         </aside>
       </main>
 
