@@ -1029,6 +1029,7 @@
     if (e.code && e.code.startsWith("Digit") && e.code.length === 6) {
       const num = Number(e.code[5]);
       if (num >= 1 && num <= 9) {
+        e.preventDefault();
         if (e.shiftKey) acted = itemDrop(num - 1);
         else acted = itemUse(num - 1);
       }
