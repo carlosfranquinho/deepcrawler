@@ -1,0 +1,18 @@
+# Scripts de Automação e Geração
+*.py
+
+# Ficheiros de Teste
+test.html
+
+# Pastas de IDE e Ferramentas AI
+.claude/
+.vscode/
+.idea/
+
+# Ficheiros do Sistema Operativo
+.DS_Store
+Thumbs.db
+
+# Caches
+__pycache__/
+*.pyc
