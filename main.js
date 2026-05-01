@@ -738,6 +738,7 @@
         renderInventory();
         return true;
       } else {
+        beep(120, 0.08, "square", 0.15);
         pushLog("A porta está trancada. Precisas de uma Chave.", "bad");
         return false;
       }
@@ -828,7 +829,7 @@
     return true;
   }
 
-  function blocksSight(t) { return t === Tile.Wall || t === Tile.DoorClosed; }
+  function blocksSight(t) { return t === Tile.Wall || t === Tile.DoorClosed || t === Tile.DoorLocked; }
 
   function bresenhamLine(a, b) {
     const pts = [];
