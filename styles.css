@@ -351,6 +351,9 @@ body{
 .invRow:hover {
   background: rgba(255,255,255,0.05);
 }
+.invRow:active {
+  background: rgba(255,255,255,0.1);
+}
 .invRow .left{
   display:flex;
   align-items:center;
@@ -811,16 +814,21 @@ body{
 .dpadDiag:active{opacity:1;}
 
 @media (max-width: 980px){
-  .app { padding: 12px 10px 24px; }
+  .app { padding: 8px 6px 16px; }
   .main { 
     grid-template-columns: 1fr; 
-    gap: 16px; 
-    margin-top: 12px; 
+    gap: 12px; 
+    margin-top: 8px; 
   }
-  .header { padding: 16px; gap: 12px; }
-  .title h1 { font-size: 36px; }
-  .title p { font-size: 15px; }
-  .hudRow { gap: 8px; }
+  
+  /* Hide unnecessary elements on mobile to save space */
+  .logPanel { display: none !important; }
+  .title p { display: none; }
+  .startModalHero { display: none; } /* also save space in modal */
+  
+  .header { padding: 12px 8px; gap: 8px; border-radius: 12px; }
+  .title h1 { font-size: 28px; margin: 0; }
+  .hudRow { gap: 6px; }
   
   .grid { 
     padding: 6px; 

@@ -1109,6 +1109,21 @@
         ? (item.typeId === "key" && keyCount > 1 ? `${item.name} ×${keyCount}` : item.name)
         : "—";
       left.appendChild(slot); left.appendChild(name); row.appendChild(left); invEl.appendChild(row);
+
+      if (item) {
+        row.style.cursor = "pointer";
+        row.addEventListener("click", () => {
+          if (!state || state.hp <= 0) return;
+          const acted = itemUse(i);
+          if (acted) doTurn(true);
+        });
+        row.addEventListener("contextmenu", (e) => {
+          e.preventDefault();
+          if (!state || state.hp <= 0) return;
+          const acted = itemDrop(i);
+          if (acted) doTurn(true);
+        });
+      }
     }
   }
 
