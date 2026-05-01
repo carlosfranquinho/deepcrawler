@@ -1,9 +1,9 @@
 (() => {
   "use strict";
 
-  const LEVEL_W   = 61;
+  const LEVEL_W   = 41;
+  const LEVEL_H   = 41;
   const VIEW_W    = 21;
-  const LEVEL_H   = 61;
   const VIEW_H    = 21;
   const ARMOR_MAX = 5;
 
@@ -188,7 +188,7 @@
     ensureBorderWalls(tiles);
 
     const rooms = [];
-    const targetRooms = clamp(15 + Math.floor(depth * 0.5), 15, 30);
+    const targetRooms = clamp(8 + Math.floor(depth * 0.3), 8, 15);
     for (let tries = 0; tries < 500 && rooms.length < targetRooms; tries++) {
       const w = roll(rng, 6, 9), h = roll(rng, 6, 9);
       const x = roll(rng, 1, LEVEL_W-w-2), y = roll(rng, 1, LEVEL_H-h-2);
@@ -241,7 +241,7 @@
     let specialsSpawned = 0;
 
     const items = [];
-    const itemCount = clamp(4 + Math.floor(depth * 0.3), 4, 12);
+    const itemCount = clamp(2 + Math.floor(depth * 0.1), 2, 5);
     const occItems = new Set([...nearDoor, idx(playerStart.x, playerStart.y), idx(down.x, down.y), idx(up.x, up.y)]);
     for (let i = 0; i < itemCount; i++) {
       let pos = null;
@@ -278,7 +278,7 @@
 
     // Inimigos
     const enemies = [];
-    const enemyCount = clamp(12 + Math.floor(depth * 0.8), 12, 35);
+    const enemyCount = Math.floor(rooms.length * (1 + rng()));
     const occEnemies = new Set([...nearDoor, idx(playerStart.x, playerStart.y), idx(down.x, down.y), idx(up.x, up.y)]);
     for (let i = 0; i < enemyCount; i++) {
       let pos = null;
