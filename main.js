@@ -71,12 +71,12 @@
 
   // Arquétipos de jogador — valores tabelados
   const PLAYER_ARCHETYPES = [
-    { name: "Guerreiro", maxHp: 14, atk: [2, 5], armor: 1, charisma: 0 },
-    { name: "Ladrão", maxHp: 9, atk: [3, 5], armor: 0, charisma: 3 },
-    { name: "Mago", maxHp: 8, atk: [1, 7], armor: 0, charisma: 1 },
-    { name: "Paladino", maxHp: 12, atk: [2, 4], armor: 1, charisma: 2 },
-    { name: "Bárbaro", maxHp: 16, atk: [3, 6], armor: 0, charisma: 0 },
-    { name: "Turista", maxHp: 10, atk: [1, 3], armor: 0, charisma: 1 },
+    { name: "Guerreiro", maxHp: 14, atk: [2, 5], armor: 1, charisma: 0, emoji: "🤺" },
+    { name: "Ladrão", maxHp: 9, atk: [3, 5], armor: 0, charisma: 3, emoji: "🥷" },
+    { name: "Mago", maxHp: 8, atk: [1, 7], armor: 0, charisma: 1, emoji: "🧙‍♂️" },
+    { name: "Paladino", maxHp: 12, atk: [2, 4], armor: 1, charisma: 2, emoji: "🛡️" },
+    { name: "Bárbaro", maxHp: 16, atk: [3, 6], armor: 0, charisma: 0, emoji: "🪓" },
+    { name: "Turista", maxHp: 10, atk: [1, 3], armor: 0, charisma: 1, emoji: "📸" },
   ];
 
   // RNG de combate global — avança ao longo de toda a sessão
@@ -1194,6 +1194,8 @@
     if (state.pos.x >= startX && state.pos.x < startX + VIEW_W && state.pos.y >= startY && state.pos.y < startY + VIEW_H) {
       const vi = (state.pos.y - startY) * VIEW_W + (state.pos.x - startX);
       cells[vi].className = "cell tilePlayer";
+      const arch = PLAYER_ARCHETYPES.find(a => a.name === state.archetype) || PLAYER_ARCHETYPES[0];
+      cells[vi].textContent = arch.emoji;
     }
 
     renderInventory();
