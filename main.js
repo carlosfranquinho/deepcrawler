@@ -220,6 +220,8 @@
     armor: { id: "armor", name: "Armadura", cssClass: "tileItemArmor" },
     charm: { id: "charm", name: "Amuleto", cssClass: "tileItemCharm" },
     key: { id: "key", name: "Chave", cssClass: "tileItemKey" },
+    sword: { id: "sword", name: "Espada", cssClass: "tileItemSword" },
+    scroll: { id: "scroll", name: "Pergaminho", cssClass: "tileItemScroll" },
   };
 
   function generateLevel(depth, baseSeed) {
@@ -349,7 +351,7 @@
 
       let tp = ITEM_TYPES.potion;
       if (isSpecialLevel && specialsSpawned < 1 && rng() < 0.6) {
-        tp = choose(rng, [ITEM_TYPES.armor, ITEM_TYPES.charm]);
+        tp = choose(rng, [ITEM_TYPES.armor, ITEM_TYPES.charm, ITEM_TYPES.sword, ITEM_TYPES.scroll]);
         specialsSpawned++;
       }
 
@@ -426,6 +428,7 @@
 
   // ── Sons (Web Audio API) ─────────────────────────────────────────────────────
 
+  let soundMuted = false;
   let _audioCtx = null;
   function getAudioCtx() {
     if (!_audioCtx) {
@@ -435,6 +438,7 @@
   }
 
   function beep(freq, dur, type = "square", vol = 0.18, delay = 0) {
+    if (soundMuted) return;
     const ctx = getAudioCtx();
     if (!ctx) return;
     try {
@@ -505,6 +509,11 @@
   const playerNameInput = el("playerNameInput");
   const startBtn = el("startBtn");
   const scoresEl = el("scores");
+  const archetypeGrid = el("archetypeGrid");
+  const muteBtn = el("muteBtn");
+  const stairsVal = el("stairsVal");
+  const continueBtn = el("continueBtn");
+  const continueSection = el("continueSection");
 
   const cells = [];
   for (let i = 0; i < VIEW_W * VIEW_H; i++) {
@@ -545,6 +554,36 @@
 
   /** @type {{seed:number,playerName:string,archetype:string,depth:number,hp:number,maxHp:number,pos:Pos,levels:Map<number,Level>,alive:boolean,xp:number,lvl:number,armor:number,charisma:number,atk:[number,number],inv:{id:string,typeId:string,name:string}[],points:number}} */
   let state;
+
+  // ── Persistência ─────────────────────────────────────────────────────────────
+
+  function saveGame() {
+    if (!state?.alive) return;
+    try {
+      const s = {
+        ...state,
+        levels: [...state.levels.entries()].map(([d, l]) => [d, { ...l, explored: [...l.explored] }]),
+      };
+      localStorage.setItem("deepcrawler_save", JSON.stringify(s));
+    } catch (e) {}
+  }
+
+  function loadGame() {
+    try {
+      const raw = localStorage.getItem("deepcrawler_save");
+      if (!raw) return false;
+      const s = JSON.parse(raw);
+      s.levels = new Map(s.levels.map(([d, l]) => [d, { ...l, explored: new Uint8Array(l.explored) }]));
+      state = s;
+      selectedArchIdx = PLAYER_ARCHETYPES.findIndex(a => a.name === state.archetype);
+      if (selectedArchIdx < 0) selectedArchIdx = 0;
+      combatRng = mulberry32((state.seed ^ state.points) >>> 0);
+      return true;
+    } catch (e) { return false; }
+  }
+
+  function hasSave() { return !!localStorage.getItem("deepcrawler_save"); }
+  function clearSave() { localStorage.removeItem("deepcrawler_save"); }
 
   // ── Pontuações ───────────────────────────────────────────────────────────────
 
@@ -622,9 +661,56 @@
 
   // ── Modal ────────────────────────────────────────────────────────────────────
 
+  let selectedArchIdx = 0;
+
+  const ARCH_META = [
+    { color: "#38bdf8", tagline: "Tanque resistente e confiável" },
+    { color: "#f59e0b", tagline: "Ágil, furtivo, esquiva elevada" },
+    { color: "#a78bfa", tagline: "Frágil mas com dano explosivo" },
+    { color: "#34d399", tagline: "Proteção e equilíbrio total" },
+    { color: "#ef4444", tagline: "Força bruta sem recuo" },
+  ];
+
+  function archStatBar(val, max, color) {
+    return Array.from({ length: 5 }, (_, i) => {
+      const on = i < Math.round((val / max) * 5);
+      return `<span class="archDot${on ? " on" : ""}"${on ? ` style="background:${color}"` : ""}></span>`;
+    }).join("");
+  }
+
+  function buildArchetypePicker() {
+    archetypeGrid.innerHTML = "";
+    PLAYER_ARCHETYPES.forEach((arch, i) => {
+      const meta = ARCH_META[i];
+      const card = document.createElement("button");
+      card.type = "button";
+      card.className = "archCard" + (i === selectedArchIdx ? " archSelected" : "");
+      card.style.setProperty("--arch-color", meta.color);
+      const atkAvg = (arch.atk[0] + arch.atk[1]) / 2;
+      card.innerHTML = `
+        <div class="archTop">
+          <div class="archBadge" style="background:${meta.color}22;border-color:${meta.color}55;color:${meta.color}">${arch.name[0]}</div>
+          <div class="archMeta">
+            <div class="archName">${arch.name}</div>
+            <div class="archTagline">${meta.tagline}</div>
+          </div>
+        </div>
+        <div class="archStatList">
+          <div class="archStat"><span class="archStatLbl">HP</span><div class="archBarWrap">${archStatBar(arch.maxHp, 16, meta.color)}</div><span class="archStatNum">${arch.maxHp}</span></div>
+          <div class="archStat"><span class="archStatLbl">ATK</span><div class="archBarWrap">${archStatBar(atkAvg, 4.5, meta.color)}</div><span class="archStatNum">${arch.atk[0]}-${arch.atk[1]}</span></div>
+          <div class="archStat"><span class="archStatLbl">ARM</span><div class="archBarWrap">${archStatBar(arch.armor, 1, meta.color)}</div><span class="archStatNum">${arch.armor}</span></div>
+          <div class="archStat"><span class="archStatLbl">CAR</span><div class="archBarWrap">${archStatBar(arch.charisma, 3, meta.color)}</div><span class="archStatNum">${arch.charisma}</span></div>
+        </div>`;
+      card.addEventListener("click", () => { selectedArchIdx = i; buildArchetypePicker(); });
+      archetypeGrid.appendChild(card);
+    });
+  }
+
   function showModal() {
     startModal.removeAttribute("hidden");
     playerNameInput.value = "";
+    buildArchetypePicker();
+    continueSection.hidden = !hasSave();
     setTimeout(() => playerNameInput.focus(), 50);
   }
 
@@ -633,7 +719,7 @@
   function startFromModal() {
     const name = playerNameInput.value.trim() || "Anónimo";
     hideModal();
-    newGame((Math.random() * 2 ** 32) >>> 0, name);
+    newGame((Math.random() * 2 ** 32) >>> 0, name, selectedArchIdx);
   }
 
   startBtn.addEventListener("click", startFromModal);
@@ -644,12 +730,9 @@
 
   // ── Jogo ─────────────────────────────────────────────────────────────────────
 
-  function newGame(seed = (Math.random() * 2 ** 32) >>> 0, playerName = "Anónimo") {
+  function newGame(seed = (Math.random() * 2 ** 32) >>> 0, playerName = "Anónimo", archIdx = selectedArchIdx) {
     combatRng = mulberry32(seed ^ 0xDEADBEEF);
-
-    // Arquétipo aleatório baseado na seed
-    const archRng = mulberry32(seed ^ 0xA1C1234);
-    const arch = choose(archRng, PLAYER_ARCHETYPES);
+    const arch = PLAYER_ARCHETYPES[archIdx] ?? PLAYER_ARCHETYPES[0];
 
     state = {
       seed, playerName, archetype: arch.name,
@@ -685,6 +768,7 @@
 
   function dealDamageToEnemy(enemy, amount) {
     enemy.hp -= amount;
+    showFloat(enemy.pos.x, enemy.pos.y, `-${amount}`, "floatDmg");
     if (enemy.hp <= 0) {
       enemy.hp = 0;
       sfx.kill();
@@ -701,9 +785,11 @@
     const Art = art.toUpperCase();
     const mitigated = Math.max(1, amount - state.armor);
     state.hp -= mitigated;
+    showFloat(state.pos.x, state.pos.y, `-${mitigated}`, "floatHit");
     if (state.hp <= 0) {
       state.hp = 0; state.alive = false;
       sfx.death();
+      clearSave();
       saveScore();
       pushLog(`Foste morto por um${art === "a" ? "a" : ""} **${sourceName}**. Fim de jogo.`, "bad");
       pushLog(`Pontuação final: **${state.points}** pts (andar ${state.depth}, nível ${state.lvl}).`, "bad");
@@ -723,6 +809,7 @@
 
   function grantXp(amount) {
     state.xp += amount;
+    showFloat(state.pos.x, state.pos.y, `+${amount} xp`, "floatXp");
     pushLog(`Ganhaste **${amount}** XP.`, "good");
     while (state.xp >= xpToNext(state.lvl)) {
       state.xp -= xpToNext(state.lvl);
@@ -845,6 +932,7 @@
       state.hp = Math.min(state.maxHp, state.hp + 4);
       state.points += 10;
       sfx.pickup();
+      showFloat(state.pos.x, state.pos.y, `+${state.hp - before} hp`, "floatHeal");
       pushLog(`Bebeste uma poção (+**${state.hp - before}** HP, +10 pontos).`, "good");
     } else if (item.typeId === "armor") {
       if (state.armor >= ARMOR_MAX) {
@@ -858,6 +946,17 @@
       state.charisma += 1; state.points += 15;
       sfx.pickup();
       pushLog(`Usaste um amuleto (+**1** carisma → **${state.charisma * 10}%** de esquiva, +15 pontos).`, "good");
+    } else if (item.typeId === "sword") {
+      state.atk[0] += 1; state.atk[1] += 1; state.points += 20;
+      sfx.pickup();
+      showFloat(state.pos.x, state.pos.y, `ATK+1`, "floatHeal");
+      pushLog(`Equipaste uma Espada (ATK **+1/+1**, +20 pontos). [${state.atk[0]}-${state.atk[1]}]`, "good");
+    } else if (item.typeId === "scroll") {
+      const before = state.hp;
+      state.hp = Math.min(state.maxHp, state.hp + 8); state.points += 12;
+      sfx.pickup();
+      showFloat(state.pos.x, state.pos.y, `+${state.hp - before} hp`, "floatHeal");
+      pushLog(`Usaste um Pergaminho de cura (+**${state.hp - before}** HP, +12 pontos).`, "good");
     } else { return false; }
 
     state.inv[slotIdx] = null;
@@ -977,15 +1076,43 @@
   }
 
   function renderInventory() {
+    const keyCount = state.inv.filter(it => it?.typeId === "key").length;
     invEl.innerHTML = "";
     for (let i = 0; i < 9; i++) {
       const row = document.createElement("div"); row.className = "invRow";
       const left = document.createElement("div"); left.className = "left";
       const slot = document.createElement("div"); slot.className = "invSlot"; slot.textContent = String(i + 1);
       const name = document.createElement("div"); name.className = "invName";
-      name.textContent = state.inv[i] ? state.inv[i].name : "—";
+      const item = state.inv[i];
+      name.textContent = item
+        ? (item.typeId === "key" && keyCount > 1 ? `${item.name} ×${keyCount}` : item.name)
+        : "—";
       left.appendChild(slot); left.appendChild(name); row.appendChild(left); invEl.appendChild(row);
     }
+  }
+
+  let viewOriginX = 0, viewOriginY = 0;
+
+  function stairsCompass(lvl) {
+    if (!lvl?.down) return "—";
+    const dx = lvl.down.x - state.pos.x, dy = lvl.down.y - state.pos.y;
+    const dist = Math.abs(dx) + Math.abs(dy);
+    if (dist === 0) return "aqui";
+    const dirs = ["→", "↘", "↓", "↙", "←", "↖", "↑", "↗"];
+    const angle = Math.round(Math.atan2(dy, dx) * 4 / Math.PI);
+    return dirs[((angle % 8) + 8) % 8] + " " + dist;
+  }
+
+  function showFloat(wx, wy, text, cssClass) {
+    const vx = wx - viewOriginX, vy = wy - viewOriginY;
+    if (vx < 0 || vx >= VIEW_W || vy < 0 || vy >= VIEW_H) return;
+    const span = document.createElement("span");
+    span.className = "floatNum " + cssClass;
+    span.textContent = text;
+    span.style.left = (14 + vx * 27 + 12) + "px";
+    span.style.top = (14 + vy * 27) + "px";
+    gridEl.appendChild(span);
+    span.addEventListener("animationend", () => span.remove(), { once: true });
   }
 
   function render() {
@@ -998,6 +1125,7 @@
     chaVal.textContent = String(state.charisma);
     seedVal.textContent = String(state.seed >>> 0);
     pointsVal.textContent = String(state.points);
+    stairsVal.textContent = stairsCompass(lvl);
 
     const visible = computeFov(lvl, state.pos, 8);
 
@@ -1006,6 +1134,8 @@
 
     startX = clamp(startX, 0, LEVEL_W - VIEW_W);
     startY = clamp(startY, 0, LEVEL_H - VIEW_H);
+    viewOriginX = startX;
+    viewOriginY = startY;
 
     for (let vy = 0; vy < VIEW_H; vy++) {
       for (let vx = 0; vx < VIEW_W; vx++) {
@@ -1051,6 +1181,7 @@
   function doTurn(playerActed) {
     if (!playerActed) return;
     cleanupDead(); enemiesTurn(); cleanupDead(); render();
+    saveGame();
   }
 
   function onKeyDown(e) {
@@ -1102,6 +1233,26 @@
     await renderScores();
   });
   closeScoresBtn.addEventListener("click", () => scoresModal.setAttribute("hidden", ""));
+  continueBtn.addEventListener("click", () => {
+    if (loadGame()) { hideModal(); render(); gridEl.focus(); }
+  });
+  muteBtn.addEventListener("click", () => {
+    soundMuted = !soundMuted;
+    muteBtn.textContent = soundMuted ? "Sem som" : "Som";
+  });
+
+  ["dpadUp", "dpadDown", "dpadLeft", "dpadRight", "dpadWait"].forEach(id => {
+    el(id).addEventListener("click", () => {
+      if (!state) return;
+      let acted = false;
+      if (id === "dpadUp") acted = playerTryMove(0, -1);
+      else if (id === "dpadDown") acted = playerTryMove(0, 1);
+      else if (id === "dpadLeft") acted = playerTryMove(-1, 0);
+      else if (id === "dpadRight") acted = playerTryMove(1, 0);
+      else if (id === "dpadWait") acted = playerWait();
+      doTurn(acted);
+    });
+  });
 
   renderScores();
   showModal();

@@ -27,12 +27,14 @@
             <div class="pill"><span class="label">Armadura</span> <span id="armVal">0</span></div>
             <div class="pill"><span class="label">Carisma</span> <span id="chaVal">0</span></div>
             <div class="pill"><span class="label">Pontos</span> <span id="pointsVal">0</span></div>
+            <div class="pill"><span class="label">Descida</span> <span id="stairsVal">—</span></div>
             <div class="pill"><span class="label">Seed</span> <span id="seedVal">—</span></div>
           </div>
           <div class="hudRow">
             <button id="newGameBtn" class="btn">Novo jogo</button>
             <button id="scoresBtn" class="btn btnGhost">Pontuações</button>
             <button id="helpBtn" class="btn btnGhost" aria-expanded="false">Ajuda</button>
+            <button id="muteBtn" class="btn btnGhost">Som</button>
           </div>
         </div>
       </header>
@@ -43,6 +45,15 @@
           <div class="logPanel" style="box-shadow: none; border: none; padding: 0; margin-top: 16px; background: transparent;">
             <h2>Registo</h2>
             <div id="log" class="log" aria-live="polite" style="height: 180px;"></div>
+          </div>
+          <div class="dpad" aria-label="Controlos de direção">
+            <div class="dpadRow"><button class="dpadBtn" id="dpadUp">▲</button></div>
+            <div class="dpadRow">
+              <button class="dpadBtn" id="dpadLeft">◀</button>
+              <button class="dpadBtn dpadCenter" id="dpadWait">·</button>
+              <button class="dpadBtn" id="dpadRight">▶</button>
+            </div>
+            <div class="dpadRow"><button class="dpadBtn" id="dpadDown">▼</button></div>
           </div>
         </section>
 
@@ -70,6 +81,14 @@
       <div class="modalBox">
         <h2 id="modalTitle">DeepCrawler</h2>
         <p class="muted">Introduz o teu nome para entrar na tabela de pontuação.</p>
+        <div id="continueSection" hidden>
+          <button id="continueBtn" class="btn" style="width:100%">Continuar partida guardada</button>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="flex:1;height:1px;background:rgba(255,255,255,.08)"></div>
+            <span class="muted" style="font-size:11px">ou começa nova</span>
+            <div style="flex:1;height:1px;background:rgba(255,255,255,.08)"></div>
+          </div>
+        </div>
         <input
           type="text"
           id="playerNameInput"
@@ -78,6 +97,10 @@
           maxlength="20"
           autocomplete="off"
         />
+        <div>
+          <p class="muted" style="margin: 0 0 8px; font-size: 13px; text-align: left;">Escolhe o teu arquétipo:</p>
+          <div class="archetypeGrid" id="archetypeGrid"></div>
+        </div>
         <button id="startBtn" class="btn">Iniciar</button>
       </div>
     </div>
@@ -130,6 +153,6 @@
       </div>
     </div>
 
-    <script src="./main.js"></script>
+    <script src="./main.js?v=5"></script>
   </body>
 </html>
