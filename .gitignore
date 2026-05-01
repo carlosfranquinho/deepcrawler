@@ -16,3 +16,6 @@ Thumbs.db
 # Caches
 __pycache__/
 *.pyc
+
+# Notas
+emojis_utilizados.md

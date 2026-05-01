@@ -24,14 +24,14 @@
   const ENEMY_TYPES = {
     ratazana_de_esgoto: { id: "ratazana_de_esgoto", name: "Ratazana de esgoto", article: "a", glyph: "r", va: 1, cssClass: "tileEnemyG", maxHp: 3, atk: [1, 2] },
     morcego_das_cavernas: { id: "morcego_das_cavernas", name: "Morcego das cavernas", article: "o", glyph: "f", va: 1, cssClass: "tileEnemyG", maxHp: 3, atk: [1, 2] },
-    chacal: { id: "chacal", name: "Chacal", article: "o", glyph: "d", va: 2, cssClass: "tileEnemyG", maxHp: 5, atk: [2, 3] },
+    beringela_radioativa: { id: "beringela_radioativa", name: "Beringela Radioativa", article: "a", glyph: "d", va: 2, cssClass: "tileEnemyG", maxHp: 5, atk: [2, 3] },
     gnomo_das_trevas: { id: "gnomo_das_trevas", name: "Gnomo das Trevas", article: "o", glyph: "k", va: 2, cssClass: "tileEnemyG", maxHp: 5, atk: [2, 3] },
     homunculo: { id: "homunculo", name: "Homúnculo", article: "o", glyph: "i", va: 2, cssClass: "tileEnemyG", maxHp: 5, atk: [2, 3] },
     raposa: { id: "raposa", name: "Raposa", article: "a", glyph: "d", va: 2, cssClass: "tileEnemyG", maxHp: 5, atk: [2, 3] },
     formiga_gigante: { id: "formiga_gigante", name: "Formiga gigante", article: "a", glyph: "a", va: 3, cssClass: "tileEnemyG", maxHp: 6, atk: [2, 4] },
     bolha_acida: { id: "bolha_acida", name: "Bolha ácida", article: "a", glyph: "b", va: 3, cssClass: "tileEnemyG", maxHp: 6, atk: [2, 4] },
     lagarto_das_rochas: { id: "lagarto_das_rochas", name: "Lagarto das rochas", article: "o", glyph: ":", va: 3, cssClass: "tileEnemyG", maxHp: 6, atk: [2, 4] },
-    luz_amarela: { id: "luz_amarela", name: "Luz Amarela", article: "a", glyph: "y", va: 3, cssClass: "tileEnemyG", maxHp: 6, atk: [2, 4] },
+    luz_de_presenca: { id: "luz_de_presenca", name: "Luz de Presença", article: "a", glyph: "y", va: 3, cssClass: "tileEnemyG", maxHp: 6, atk: [2, 4] },
     lobo_selvagem: { id: "lobo_selvagem", name: "Lobo selvagem", article: "o", glyph: "d", va: 4, cssClass: "tileEnemyG", maxHp: 8, atk: [3, 4] },
     goblin: { id: "goblin", name: "Goblin", article: "o", glyph: "o", va: 4, cssClass: "tileEnemyG", maxHp: 8, atk: [3, 4] },
     serpente: { id: "serpente", name: "Serpente", article: "a", glyph: "S", va: 4, cssClass: "tileEnemyG", maxHp: 8, atk: [3, 4] },
@@ -44,11 +44,11 @@
     geleia_azul: { id: "geleia_azul", name: "Geleia Azul", article: "a", glyph: "j", va: 11, cssClass: "tileEnemyO", maxHp: 18, atk: [6, 9] },
     soldado_anao: { id: "soldado_anao", name: "Soldado Anão", article: "o", glyph: "h", va: 11, cssClass: "tileEnemyO", maxHp: 18, atk: [6, 9] },
     duende_ladrao: { id: "duende_ladrao", name: "Duende Ladrão", article: "o", glyph: "l", va: 13, cssClass: "tileEnemyO", maxHp: 21, atk: [7, 10] },
-    mumia_humana: { id: "mumia_humana", name: "Múmia Humana", article: "a", glyph: "M", va: 14, cssClass: "tileEnemyO", maxHp: 23, atk: [8, 11] },
+    comedor_de_miolos: { id: "comedor_de_miolos", name: "Comedor de Miolos", article: "o", glyph: "M", va: 14, cssClass: "tileEnemyO", maxHp: 23, atk: [8, 11] },
     mimico: { id: "mimico", name: "Mímico", article: "o", glyph: "m", va: 15, cssClass: "tileEnemyO", maxHp: 24, atk: [8, 12] },
     gnomo_feiticeiro: { id: "gnomo_feiticeiro", name: "Gnomo Feiticeiro", article: "o", glyph: "G", va: 16, cssClass: "tileEnemySK", maxHp: 26, atk: [9, 12] },
     ogre: { id: "ogre", name: "Ogre", article: "o", glyph: "O", va: 18, cssClass: "tileEnemySK", maxHp: 29, atk: [10, 14] },
-    inseto_eletrico: { id: "inseto_eletrico", name: "Inseto Elétrico", article: "o", glyph: "x", va: 20, cssClass: "tileEnemySK", maxHp: 32, atk: [11, 15] },
+    mosca_choca: { id: "mosca_choca", name: "Mosca Choca", article: "a", glyph: "x", va: 20, cssClass: "tileEnemySK", maxHp: 32, atk: [11, 15] },
     limo_verde: { id: "limo_verde", name: "Limo Verde", article: "o", glyph: "P", va: 22, cssClass: "tileEnemySK", maxHp: 35, atk: [12, 16] },
     gigante_das_colinas: { id: "gigante_das_colinas", name: "Gigante das Colinas", article: "o", glyph: "H", va: 24, cssClass: "tileEnemySK", maxHp: 38, atk: [13, 18] },
     brutamontes: { id: "brutamontes", name: "Brutamontes", article: "o", glyph: "U", va: 26, cssClass: "tileEnemyTR", maxHp: 41, atk: [14, 19] },
@@ -56,7 +56,7 @@
     elemental_do_fogo: { id: "elemental_do_fogo", name: "Elemental do Fogo", article: "o", glyph: "E", va: 30, cssClass: "tileEnemyTR", maxHp: 47, atk: [16, 22] },
     basilisco: { id: "basilisco", name: "Basilisco", article: "o", glyph: "c", va: 32, cssClass: "tileEnemyTR", maxHp: 50, atk: [17, 23] },
     sombra_veloz: { id: "sombra_veloz", name: "Sombra veloz", article: "a", glyph: "i", va: 35, cssClass: "tileEnemyTR", maxHp: 54, atk: [18, 25] },
-    capitao_de_patrulha: { id: "capitao_de_patrulha", name: "Capitão de Patrulha", article: "o", glyph: "K", va: 38, cssClass: "tileEnemyTR", maxHp: 59, atk: [20, 27] },
+    policia_bebado: { id: "policia_bebado", name: "Polícia Bêbado", article: "o", glyph: "K", va: 38, cssClass: "tileEnemyTR", maxHp: 59, atk: [20, 27] },
     carnical: { id: "carnical", name: "Carniçal", article: "o", glyph: "Z", va: 40, cssClass: "tileEnemyTR", maxHp: 62, atk: [21, 28] },
     vampiro: { id: "vampiro", name: "Vampiro", article: "o", glyph: "V", va: 42, cssClass: "tileEnemyV", maxHp: 65, atk: [22, 30] },
     necromante: { id: "necromante", name: "Necromante", article: "o", glyph: "L", va: 45, cssClass: "tileEnemyV", maxHp: 69, atk: [23, 32] },
@@ -71,12 +71,12 @@
 
   // Arquétipos de jogador — valores tabelados
   const PLAYER_ARCHETYPES = [
-    { name: "Guerreiro", maxHp: 14, atk: [2, 5], armor: 1, charisma: 0, emoji: "🤺" },
-    { name: "Ladrão", maxHp: 9, atk: [3, 5], armor: 0, charisma: 3, emoji: "🥷" },
-    { name: "Mago", maxHp: 8, atk: [1, 7], armor: 0, charisma: 1, emoji: "🧙‍♂️" },
-    { name: "Paladino", maxHp: 12, atk: [2, 4], armor: 1, charisma: 2, emoji: "🛡️" },
-    { name: "Bárbaro", maxHp: 16, atk: [3, 6], armor: 0, charisma: 0, emoji: "🪓" },
-    { name: "Turista", maxHp: 10, atk: [1, 3], armor: 0, charisma: 1, emoji: "📸" },
+    { name: "Guerreiro", maxHp: 14, atk: [2, 5], armor: 1, charisma: 0, emoji: "😠" },
+    { name: "Ladrão", maxHp: 9, atk: [3, 5], armor: 0, charisma: 3, emoji: "😈" },
+    { name: "Mago", maxHp: 8, atk: [1, 7], armor: 0, charisma: 1, emoji: "🧐" },
+    { name: "Paladino", maxHp: 12, atk: [2, 4], armor: 1, charisma: 2, emoji: "😇" },
+    { name: "Bárbaro", maxHp: 16, atk: [3, 6], armor: 0, charisma: 0, emoji: "🤬" },
+    { name: "Turista", maxHp: 10, atk: [1, 3], armor: 0, charisma: 1, emoji: "🤪" },
   ];
 
   // RNG de combate global — avança ao longo de toda a sessão
