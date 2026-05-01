@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./styles.css?v=3" />
+    <link rel="stylesheet" href="./styles.css?v=4" />
     <link rel="stylesheet" href="./monsters.css?v=3" />
   </head>
   <body>
@@ -78,30 +78,40 @@
 
     <!-- Modal de início / novo jogo -->
     <div id="startModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-      <div class="modalBox">
-        <h2 id="modalTitle">DeepCrawler</h2>
-        <p class="muted">Introduz o teu nome para entrar na tabela de pontuação.</p>
+      <div class="modalBox startModalBox">
+        <div class="startModalHero">
+          <div class="startModalLogo">⚔</div>
+          <h2 id="modalTitle" class="startModalTitle">DeepCrawler</h2>
+          <p class="startModalSub">Escolhe o teu destino. A masmorra não tem fundo.</p>
+        </div>
+
         <div id="continueSection" hidden>
-          <button id="continueBtn" class="btn" style="width:100%">Continuar partida guardada</button>
-          <div style="display:flex;align-items:center;gap:10px">
-            <div style="flex:1;height:1px;background:rgba(255,255,255,.08)"></div>
-            <span class="muted" style="font-size:11px">ou começa nova</span>
-            <div style="flex:1;height:1px;background:rgba(255,255,255,.08)"></div>
+          <button id="continueBtn" class="btn btnFull">↩ Continuar partida guardada</button>
+          <div class="startDivider">
+            <div class="startDividerLine"></div>
+            <span class="startDividerText">ou começa nova</span>
+            <div class="startDividerLine"></div>
           </div>
         </div>
-        <input
-          type="text"
-          id="playerNameInput"
-          class="nameInput"
-          placeholder="O teu nome…"
-          maxlength="20"
-          autocomplete="off"
-        />
-        <div>
-          <p class="muted" style="margin: 0 0 8px; font-size: 13px; text-align: left;">Escolhe o teu arquétipo:</p>
+
+        <div class="startField">
+          <label class="startLabel" for="playerNameInput">O teu nome de aventureiro</label>
+          <input
+            type="text"
+            id="playerNameInput"
+            class="nameInput"
+            placeholder="Escreve aqui…"
+            maxlength="20"
+            autocomplete="off"
+          />
+        </div>
+
+        <div class="startArchSection">
+          <p class="startLabel">Escolhe o teu arquétipo</p>
           <div class="archetypeGrid" id="archetypeGrid"></div>
         </div>
-        <button id="startBtn" class="btn">Iniciar</button>
+
+        <button id="startBtn" class="btn btnFull btnGlow">Entrar na Masmorra →</button>
       </div>
     </div>
 

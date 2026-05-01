@@ -76,6 +76,7 @@
     { name: "Mago", maxHp: 8, atk: [1, 7], armor: 0, charisma: 1 },
     { name: "Paladino", maxHp: 12, atk: [2, 4], armor: 1, charisma: 2 },
     { name: "Bárbaro", maxHp: 16, atk: [3, 6], armor: 0, charisma: 0 },
+    { name: "Turista", maxHp: 10, atk: [1, 3], armor: 0, charisma: 1 },
   ];
 
   // RNG de combate global — avança ao longo de toda a sessão
@@ -664,11 +665,12 @@
   let selectedArchIdx = 0;
 
   const ARCH_META = [
-    { color: "#38bdf8", tagline: "Tanque resistente e confiável" },
-    { color: "#f59e0b", tagline: "Ágil, furtivo, esquiva elevada" },
-    { color: "#a78bfa", tagline: "Frágil mas com dano explosivo" },
-    { color: "#34d399", tagline: "Proteção e equilíbrio total" },
-    { color: "#ef4444", tagline: "Força bruta sem recuo" },
+    { color: "#38bdf8", tagline: "Tanque resistente e confiável", img: "arquetipos/guerreiro.png" },
+    { color: "#f59e0b", tagline: "Ágil, furtivo, esquiva elevada", img: "arquetipos/ladrao.png" },
+    { color: "#a78bfa", tagline: "Frágil mas com dano explosivo", img: "arquetipos/mago.png" },
+    { color: "#34d399", tagline: "Proteção e equilíbrio total", img: "arquetipos/paladino.png" },
+    { color: "#ef4444", tagline: "Força bruta sem recuo", img: "arquetipos/barbaro.png" },
+    { color: "#fbbf24", tagline: "Perdido, confuso mas sortudo!", img: "arquetipos/turista.png" },
   ];
 
   function archStatBar(val, max, color) {
@@ -682,25 +684,29 @@
     archetypeGrid.innerHTML = "";
     PLAYER_ARCHETYPES.forEach((arch, i) => {
       const meta = ARCH_META[i];
+      const isSelected = i === selectedArchIdx;
       const card = document.createElement("button");
       card.type = "button";
-      card.className = "archCard" + (i === selectedArchIdx ? " archSelected" : "");
+      card.className = "archCard" + (isSelected ? " archSelected" : "");
       card.style.setProperty("--arch-color", meta.color);
       const atkAvg = (arch.atk[0] + arch.atk[1]) / 2;
       card.innerHTML = `
-        <div class="archTop">
-          <div class="archBadge" style="background:${meta.color}22;border-color:${meta.color}55;color:${meta.color}">${arch.name[0]}</div>
-          <div class="archMeta">
-            <div class="archName">${arch.name}</div>
-            <div class="archTagline">${meta.tagline}</div>
+        <div class="archPortraitWrap">
+          <img class="archPortrait" src="${meta.img}" alt="${arch.name}" loading="lazy" />
+          <div class="archPortraitGlow" style="background:radial-gradient(ellipse at bottom, ${meta.color}55 0%, transparent 70%)"></div>
+        </div>
+        <div class="archCardBody">
+          <div class="archName" style="color:${meta.color}">${arch.name}</div>
+          <div class="archTagline">${meta.tagline}</div>
+          <div class="archStatList">
+            <div class="archStat"><span class="archStatLbl">HP</span><div class="archBarWrap">${archStatBar(arch.maxHp, 16, meta.color)}</div><span class="archStatNum">${arch.maxHp}</span></div>
+            <div class="archStat"><span class="archStatLbl">ATK</span><div class="archBarWrap">${archStatBar(atkAvg, 4.5, meta.color)}</div><span class="archStatNum">${arch.atk[0]}-${arch.atk[1]}</span></div>
+            <div class="archStat"><span class="archStatLbl">ARM</span><div class="archBarWrap">${archStatBar(arch.armor, 1, meta.color)}</div><span class="archStatNum">${arch.armor}</span></div>
+            <div class="archStat"><span class="archStatLbl">CAR</span><div class="archBarWrap">${archStatBar(arch.charisma, 3, meta.color)}</div><span class="archStatNum">${arch.charisma}</span></div>
           </div>
         </div>
-        <div class="archStatList">
-          <div class="archStat"><span class="archStatLbl">HP</span><div class="archBarWrap">${archStatBar(arch.maxHp, 16, meta.color)}</div><span class="archStatNum">${arch.maxHp}</span></div>
-          <div class="archStat"><span class="archStatLbl">ATK</span><div class="archBarWrap">${archStatBar(atkAvg, 4.5, meta.color)}</div><span class="archStatNum">${arch.atk[0]}-${arch.atk[1]}</span></div>
-          <div class="archStat"><span class="archStatLbl">ARM</span><div class="archBarWrap">${archStatBar(arch.armor, 1, meta.color)}</div><span class="archStatNum">${arch.armor}</span></div>
-          <div class="archStat"><span class="archStatLbl">CAR</span><div class="archBarWrap">${archStatBar(arch.charisma, 3, meta.color)}</div><span class="archStatNum">${arch.charisma}</span></div>
-        </div>`;
+        ${isSelected ? `<div class="archCheckmark" style="color:${meta.color}">✓</div>` : ""}
+      `;
       card.addEventListener("click", () => { selectedArchIdx = i; buildArchetypePicker(); });
       archetypeGrid.appendChild(card);
     });

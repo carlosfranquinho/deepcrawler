@@ -580,64 +580,180 @@ body{
   .scoreDate{display:none}
 }
 
-/* Arquétipos */
-.archetypeGrid{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  justify-content:center;
+/* ── Start Modal Premium ─────────────────────────────────────────────────── */
+.startModalBox {
+  width: min(640px, 96vw) !important;
+  padding: 0 !important;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-height: 92vh;
+  overflow-y: auto;
 }
-.archCard{
+.startModalHero {
+  background: radial-gradient(ellipse at top, rgba(56,189,248,0.15) 0%, transparent 70%),
+              linear-gradient(180deg, rgba(15,23,42,0.95) 0%, var(--panel) 100%);
+  padding: 36px 32px 28px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.startModalLogo {
+  font-size: 48px;
+  line-height: 1;
+  margin-bottom: 12px;
+  filter: drop-shadow(0 0 20px rgba(56,189,248,0.4));
+}
+.startModalTitle {
+  margin: 0 0 8px;
+  font-size: 38px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #fff 0%, #7dd3fc 50%, #0284c7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 1px;
+}
+.startModalSub {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 300;
+}
+.startField {
+  padding: 20px 28px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.startLabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0;
+}
+.startArchSection {
+  padding: 16px 28px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+#startBtn.btnFull, #continueBtn.btnFull {
+  margin: 16px 28px 24px;
+  width: calc(100% - 56px) !important;
+}
+.startDivider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 12px 0 4px;
+}
+.startDividerLine { flex: 1; height: 1px; background: rgba(255,255,255,.08); }
+.startDividerText { font-size: 11px; color: var(--muted); white-space: nowrap; }
+#continueSection { padding: 0 28px; }
+.btnFull { width: 100%; }
+.btnGlow {
+  background: linear-gradient(135deg, #0ea5e9, #0284c7) !important;
+  box-shadow: 0 0 20px rgba(14,165,233,0.35), 0 4px 12px rgba(0,0,0,0.3) !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.5px;
+  transition: all 0.2s !important;
+}
+.btnGlow:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 28px rgba(14,165,233,0.5), 0 6px 16px rgba(0,0,0,0.4) !important;
+}
+
+/* ── Arquétipos ────────────────────────────────────────────────────────────── */
+.archetypeGrid {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.1) transparent;
+}
+.archetypeGrid::-webkit-scrollbar { height: 4px; }
+.archetypeGrid::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 2px; }
+
+.archCard {
   --arch-color: var(--accent);
-  flex: 0 0 calc(50% - 4px);
-  padding:12px;
-  border-radius:14px;
-  border:1px solid rgba(255,255,255,.10);
-  background:rgba(0,0,0,.30);
-  color:var(--text);
-  cursor:pointer;
-  font-family:inherit;
-  text-align:left;
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-  transition:all 0.15s;
+  flex: 0 0 130px;
+  border-radius: 16px;
+  border: 1.5px solid rgba(255,255,255,.10);
+  background: rgba(0,0,0,.40);
+  color: var(--text);
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  transition: all 0.18s;
+  overflow: hidden;
+  position: relative;
 }
-.archCard:hover{
-  border-color:rgba(255,255,255,.22);
-  background:rgba(255,255,255,.04);
+.archCard:hover {
+  border-color: rgba(255,255,255,.28);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
 }
-.archCard.archSelected{
-  border-color:var(--arch-color);
-  background:rgba(0,0,0,.45);
-  box-shadow:0 0 0 1px var(--arch-color), 0 0 18px color-mix(in srgb,var(--arch-color) 22%,transparent);
+.archCard.archSelected {
+  border-color: var(--arch-color);
+  box-shadow: 0 0 0 1px var(--arch-color), 0 0 24px color-mix(in srgb,var(--arch-color) 30%,transparent);
+  transform: translateY(-3px);
 }
-.archTop{display:flex;align-items:center;gap:8px}
-.archBadge{
-  width:34px;height:34px;
-  border-radius:9px;
-  border:1px solid;
-  display:flex;align-items:center;justify-content:center;
-  font-weight:800;font-size:15px;
-  flex:0 0 auto;
+.archPortraitWrap {
+  position: relative;
+  width: 100%;
+  height: 100px;
+  overflow: hidden;
+  background: rgba(0,0,0,0.3);
 }
-.archMeta{display:flex;flex-direction:column;gap:2px;min-width:0}
-.archName{font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.archTagline{font-size:10px;color:var(--muted);line-height:1.3}
-.archStatList{display:flex;flex-direction:column;gap:3px}
-.archStat{display:flex;align-items:center;gap:5px}
-.archStatLbl{
-  font-size:9px;color:var(--muted);font-weight:700;
-  width:20px;flex:0 0 auto;
-  text-transform:uppercase;letter-spacing:.5px;
+.archPortrait {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
 }
-.archBarWrap{display:flex;gap:2px;flex:1}
-.archDot{
-  flex:1;height:5px;border-radius:2px;
-  background:rgba(255,255,255,.10);
+.archPortraitGlow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
 }
-.archDot.on{ /* color set inline */ }
-.archStatNum{font-size:10px;color:var(--muted);width:26px;text-align:right;flex:0 0 auto}
+.archCardBody {
+  padding: 10px 10px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.archName { font-weight: 800; font-size: 13px; line-height: 1.2; }
+.archTagline { font-size: 9px; color: var(--muted); line-height: 1.35; }
+.archStatList { display: flex; flex-direction: column; gap: 3px; margin-top: 2px; }
+.archStat { display: flex; align-items: center; gap: 4px; }
+.archStatLbl {
+  font-size: 8px; color: var(--muted); font-weight: 700;
+  width: 18px; flex: 0 0 auto;
+  text-transform: uppercase; letter-spacing: .5px;
+}
+.archBarWrap { display: flex; gap: 2px; flex: 1; }
+.archDot {
+  flex: 1; height: 4px; border-radius: 2px;
+  background: rgba(255,255,255,.10);
+}
+.archDot.on { /* color set inline */ }
+.archStatNum { font-size: 9px; color: var(--muted); width: 22px; text-align: right; flex: 0 0 auto; }
+.archCheckmark {
+  position: absolute;
+  top: 8px; right: 8px;
+  font-size: 16px;
+  font-weight: 900;
+  filter: drop-shadow(0 0 6px currentColor);
+}
+
 
 /* Floating numbers */
 .floatNum{
