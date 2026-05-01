@@ -350,8 +350,15 @@
   const pointsVal       = el("pointsVal");
   const newGameBtn      = el("newGameBtn");
   const helpBtn         = el("helpBtn");
-  const helpEl          = el("help");
+  const scoresBtn       = el("scoresBtn");
   const invEl           = el("inv");
+  const gameOverModal   = el("gameOverModal");
+  const gameOverMsg     = el("gameOverMsg");
+  const restartBtn      = el("restartBtn");
+  const scoresModal     = el("scoresModal");
+  const closeScoresBtn  = el("closeScoresBtn");
+  const helpModal       = el("helpModal");
+  const closeHelpBtn    = el("closeHelpBtn");
   const startModal      = el("startModal");
   const playerNameInput = el("playerNameInput");
   const startBtn        = el("startBtn");
@@ -523,6 +530,8 @@
       pushLog(`Foste morto por **${sourceName}**. Fim de jogo.`, "bad");
       pushLog(`Pontuação final: **${state.points}** pts (andar ${state.depth}, nível ${state.lvl}).`, "bad");
       pushLog("Clica em **Novo jogo** para tentar novamente.", "bad");
+      gameOverMsg.innerHTML = `Foste morto por <b>${sourceName}</b>.<br><br>Pontuação: <b>${state.points}</b> pts<br>Andar: ${state.depth} | Nível: ${state.lvl}`;
+      gameOverModal.removeAttribute("hidden");
     } else {
       sfx.hit();
       if (state.armor > 0 && mitigated !== amount)
@@ -805,6 +814,7 @@
   }
 
   function onKeyDown(e) {
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
     if (e.key === "Tab") return;
     if (["ArrowUp","ArrowDown","ArrowLeft","ArrowRight","w","a","s","d","W","A","S","D"," ","1","2","3","4","5","6","7","8","9"].includes(e.key))
       e.preventDefault();
@@ -825,12 +835,18 @@
   }
 
   document.addEventListener("keydown", onKeyDown, { passive: false });
-  newGameBtn.addEventListener("click", showModal);
-  helpBtn.addEventListener("click", () => {
-    const willShow = helpEl.hasAttribute("hidden");
-    if (willShow) helpEl.removeAttribute("hidden"); else helpEl.setAttribute("hidden", "");
-    helpBtn.setAttribute("aria-expanded", willShow ? "true" : "false");
+  newGameBtn.addEventListener("click", () => {
+    gameOverModal.setAttribute("hidden", "");
+    showModal();
   });
+  restartBtn.addEventListener("click", () => {
+    gameOverModal.setAttribute("hidden", "");
+    showModal();
+  });
+  helpBtn.addEventListener("click", () => helpModal.removeAttribute("hidden"));
+  closeHelpBtn.addEventListener("click", () => helpModal.setAttribute("hidden", ""));
+  scoresBtn.addEventListener("click", () => { renderScores(); scoresModal.removeAttribute("hidden"); });
+  closeScoresBtn.addEventListener("click", () => scoresModal.setAttribute("hidden", ""));
 
   renderScores();
   showModal();

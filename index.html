@@ -30,6 +30,7 @@
           </div>
           <div class="hudRow">
             <button id="newGameBtn" class="btn">Novo jogo</button>
+            <button id="scoresBtn" class="btn btnGhost">Pontuações</button>
             <button id="helpBtn" class="btn btnGhost" aria-expanded="false">Ajuda</button>
           </div>
         </div>
@@ -38,62 +39,35 @@
       <main class="main">
         <section class="panel">
           <div id="grid" class="grid" role="application" aria-label="Grelha do jogo"></div>
-          <div class="legend">
-            <div class="legendItem"><span class="tile tileWall"        aria-hidden="true"></span> Parede</div>
-            <div class="legendItem"><span class="tile tileFloor"       aria-hidden="true"></span> Chão</div>
-            <div class="legendItem"><span class="tile tilePlayer"      aria-hidden="true"></span> Jogador</div>
-            <div class="legendItem"><span class="tile tileStairsDown"  aria-hidden="true"></span> Descer</div>
-            <div class="legendItem"><span class="tile tileStairsUp"    aria-hidden="true"></span> Subir</div>
-            <div class="legendItem"><span class="tile tileDoorClosed"  aria-hidden="true"></span> Porta</div>
-            <div class="legendItem"><span class="tile tileEnemyG"      aria-hidden="true"></span> Goblin</div>
-            <div class="legendItem"><span class="tile tileEnemyO"      aria-hidden="true"></span> Orc</div>
-            <div class="legendItem"><span class="tile tileEnemyS"      aria-hidden="true"></span> Slime</div>
-            <div class="legendItem"><span class="tile tileEnemySK"     aria-hidden="true"></span> Esqueleto</div>
-            <div class="legendItem"><span class="tile tileEnemyV"      aria-hidden="true"></span> Vampiro</div>
-            <div class="legendItem"><span class="tile tileEnemyTR"     aria-hidden="true"></span> Troll</div>
-            <div class="legendItem"><span class="tile tileEnemyD"      aria-hidden="true"></span> Demónio</div>
+          <div class="logPanel" style="box-shadow: none; border: none; padding: 0; margin-top: 16px; background: transparent;">
+            <h2>Registo</h2>
+            <div id="log" class="log" aria-live="polite" style="height: 200px;"></div>
           </div>
         </section>
 
         <aside class="sidebar">
-          <section id="help" class="help" hidden>
-            <h2>Como jogar</h2>
-            <ul>
-              <li><b>Mover</b>: Setas ou WASD</li>
-              <li><b>Esperar</b>: Espaço</li>
-              <li><b>Abrir porta</b>: Andar contra ela</li>
-              <li><b>Descer</b>: Pisar em <b>&gt;</b></li>
-              <li><b>Subir</b>: Pisar em <b>&lt;</b></li>
-              <li><b>Atacar</b>: Andar contra um inimigo</li>
-              <li><b>Usar item</b>: Carregar em <b>1–9</b> (slots do inventário)</li>
-            </ul>
-            <p class="muted">
-              Cada tecla é um turno: <b>tu ages</b>, depois <b>os inimigos agem</b>.
-              A masmorra é infinita: novos andares são gerados ao descer.
-            </p>
-            <p class="muted">
-              <b>Carisma</b>: cada ponto dá 10% de chance de esquivar ataques inimigos.<br>
-              <b>Armadura</b>: reduz o dano recebido (máx. 5), mas nunca abaixo de 1.
-            </p>
-          </section>
-
-          <section class="invPanel">
-            <h2>Inventário</h2>
-            <div id="inv" class="inv"></div>
-            <p class="muted invHint">Carrega em <b>1–9</b> para usar um item.</p>
-          </section>
-
-          <section class="logPanel">
-            <h2>Registo</h2>
-            <div id="log" class="log" aria-live="polite"></div>
+          <section class="legend" style="border:1px solid rgba(255,255,255,.08); border-radius:20px; background: var(--panel); padding:18px 20px;">
+            <h2 style="margin:0 0 12px; font-size:18px; color: #fff;">Legenda</h2>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 13px; color: var(--muted);">
+              <div class="legendItem"><span class="tile tileWall"        aria-hidden="true"></span> Parede</div>
+              <div class="legendItem"><span class="tile tileFloor"       aria-hidden="true"></span> Chão</div>
+              <div class="legendItem"><span class="tile tilePlayer"      aria-hidden="true"></span> Jogador</div>
+              <div class="legendItem"><span class="tile tileStairsDown"  aria-hidden="true"></span> Descer</div>
+              <div class="legendItem"><span class="tile tileStairsUp"    aria-hidden="true"></span> Subir</div>
+              <div class="legendItem"><span class="tile tileDoorClosed"  aria-hidden="true"></span> Porta</div>
+              <div class="legendItem"><span class="tile tileEnemyG"      aria-hidden="true"></span> Goblin</div>
+              <div class="legendItem"><span class="tile tileEnemyO"      aria-hidden="true"></span> Orc</div>
+              <div class="legendItem"><span class="tile tileEnemyS"      aria-hidden="true"></span> Slime</div>
+              <div class="legendItem"><span class="tile tileEnemySK"     aria-hidden="true"></span> Esqueleto</div>
+              <div class="legendItem"><span class="tile tileEnemyV"      aria-hidden="true"></span> Vampiro</div>
+              <div class="legendItem"><span class="tile tileEnemyTR"     aria-hidden="true"></span> Troll</div>
+              <div class="legendItem"><span class="tile tileEnemyD"      aria-hidden="true"></span> Demónio</div>
+            </div>
           </section>
         </aside>
       </main>
 
-      <section class="scoresSection">
-        <h2 class="scoresSectionTitle">Tabela de Pontuação</h2>
-        <div id="scores" class="scoresList"></div>
-      </section>
+
 
       <footer class="footer">
         <span class="muted">Dica: clica na grelha para focar os controlos do teclado.</span>
@@ -114,6 +88,48 @@
           autocomplete="off"
         />
         <button id="startBtn" class="btn">Iniciar</button>
+      </div>
+    </div>
+
+    <div id="gameOverModal" class="modal" role="dialog" aria-modal="true" hidden>
+      <div class="modalBox">
+        <h2 style="background: linear-gradient(to right, #fca5a5, #ef4444); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Fim de Jogo</h2>
+        <p class="muted" id="gameOverMsg" style="font-size: 16px;">Morreste.</p>
+        <button id="restartBtn" class="btn">Jogar novamente?</button>
+      </div>
+    </div>
+
+    <div id="scoresModal" class="modal" role="dialog" aria-modal="true" hidden>
+      <div class="modalBox" style="width: min(600px, 90vw);">
+        <h2 class="scoresSectionTitle">Tabela de Pontuação</h2>
+        <div id="scores" class="scoresList"></div>
+        <button id="closeScoresBtn" class="btn" style="margin-top: 16px;">Fechar</button>
+      </div>
+    </div>
+
+    <div id="helpModal" class="modal" role="dialog" aria-modal="true" hidden>
+      <div class="modalBox">
+        <h2>Como jogar</h2>
+        <div class="help">
+          <ul>
+            <li><b>Mover</b>: Setas ou WASD</li>
+            <li><b>Esperar</b>: Espaço</li>
+            <li><b>Abrir porta</b>: Andar contra ela</li>
+            <li><b>Descer</b>: Pisar em <b>&gt;</b></li>
+            <li><b>Subir</b>: Pisar em <b>&lt;</b></li>
+            <li><b>Atacar</b>: Andar contra um inimigo</li>
+            <li><b>Usar item</b>: Carregar em <b>1–9</b> (slots do inventário)</li>
+          </ul>
+          <p class="muted" style="text-align: left; margin-top: 12px;">
+            Cada tecla é um turno: <b>tu ages</b>, depois <b>os inimigos agem</b>.
+            A masmorra é infinita: novos andares são gerados ao descer.
+          </p>
+          <p class="muted" style="text-align: left;">
+            <b>Carisma</b>: cada ponto dá 10% de chance de esquivar ataques inimigos.<br>
+            <b>Armadura</b>: reduz o dano recebido (máx. 5), mas nunca abaixo de 1.
+          </p>
+        </div>
+        <button id="closeHelpBtn" class="btn">Fechar</button>
       </div>
     </div>
 
