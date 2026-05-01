@@ -9,7 +9,7 @@
 
   const Tile = {
     Wall: "#", Floor: ".", Up: "<", Down: ">",
-    Corpse: "%", DoorClosed: "+", DoorOpen: "/",
+    Corpse: "%", DoorClosed: "+", DoorOpen: "/", DoorLocked: "X",
   };
 
   /** @typedef {{x:number,y:number}} Pos */
@@ -110,7 +110,7 @@
   function isWalkableTile(t) {
     return t === Tile.Floor || t === Tile.Up || t === Tile.Down || t === Tile.Corpse || t === Tile.DoorOpen;
   }
-  function isBlockingTile(t) { return t === Tile.Wall || t === Tile.DoorClosed; }
+  function isBlockingTile(t) { return t === Tile.Wall || t === Tile.DoorClosed || t === Tile.DoorLocked; }
 
   function ensureBorderWalls(tiles) {
     for (let x = 0; x < LEVEL_W; x++) { tiles[idx(x, 0)] = Tile.Wall; tiles[idx(x, LEVEL_H-1)] = Tile.Wall; }
@@ -216,6 +216,7 @@
     potion: { id: "potion", name: "Poção",    cssClass: "tileItemPotion" },
     armor:  { id: "armor",  name: "Armadura", cssClass: "tileItemArmor"  },
     charm:  { id: "charm",  name: "Amuleto",  cssClass: "tileItemCharm"  },
+    key:    { id: "key",    name: "Chave",    cssClass: "tileItemKey"    },
   };
 
   function generateLevel(depth, baseSeed) {
@@ -249,6 +250,20 @@
 
     placeDoors(tiles, rooms, rng);
 
+    const doorIndices = [];
+    for (let i = 0; i < tiles.length; i++) {
+      if (tiles[i] === Tile.DoorClosed) doorIndices.push(i);
+    }
+    const numLocked = Math.min(doorIndices.length, clamp(Math.floor(depth / 3), 1, 3));
+    for (let i = 0; i < numLocked; i++) {
+      const idxToSwap = roll(rng, i, doorIndices.length - 1);
+      const temp = doorIndices[i];
+      doorIndices[i] = doorIndices[idxToSwap];
+      doorIndices[idxToSwap] = temp;
+      tiles[doorIndices[i]] = Tile.DoorLocked;
+    }
+
+
     // Exclusões: tiles adjacentes a portas — escadas nunca ficam imediatamente à frente de uma porta
     const nearDoor = doorExclusions(tiles);
 
@@ -280,7 +295,45 @@
 
     const items = [];
     const itemCount = clamp(2 + Math.floor(depth * 0.1), 2, 5);
+    // Safe zone BFS for keys
+    const safeZone = [];
+    const visited = new Uint8Array(LEVEL_W * LEVEL_H);
+    const q = [idx(playerStart.x, playerStart.y)];
+    visited[q[0]] = 1;
+    let qh = 0;
+    while (qh < q.length) {
+      const cur = q[qh++];
+      const cx = cur % LEVEL_W, cy = (cur / LEVEL_W) | 0;
+      if (tiles[cur] === Tile.Floor) safeZone.push({x: cx, y: cy});
+      
+      for (const n of neighbors4({x: cx, y: cy})) {
+        if (!inBounds(n.x, n.y)) continue;
+        const ni = idx(n.x, n.y);
+        if (!visited[ni] && tiles[ni] !== Tile.Wall && tiles[ni] !== Tile.DoorLocked) {
+          visited[ni] = 1;
+          q.push(ni);
+        }
+      }
+    }
+
     const occItems = new Set([...nearDoor, idx(playerStart.x, playerStart.y), idx(down.x, down.y), idx(up.x, up.y)]);
+    
+    // Spawn keys in safe zone
+    if (safeZone.length > 0) {
+      for (let i = 0; i < numLocked; i++) {
+        let pos = null;
+        for (let t = 0; t < 50; t++) {
+          const p = choose(rng, safeZone);
+          if (p && !occItems.has(idx(p.x, p.y))) {
+            occItems.add(idx(p.x, p.y)); pos = p; break;
+          }
+        }
+        if (pos) {
+          items.push({ id: `${depth}-${seed}-key-${i}`, typeId: "key", name: "Chave", cssClass: "tileItemKey", pos });
+        }
+      }
+    }
+
     for (let i = 0; i < itemCount; i++) {
       let pos = null;
       for (let t = 0; t < 300; t++) {
@@ -671,6 +724,21 @@
       sfx.door();
       pushLog("Abriste uma porta (+1 ponto).", "info");
       return true;
+    }
+    if (t === Tile.DoorLocked) {
+      const keyIdx = state.inv.findIndex(it => it.typeId === "key");
+      if (keyIdx !== -1) {
+        state.inv.splice(keyIdx, 1);
+        lvl.tiles[idx(nx, ny)] = Tile.DoorOpen;
+        state.points += 5;
+        sfx.door();
+        pushLog("Destrancaste a porta com uma Chave (+5 pontos).", "good");
+        renderInventory();
+        return true;
+      } else {
+        pushLog("A porta está trancada. Precisas de uma Chave.", "bad");
+        return false;
+      }
     }
     if (!isWalkableTile(t)) return false;
 
