@@ -86,7 +86,13 @@
       <div class="modalBox">
         <h2 style="background: linear-gradient(to right, #fca5a5, #ef4444); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Fim de Jogo</h2>
         <p class="muted" id="gameOverMsg" style="font-size: 16px;">Morreste.</p>
-        <button id="restartBtn" class="btn">Jogar novamente?</button>
+        <div style="margin-top: 24px;">
+          <h3 style="margin: 0 0 12px;">Jogar novamente?</h3>
+          <div style="display: flex; gap: 12px; justify-content: center;">
+            <button id="restartBtnSim" class="btn">Sim</button>
+            <button id="restartBtnNao" class="btn btnGhost">Não</button>
+          </div>
+        </div>
       </div>
     </div>
 

@@ -492,7 +492,8 @@
   const invEl           = el("inv");
   const gameOverModal   = el("gameOverModal");
   const gameOverMsg     = el("gameOverMsg");
-  const restartBtn      = el("restartBtn");
+  const restartBtnSim   = el("restartBtnSim");
+  const restartBtnNao   = el("restartBtnNao");
   const scoresModal     = el("scoresModal");
   const closeScoresBtn  = el("closeScoresBtn");
   const helpModal       = el("helpModal");
@@ -672,7 +673,7 @@
       pushLog(`Foste morto por um${art === "a" ? "a" : ""} **${sourceName}**. Fim de jogo.`, "bad");
       pushLog(`Pontuação final: **${state.points}** pts (andar ${state.depth}, nível ${state.lvl}).`, "bad");
       pushLog("Clica em **Novo jogo** para tentar novamente.", "bad");
-      gameOverMsg.innerHTML = `Foste morto por um${art === "a" ? "a" : ""} <b>${sourceName}</b>.<br><br>Pontuação: <b>${state.points}</b> pts<br>Andar: ${state.depth} | Nível: ${state.lvl}`;
+      gameOverMsg.innerHTML = `<b>${state.playerName}</b>, ${state.archetype} de nível ${state.lvl}, foi morto por um${art === "a" ? "a" : ""} <b>${sourceName}</b> no andar ${state.depth}.<br><br>Pontuação final: <b>${state.points}</b> pts`;
       gameOverModal.removeAttribute("hidden");
     } else {
       sfx.hit();
@@ -1048,9 +1049,14 @@
     gameOverModal.setAttribute("hidden", "");
     showModal();
   });
-  restartBtn.addEventListener("click", () => {
+  restartBtnSim.addEventListener("click", () => {
     gameOverModal.setAttribute("hidden", "");
-    showModal();
+    newGame((Math.random() * 2 ** 32) >>> 0, state.playerName);
+  });
+  restartBtnNao.addEventListener("click", () => {
+    gameOverModal.setAttribute("hidden", "");
+    renderScores();
+    scoresModal.removeAttribute("hidden");
   });
   helpBtn.addEventListener("click", () => helpModal.removeAttribute("hidden"));
   closeHelpBtn.addEventListener("click", () => helpModal.setAttribute("hidden", ""));
