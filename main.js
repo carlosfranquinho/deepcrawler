@@ -14,18 +14,56 @@
 
   /** @typedef {{x:number,y:number}} Pos */
   /** @typedef {{id:string,name:string,glyph:string,cssClass:string,maxHp:number,atk:[number,number]}} EnemyType */
-  /** @typedef {{id:string,typeId:string,name:string,glyph:string,cssClass:string,pos:Pos,hp:number,maxHp:number}} Enemy */
+  /** @typedef {{id:string,typeId:string,name:string,article:string,va:number,glyph:string,cssClass:string,pos:Pos,hp:number,maxHp:number,atk:[number,number]}} Enemy */
   /** @typedef {{id:string,typeId:string,name:string,cssClass:string,pos:Pos}} Item */
   /** @typedef {{depth:number,seed:number,tiles:string[],playerStart:Pos,up:Pos,down:Pos,enemies:Enemy[],items:Item[],explored:Uint8Array}} Level */
 
-  const ENEMY_TYPES /** @type {Record<string, EnemyType>} */ = {
-    goblin:   { id: "goblin",   name: "Goblin",   glyph: "g", cssClass: "tileEnemyG",  maxHp: 3,  atk: [1, 2] },
-    orc:      { id: "orc",      name: "Orc",       glyph: "o", cssClass: "tileEnemyO",  maxHp: 6,  atk: [1, 3] },
-    slime:    { id: "slime",    name: "Slime",     glyph: "s", cssClass: "tileEnemyS",  maxHp: 4,  atk: [1, 2] },
-    skeleton: { id: "skeleton", name: "Esqueleto", glyph: "k", cssClass: "tileEnemySK", maxHp: 5,  atk: [2, 3] },
-    vampire:  { id: "vampire",  name: "Vampiro",   glyph: "v", cssClass: "tileEnemyV",  maxHp: 8,  atk: [2, 4] },
-    troll:    { id: "troll",    name: "Troll",     glyph: "T", cssClass: "tileEnemyTR", maxHp: 10, atk: [2, 4] },
-    demon:    { id: "demon",    name: "Demônio",   glyph: "D", cssClass: "tileEnemyD",  maxHp: 12, atk: [3, 5] },
+  const ENEMY_TYPES = {
+    ratazana_de_esgoto: { id: "ratazana_de_esgoto", name: "Ratazana de esgoto", article: "a", glyph: "r", va: 1, cssClass: "tileEnemyG", maxHp: 3, atk: [1, 2] },
+    morcego_das_cavernas: { id: "morcego_das_cavernas", name: "Morcego das cavernas", article: "o", glyph: "f", va: 1, cssClass: "tileEnemyG", maxHp: 3, atk: [1, 2] },
+    chacal: { id: "chacal", name: "Chacal", article: "o", glyph: "d", va: 2, cssClass: "tileEnemyG", maxHp: 5, atk: [2, 3] },
+    gnomo_das_trevas: { id: "gnomo_das_trevas", name: "Gnomo das Trevas", article: "o", glyph: "k", va: 2, cssClass: "tileEnemyG", maxHp: 5, atk: [2, 3] },
+    homunculo: { id: "homunculo", name: "Homúnculo", article: "o", glyph: "i", va: 2, cssClass: "tileEnemyG", maxHp: 5, atk: [2, 3] },
+    raposa: { id: "raposa", name: "Raposa", article: "a", glyph: "d", va: 2, cssClass: "tileEnemyG", maxHp: 5, atk: [2, 3] },
+    formiga_gigante: { id: "formiga_gigante", name: "Formiga gigante", article: "a", glyph: "a", va: 3, cssClass: "tileEnemyG", maxHp: 6, atk: [2, 4] },
+    bolha_acida: { id: "bolha_acida", name: "Bolha ácida", article: "a", glyph: "b", va: 3, cssClass: "tileEnemyG", maxHp: 6, atk: [2, 4] },
+    lagarto_das_rochas: { id: "lagarto_das_rochas", name: "Lagarto das rochas", article: "o", glyph: ":", va: 3, cssClass: "tileEnemyG", maxHp: 6, atk: [2, 4] },
+    luz_amarela: { id: "luz_amarela", name: "Luz Amarela", article: "a", glyph: "y", va: 3, cssClass: "tileEnemyG", maxHp: 6, atk: [2, 4] },
+    lobo_selvagem: { id: "lobo_selvagem", name: "Lobo selvagem", article: "o", glyph: "d", va: 4, cssClass: "tileEnemyG", maxHp: 8, atk: [3, 4] },
+    goblin: { id: "goblin", name: "Goblin", article: "o", glyph: "o", va: 4, cssClass: "tileEnemyG", maxHp: 8, atk: [3, 4] },
+    serpente: { id: "serpente", name: "Serpente", article: "a", glyph: "S", va: 4, cssClass: "tileEnemyG", maxHp: 8, atk: [3, 4] },
+    orc: { id: "orc", name: "Orc", article: "o", glyph: "o", va: 5, cssClass: "tileEnemyG", maxHp: 9, atk: [3, 5] },
+    perfurador_de_rocha: { id: "perfurador_de_rocha", name: "Perfurador de Rocha", article: "o", glyph: "p", va: 6, cssClass: "tileEnemyO", maxHp: 11, atk: [4, 6] },
+    geleia_ocre: { id: "geleia_ocre", name: "Geleia Ocre", article: "a", glyph: "j", va: 7, cssClass: "tileEnemyO", maxHp: 12, atk: [4, 6] },
+    besta_chifruda: { id: "besta_chifruda", name: "Besta chifruda", article: "a", glyph: "q", va: 8, cssClass: "tileEnemyO", maxHp: 14, atk: [5, 7] },
+    urso_coruja: { id: "urso_coruja", name: "Urso-Coruja", article: "o", glyph: "h", va: 10, cssClass: "tileEnemyO", maxHp: 17, atk: [6, 8] },
+    tigre_dentes_de_sabre: { id: "tigre_dentes_de_sabre", name: "Tigre dentes-de-sabre", article: "o", glyph: "f", va: 10, cssClass: "tileEnemyO", maxHp: 17, atk: [6, 8] },
+    geleia_azul: { id: "geleia_azul", name: "Geleia Azul", article: "a", glyph: "j", va: 11, cssClass: "tileEnemyO", maxHp: 18, atk: [6, 9] },
+    soldado_anao: { id: "soldado_anao", name: "Soldado Anão", article: "o", glyph: "h", va: 11, cssClass: "tileEnemyO", maxHp: 18, atk: [6, 9] },
+    duende_ladrao: { id: "duende_ladrao", name: "Duende Ladrão", article: "o", glyph: "l", va: 13, cssClass: "tileEnemyO", maxHp: 21, atk: [7, 10] },
+    mumia_humana: { id: "mumia_humana", name: "Múmia Humana", article: "a", glyph: "M", va: 14, cssClass: "tileEnemyO", maxHp: 23, atk: [8, 11] },
+    mimico: { id: "mimico", name: "Mímico", article: "o", glyph: "m", va: 15, cssClass: "tileEnemyO", maxHp: 24, atk: [8, 12] },
+    gnomo_feiticeiro: { id: "gnomo_feiticeiro", name: "Gnomo Feiticeiro", article: "o", glyph: "G", va: 16, cssClass: "tileEnemySK", maxHp: 26, atk: [9, 12] },
+    ogre: { id: "ogre", name: "Ogre", article: "o", glyph: "O", va: 18, cssClass: "tileEnemySK", maxHp: 29, atk: [10, 14] },
+    inseto_eletrico: { id: "inseto_eletrico", name: "Inseto Elétrico", article: "o", glyph: "x", va: 20, cssClass: "tileEnemySK", maxHp: 32, atk: [11, 15] },
+    limo_verde: { id: "limo_verde", name: "Limo Verde", article: "o", glyph: "P", va: 22, cssClass: "tileEnemySK", maxHp: 35, atk: [12, 16] },
+    gigante_das_colinas: { id: "gigante_das_colinas", name: "Gigante das Colinas", article: "o", glyph: "H", va: 24, cssClass: "tileEnemySK", maxHp: 38, atk: [13, 18] },
+    brutamontes: { id: "brutamontes", name: "Brutamontes", article: "o", glyph: "U", va: 26, cssClass: "tileEnemyTR", maxHp: 41, atk: [14, 19] },
+    troll: { id: "troll", name: "Troll", article: "o", glyph: "T", va: 28, cssClass: "tileEnemyTR", maxHp: 44, atk: [15, 20] },
+    elemental_do_fogo: { id: "elemental_do_fogo", name: "Elemental do Fogo", article: "o", glyph: "E", va: 30, cssClass: "tileEnemyTR", maxHp: 47, atk: [16, 22] },
+    basilisco: { id: "basilisco", name: "Basilisco", article: "o", glyph: "c", va: 32, cssClass: "tileEnemyTR", maxHp: 50, atk: [17, 23] },
+    sombra_veloz: { id: "sombra_veloz", name: "Sombra veloz", article: "a", glyph: "i", va: 35, cssClass: "tileEnemyTR", maxHp: 54, atk: [18, 25] },
+    capitao_de_patrulha: { id: "capitao_de_patrulha", name: "Capitão de Patrulha", article: "o", glyph: "K", va: 38, cssClass: "tileEnemyTR", maxHp: 59, atk: [20, 27] },
+    carnical: { id: "carnical", name: "Carniçal", article: "o", glyph: "Z", va: 40, cssClass: "tileEnemyTR", maxHp: 62, atk: [21, 28] },
+    vampiro: { id: "vampiro", name: "Vampiro", article: "o", glyph: "V", va: 42, cssClass: "tileEnemyV", maxHp: 65, atk: [22, 30] },
+    necromante: { id: "necromante", name: "Necromante", article: "o", glyph: "L", va: 45, cssClass: "tileEnemyV", maxHp: 69, atk: [23, 32] },
+    espectro: { id: "espectro", name: "Espectro", article: "o", glyph: "W", va: 46, cssClass: "tileEnemyV", maxHp: 71, atk: [24, 32] },
+    dragao: { id: "dragao", name: "Dragão", article: "o", glyph: "D", va: 50, cssClass: "tileEnemyV", maxHp: 77, atk: [26, 35] },
+    balrog: { id: "balrog", name: "Balrog", article: "o", glyph: "&", va: 55, cssClass: "tileEnemyV", maxHp: 84, atk: [28, 38] },
+    medusa: { id: "medusa", name: "Medusa", article: "a", glyph: "@", va: 60, cssClass: "tileEnemyD", maxHp: 92, atk: [31, 42] },
+    feiticeiro_das_trevas: { id: "feiticeiro_das_trevas", name: "Feiticeiro das Trevas", article: "o", glyph: "@", va: 75, cssClass: "tileEnemyD", maxHp: 114, atk: [38, 52] },
+    vlad_o_empalador: { id: "vlad_o_empalador", name: "Vlad, o Empalador", article: "o", glyph: "V", va: 80, cssClass: "tileEnemyD", maxHp: 122, atk: [41, 55] },
+    devorador_de_almas: { id: "devorador_de_almas", name: "Devorador de Almas", article: "o", glyph: "&", va: 95, cssClass: "tileEnemyD", maxHp: 144, atk: [48, 65] },
   };
 
   // Arquétipos de jogador — valores tabelados
@@ -262,19 +300,28 @@
       items.push({ id: `${depth}-${seed}-it-${i}-${tp.id}`, typeId: tp.id, name: tp.name, cssClass: tp.cssClass, pos });
     }
 
-    // Tier de dificuldade: sobe ~a cada 10 andares com ±2 de aleatoriedade
-    const tier = Math.max(0, Math.floor((depth - 1 + roll(rng, -2, 2)) / 10));
-
-    // Bolsa de inimigos por profundidade
-    const rawBag =
-      depth < 5  ? [ENEMY_TYPES.goblin, ENEMY_TYPES.slime, ENEMY_TYPES.goblin] :
-      depth < 8  ? [ENEMY_TYPES.goblin, ENEMY_TYPES.slime, ENEMY_TYPES.skeleton, ENEMY_TYPES.goblin] :
-      depth < 12 ? [ENEMY_TYPES.orc, ENEMY_TYPES.slime, ENEMY_TYPES.skeleton, ENEMY_TYPES.goblin] :
-      depth < 18 ? [ENEMY_TYPES.orc, ENEMY_TYPES.skeleton, ENEMY_TYPES.vampire, ENEMY_TYPES.slime] :
-      depth < 25 ? [ENEMY_TYPES.orc, ENEMY_TYPES.vampire, ENEMY_TYPES.troll, ENEMY_TYPES.skeleton] :
-                   [ENEMY_TYPES.vampire, ENEMY_TYPES.demon, ENEMY_TYPES.troll, ENEMY_TYPES.orc];
-
-    const enemyTypeBag = rawBag.map(t => scaleEnemy(t, tier));
+    const availableMonsters = Object.values(ENEMY_TYPES);
+    const enemyWeights = availableMonsters.map(et => {
+      let diff = Math.abs(et.va - depth);
+      let weight = Math.max(0, 100 - diff * 15);
+      if (et.va > depth + 5) weight = 0; // Too strong
+      return { et, weight };
+    }).filter(w => w.weight > 0);
+    
+    let totalWeight = enemyWeights.reduce((sum, w) => sum + w.weight, 0);
+    if (totalWeight === 0) {
+      enemyWeights.push({ et: availableMonsters[0], weight: 1 });
+      totalWeight = 1;
+    }
+    
+    const pickMonster = () => {
+      let r = rng() * totalWeight;
+      for (let w of enemyWeights) {
+        r -= w.weight;
+        if (r <= 0) return w.et;
+      }
+      return enemyWeights[enemyWeights.length - 1].et;
+    };
 
     // Inimigos
     const enemies = [];
@@ -289,10 +336,32 @@
         occEnemies.add(ii); pos = p; break;
       }
       if (!pos) break;
-      const et = choose(rng, enemyTypeBag);
+      const et = pickMonster();
+      let name = et.name;
+      let va = et.va;
+      let maxHp = et.maxHp;
+      let atk = [...et.atk];
+      
+      if (depth > et.va + 50) {
+        const mod = Math.floor(rng() * 3);
+        if (mod === 0) {
+          name = `${et.name} Alfa`;
+          va += 10;
+          maxHp = maxHp * 2;
+        } else if (mod === 1) {
+          name = `${et.name} Corrompido`;
+          atk[1] += 5; // poison
+        } else {
+          name = `${et.name} das Profundezas`;
+          va += 50;
+          maxHp += 50;
+          atk[0] += 10; atk[1] += 10;
+        }
+      }
+      
       enemies.push({
-        id: `${depth}-${seed}-${i}-${et.id}`, typeId: et.id, name: et.name,
-        glyph: et.glyph, cssClass: et.cssClass, pos, hp: et.maxHp, maxHp: et.maxHp,
+        id: `${depth}-${seed}-${i}-${et.id}`, typeId: et.id, name, article: et.article, va,
+        glyph: et.glyph, cssClass: et.cssClass, pos, hp: maxHp, maxHp: maxHp, atk
       });
     }
 
@@ -529,39 +598,42 @@
     if (enemy.hp <= 0) {
       enemy.hp = 0;
       sfx.kill();
-      pushLog(`Derrotaste o(a) **${enemy.name}**.`, "good");
+      pushLog(`Derrotaste ${enemy.article === "a" ? "a" : "o"} **${enemy.name}**.`, "good");
     } else {
       sfx.attack();
-      pushLog(`Acertaste no(a) **${enemy.name}** em **${amount}**.`, "info");
+      pushLog(`Acertaste n${enemy.article === "a" ? "a" : "o"} **${enemy.name}** em **${amount}**.`, "info");
     }
   }
 
-  function dealDamageToPlayer(amount, sourceName) {
+  function dealDamageToPlayer(amount, sourceEnemy) {
+    const sourceName = sourceEnemy.name;
+    const art = sourceEnemy.article || "o";
+    const Art = art.toUpperCase();
     const mitigated = Math.max(1, amount - state.armor);
     state.hp -= mitigated;
     if (state.hp <= 0) {
       state.hp = 0; state.alive = false;
       sfx.death();
       saveScore();
-      pushLog(`Foste morto por **${sourceName}**. Fim de jogo.`, "bad");
+      pushLog(`Foste morto por um${art === "a" ? "a" : ""} **${sourceName}**. Fim de jogo.`, "bad");
       pushLog(`Pontuação final: **${state.points}** pts (andar ${state.depth}, nível ${state.lvl}).`, "bad");
       pushLog("Clica em **Novo jogo** para tentar novamente.", "bad");
-      gameOverMsg.innerHTML = `Foste morto por <b>${sourceName}</b>.<br><br>Pontuação: <b>${state.points}</b> pts<br>Andar: ${state.depth} | Nível: ${state.lvl}`;
+      gameOverMsg.innerHTML = `Foste morto por um${art === "a" ? "a" : ""} <b>${sourceName}</b>.<br><br>Pontuação: <b>${state.points}</b> pts<br>Andar: ${state.depth} | Nível: ${state.lvl}`;
       gameOverModal.removeAttribute("hidden");
     } else {
       sfx.hit();
       if (state.armor > 0 && mitigated !== amount)
-        pushLog(`O(a) **${sourceName}** acerta-te em **${mitigated}** (armadura bloqueou **${amount - mitigated}**).`, "bad");
+        pushLog(`${Art} **${sourceName}** acerta-te em **${mitigated}** (armadura bloqueou **${amount - mitigated}**).`, "bad");
       else
-        pushLog(`O(a) **${sourceName}** acerta-te em **${mitigated}**.`, "bad");
+        pushLog(`${Art} **${sourceName}** acerta-te em **${mitigated}**.`, "bad");
     }
   }
 
   function xpToNext(lvl) { return 8 + (lvl - 1) * 6; }
 
   function grantXp(amount) {
-    state.xp += amount; state.points += amount * 10;
-    pushLog(`Ganhaste **${amount}** XP e **${amount * 10}** pontos.`, "good");
+    state.xp += amount; 
+    pushLog(`Ganhaste **${amount}** XP.`, "good");
     while (state.xp >= xpToNext(state.lvl)) {
       state.xp -= xpToNext(state.lvl);
       state.lvl += 1; state.maxHp += 2;
@@ -583,7 +655,12 @@
     if (targetEnemy) {
       const dmg = roll(combatRng, state.atk[0], state.atk[1]);
       dealDamageToEnemy(targetEnemy, dmg);
-      if (targetEnemy.hp <= 0) grantXp(2 + Math.floor(targetEnemy.maxHp / 2));
+      if (targetEnemy.hp <= 0) {
+        grantXp(2 + Math.floor(targetEnemy.maxHp / 2));
+        const pts = (targetEnemy.va * 10) + (state.depth * 2);
+        state.points += pts;
+        pushLog(`Recebeste **${pts}** pontos extra.`, "good");
+      }
       return true;
     }
 
@@ -747,7 +824,7 @@
           pushLog(`Esquivaste-te do ataque de **${e.name}**! (Carisma)`, "good");
           continue;
         }
-        dealDamageToPlayer(roll(combatRng, et.atk[0], et.atk[1]), e.name);
+        dealDamageToPlayer(roll(combatRng, e.atk[0], e.atk[1]), e);
         continue;
       }
 
