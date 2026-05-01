@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="pt">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DeepCrawler</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="header">
+        <div class="title">
+          <h1>DeepCrawler</h1>
+          <p>Roguelike por turnos numa masmorra procedural infinitamente profunda.</p>
+        </div>
+
+        <div class="hud">
+          <div class="hudRow">
+            <div class="pill"><span class="label">Andar</span> <span id="depthVal">1</span></div>
+            <div class="pill"><span class="label">HP</span> <span id="hpVal">10</span></div>
+            <div class="pill"><span class="label">Nível</span> <span id="lvlVal">1</span></div>
+            <div class="pill"><span class="label">XP</span> <span id="xpVal">0</span></div>
+            <div class="pill"><span class="label">Armadura</span> <span id="armVal">0</span></div>
+            <div class="pill"><span class="label">Carisma</span> <span id="chaVal">0</span></div>
+            <div class="pill"><span class="label">Pontos</span> <span id="pointsVal">0</span></div>
+            <div class="pill"><span class="label">Seed</span> <span id="seedVal">—</span></div>
+          </div>
+          <div class="hudRow">
+            <button id="newGameBtn" class="btn">Novo jogo</button>
+            <button id="helpBtn" class="btn btnGhost" aria-expanded="false">Ajuda</button>
+          </div>
+        </div>
+      </header>
+
+      <main class="main">
+        <section class="panel">
+          <div id="grid" class="grid" role="application" aria-label="Grelha do jogo"></div>
+          <div class="legend">
+            <div class="legendItem"><span class="tile tileWall"        aria-hidden="true"></span> Parede</div>
+            <div class="legendItem"><span class="tile tileFloor"       aria-hidden="true"></span> Chão</div>
+            <div class="legendItem"><span class="tile tilePlayer"      aria-hidden="true"></span> Jogador</div>
+            <div class="legendItem"><span class="tile tileStairsDown"  aria-hidden="true"></span> Descer</div>
+            <div class="legendItem"><span class="tile tileStairsUp"    aria-hidden="true"></span> Subir</div>
+            <div class="legendItem"><span class="tile tileDoorClosed"  aria-hidden="true"></span> Porta</div>
+            <div class="legendItem"><span class="tile tileEnemyG"      aria-hidden="true"></span> Goblin</div>
+            <div class="legendItem"><span class="tile tileEnemyO"      aria-hidden="true"></span> Orc</div>
+            <div class="legendItem"><span class="tile tileEnemyS"      aria-hidden="true"></span> Slime</div>
+          </div>
+        </section>
+
+        <aside class="sidebar">
+          <section id="help" class="help" hidden>
+            <h2>Como jogar</h2>
+            <ul>
+              <li><b>Mover</b>: Setas ou WASD</li>
+              <li><b>Esperar</b>: Espaço</li>
+              <li><b>Abrir porta</b>: Andar contra ela</li>
+              <li><b>Descer</b>: Pisar em <b>&gt;</b></li>
+              <li><b>Subir</b>: Pisar em <b>&lt;</b></li>
+              <li><b>Atacar</b>: Andar contra um inimigo</li>
+              <li><b>Usar item</b>: Carregar em <b>1–9</b> (slots do inventário)</li>
+            </ul>
+            <p class="muted">
+              Cada tecla é um turno: <b>tu ages</b>, depois <b>os inimigos agem</b>.
+              A masmorra é infinita: novos andares são gerados ao descer.
+            </p>
+            <p class="muted">
+              <b>Carisma</b>: cada ponto dá 10% de chance de esquivar ataques inimigos.<br>
+              <b>Armadura</b>: reduz o dano recebido (máx. 5), mas nunca abaixo de 1.
+            </p>
+          </section>
+
+          <section class="invPanel">
+            <h2>Inventário</h2>
+            <div id="inv" class="inv"></div>
+            <p class="muted invHint">Carrega em <b>1–9</b> para usar um item.</p>
+          </section>
+
+          <section class="logPanel">
+            <h2>Registo</h2>
+            <div id="log" class="log" aria-live="polite"></div>
+          </section>
+        </aside>
+      </main>
+
+      <section class="scoresSection">
+        <h2 class="scoresSectionTitle">Tabela de Pontuação</h2>
+        <div id="scores" class="scoresList"></div>
+      </section>
+
+      <footer class="footer">
+        <span class="muted">Dica: clica na grelha para focar os controlos do teclado.</span>
+      </footer>
+    </div>
+
+    <!-- Modal de início / novo jogo -->
+    <div id="startModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modalBox">
+        <h2 id="modalTitle">DeepCrawler</h2>
+        <p class="muted">Introduz o teu nome para entrar na tabela de pontuação.</p>
+        <input
+          type="text"
+          id="playerNameInput"
+          class="nameInput"
+          placeholder="O teu nome…"
+          maxlength="20"
+          autocomplete="off"
+        />
+        <button id="startBtn" class="btn">Iniciar</button>
+      </div>
+    </div>
+
+    <script src="./main.js"></script>
+  </body>
+</html>
