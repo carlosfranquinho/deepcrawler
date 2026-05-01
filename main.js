@@ -1,16 +1,19 @@
 (() => {
   "use strict";
 
-  const LEVEL_W   = 41;
-  const LEVEL_H   = 41;
-  const VIEW_W    = 21;
-  const VIEW_H    = 21;
+  const LEVEL_W = 41;
+  const LEVEL_H = 41;
+  const VIEW_W = 21;
+  const VIEW_H = 21;
   const ARMOR_MAX = 5;
 
   const Tile = {
     Wall: "#", Floor: ".", Up: "<", Down: ">",
     Corpse: "%", DoorClosed: "+", DoorOpen: "/", DoorLocked: "X",
   };
+
+  const SUPABASE_URL = "https://nyfoxreoogblnqptpomz.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_2RFiYJ5GGivIBfJNsp_LLw_qWkxe0s1";
 
   /** @typedef {{x:number,y:number}} Pos */
   /** @typedef {{id:string,name:string,glyph:string,cssClass:string,maxHp:number,atk:[number,number]}} EnemyType */
@@ -68,18 +71,18 @@
 
   // Arquétipos de jogador — valores tabelados
   const PLAYER_ARCHETYPES = [
-    { name: "Guerreiro",  maxHp: 14, atk: [2, 5], armor: 1, charisma: 0 },
-    { name: "Ladrão",     maxHp: 9,  atk: [3, 5], armor: 0, charisma: 3 },
-    { name: "Mago",       maxHp: 8,  atk: [1, 7], armor: 0, charisma: 1 },
-    { name: "Paladino",   maxHp: 12, atk: [2, 4], armor: 1, charisma: 2 },
-    { name: "Bárbaro",    maxHp: 16, atk: [3, 6], armor: 0, charisma: 0 },
+    { name: "Guerreiro", maxHp: 14, atk: [2, 5], armor: 1, charisma: 0 },
+    { name: "Ladrão", maxHp: 9, atk: [3, 5], armor: 0, charisma: 3 },
+    { name: "Mago", maxHp: 8, atk: [1, 7], armor: 0, charisma: 1 },
+    { name: "Paladino", maxHp: 12, atk: [2, 4], armor: 1, charisma: 2 },
+    { name: "Bárbaro", maxHp: 16, atk: [3, 6], armor: 0, charisma: 0 },
   ];
 
   // RNG de combate global — avança ao longo de toda a sessão
   let combatRng;
 
   function clamp(n, a, b) { return Math.max(a, Math.min(b, n)); }
-  function idx(x, y)      { return y * LEVEL_W + x; }
+  function idx(x, y) { return y * LEVEL_W + x; }
   function inBounds(x, y) { return x >= 0 && y >= 0 && x < LEVEL_W && y < LEVEL_H; }
 
   function mulberry32(seed) {
@@ -99,12 +102,12 @@
     return (x ^ (x >>> 16)) >>> 0;
   }
 
-  function roll(rng, min, max)  { return min + Math.floor(rng() * (max - min + 1)); }
-  function choose(rng, arr)     { return arr[Math.floor(rng() * arr.length)]; }
-  function manhattan(a, b)      { return Math.abs(a.x - b.x) + Math.abs(a.y - b.y); }
+  function roll(rng, min, max) { return min + Math.floor(rng() * (max - min + 1)); }
+  function choose(rng, arr) { return arr[Math.floor(rng() * arr.length)]; }
+  function manhattan(a, b) { return Math.abs(a.x - b.x) + Math.abs(a.y - b.y); }
 
   function neighbors4(p) {
-    return [{ x: p.x+1, y: p.y }, { x: p.x-1, y: p.y }, { x: p.x, y: p.y+1 }, { x: p.x, y: p.y-1 }];
+    return [{ x: p.x + 1, y: p.y }, { x: p.x - 1, y: p.y }, { x: p.x, y: p.y + 1 }, { x: p.x, y: p.y - 1 }];
   }
 
   function isWalkableTile(t) {
@@ -113,17 +116,17 @@
   function isBlockingTile(t) { return t === Tile.Wall || t === Tile.DoorClosed || t === Tile.DoorLocked; }
 
   function ensureBorderWalls(tiles) {
-    for (let x = 0; x < LEVEL_W; x++) { tiles[idx(x, 0)] = Tile.Wall; tiles[idx(x, LEVEL_H-1)] = Tile.Wall; }
-    for (let y = 0; y < LEVEL_H; y++) { tiles[idx(0, y)] = Tile.Wall; tiles[idx(LEVEL_W-1, y)] = Tile.Wall; }
+    for (let x = 0; x < LEVEL_W; x++) { tiles[idx(x, 0)] = Tile.Wall; tiles[idx(x, LEVEL_H - 1)] = Tile.Wall; }
+    for (let y = 0; y < LEVEL_H; y++) { tiles[idx(0, y)] = Tile.Wall; tiles[idx(LEVEL_W - 1, y)] = Tile.Wall; }
   }
 
   function rectsOverlap(a, b, pad = 0) {
-    return !(a.x+a.w+pad <= b.x || b.x+b.w+pad <= a.x || a.y+a.h+pad <= b.y || b.y+b.h+pad <= a.y);
+    return !(a.x + a.w + pad <= b.x || b.x + b.w + pad <= a.x || a.y + a.h + pad <= b.y || b.y + b.h + pad <= a.y);
   }
 
   function carveRoom(tiles, room) {
-    for (let y = room.y+1; y < room.y+room.h-1; y++)
-      for (let x = room.x+1; x < room.x+room.w-1; x++)
+    for (let y = room.y + 1; y < room.y + room.h - 1; y++)
+      for (let x = room.x + 1; x < room.x + room.w - 1; x++)
         tiles[idx(x, y)] = Tile.Floor;
   }
 
@@ -143,22 +146,22 @@
   }
 
   function randomFloorFromRoom(rng, room) {
-    return { x: roll(rng, room.x+1, room.x+room.w-2), y: roll(rng, room.y+1, room.y+room.h-2) };
+    return { x: roll(rng, room.x + 1, room.x + room.w - 2), y: roll(rng, room.y + 1, room.y + room.h - 2) };
   }
 
   function posInRoom(p, room) {
-    return p.x >= room.x && p.x < room.x+room.w && p.y >= room.y && p.y < room.y+room.h;
+    return p.x >= room.x && p.x < room.x + room.w && p.y >= room.y && p.y < room.y + room.h;
   }
   function isPerimeterCell(p, room) {
     if (!posInRoom(p, room)) return false;
-    return p.x === room.x || p.y === room.y || p.x === room.x+room.w-1 || p.y === room.y+room.h-1;
+    return p.x === room.x || p.y === room.y || p.x === room.x + room.w - 1 || p.y === room.y + room.h - 1;
   }
 
   function placeDoors(tiles, rooms, rng) {
     for (const room of rooms) {
       const candidates = [];
-      for (let y = room.y; y < room.y+room.h; y++) {
-        for (let x = room.x; x < room.x+room.w; x++) {
+      for (let y = room.y; y < room.y + room.h; y++) {
+        for (let x = room.x; x < room.x + room.w; x++) {
           const p = { x, y };
           if (!isPerimeterCell(p, room) || tiles[idx(x, y)] !== Tile.Floor) continue;
           let hasInside = false, hasOutside = false;
@@ -166,8 +169,8 @@
             if (!inBounds(n.x, n.y)) continue;
             const nt = tiles[idx(n.x, n.y)];
             const inside = posInRoom(n, room);
-            if (inside  && nt === Tile.Floor && !isPerimeterCell(n, room)) hasInside  = true;
-            if (!inside && nt === Tile.Floor)                               hasOutside = true;
+            if (inside && nt === Tile.Floor && !isPerimeterCell(n, room)) hasInside = true;
+            if (!inside && nt === Tile.Floor) hasOutside = true;
           }
           if (hasInside && hasOutside) candidates.push(p);
         }
@@ -208,20 +211,20 @@
     return {
       ...base,
       maxHp: Math.round(base.maxHp * (1 + tier * 0.4)),
-      atk:   [base.atk[0] + tier, base.atk[1] + tier],
+      atk: [base.atk[0] + tier, base.atk[1] + tier],
     };
   }
 
   const ITEM_TYPES = {
-    potion: { id: "potion", name: "Poção",    cssClass: "tileItemPotion" },
-    armor:  { id: "armor",  name: "Armadura", cssClass: "tileItemArmor"  },
-    charm:  { id: "charm",  name: "Amuleto",  cssClass: "tileItemCharm"  },
-    key:    { id: "key",    name: "Chave",    cssClass: "tileItemKey"    },
+    potion: { id: "potion", name: "Poção", cssClass: "tileItemPotion" },
+    armor: { id: "armor", name: "Armadura", cssClass: "tileItemArmor" },
+    charm: { id: "charm", name: "Amuleto", cssClass: "tileItemCharm" },
+    key: { id: "key", name: "Chave", cssClass: "tileItemKey" },
   };
 
   function generateLevel(depth, baseSeed) {
     const seed = mixSeed(baseSeed, depth);
-    const rng  = mulberry32(seed);
+    const rng = mulberry32(seed);
 
     const tiles = new Array(LEVEL_W * LEVEL_H).fill(Tile.Wall);
     ensureBorderWalls(tiles);
@@ -230,8 +233,8 @@
     const targetRooms = clamp(8 + Math.floor(depth * 0.3), 8, 15);
     for (let tries = 0; tries < 500 && rooms.length < targetRooms; tries++) {
       const w = roll(rng, 6, 9), h = roll(rng, 6, 9);
-      const x = roll(rng, 1, LEVEL_W-w-2), y = roll(rng, 1, LEVEL_H-h-2);
-      const room = { x, y, w, h, cx: (x+((w/2)|0))|0, cy: (y+((h/2)|0))|0 };
+      const x = roll(rng, 1, LEVEL_W - w - 2), y = roll(rng, 1, LEVEL_H - h - 2);
+      const room = { x, y, w, h, cx: (x + ((w / 2) | 0)) | 0, cy: (y + ((h / 2) | 0)) | 0 };
       if (rooms.some(r => rectsOverlap(r, room, 2))) continue;
       carveRoom(tiles, room);
       rooms.push(room);
@@ -240,7 +243,7 @@
 
     rooms.sort((a, b) => (a.cx - b.cx) || (a.cy - b.cy));
     for (let i = 1; i < rooms.length; i++)
-      carveCorridor(tiles, { x: rooms[i-1].cx, y: rooms[i-1].cy }, { x: rooms[i].cx, y: rooms[i].cy }, rng);
+      carveCorridor(tiles, { x: rooms[i - 1].cx, y: rooms[i - 1].cy }, { x: rooms[i].cx, y: rooms[i].cy }, rng);
 
     const extra = roll(rng, 0, 2);
     for (let i = 0; i < extra; i++) {
@@ -273,7 +276,7 @@
     const otherRooms = rooms.filter(r => r !== startRoom);
     otherRooms.sort((a, b) => manhattan({ x: b.cx, y: b.cy }, playerStart) - manhattan({ x: a.cx, y: a.cy }, playerStart));
     const downRoom = otherRooms[0] || startRoom;
-    const upRoom   = otherRooms[Math.min(roll(rng, 1, Math.min(3, otherRooms.length-1)), otherRooms.length-1)] || startRoom;
+    const upRoom = otherRooms[Math.min(roll(rng, 1, Math.min(3, otherRooms.length - 1)), otherRooms.length - 1)] || startRoom;
 
     const stairExclude = new Set([...nearDoor, idx(playerStart.x, playerStart.y)]);
     const down = safeFloor(rng, downRoom, stairExclude);
@@ -281,7 +284,7 @@
     const up = safeFloor(rng, upRoom, stairExclude);
 
     tiles[idx(down.x, down.y)] = Tile.Down;
-    tiles[idx(up.x,   up.y)]   = Tile.Up;
+    tiles[idx(up.x, up.y)] = Tile.Up;
     tiles[idx(playerStart.x, playerStart.y)] = Tile.Floor;
 
     // Itens
@@ -304,9 +307,9 @@
     while (qh < q.length) {
       const cur = q[qh++];
       const cx = cur % LEVEL_W, cy = (cur / LEVEL_W) | 0;
-      if (tiles[cur] === Tile.Floor) safeZone.push({x: cx, y: cy});
-      
-      for (const n of neighbors4({x: cx, y: cy})) {
+      if (tiles[cur] === Tile.Floor) safeZone.push({ x: cx, y: cy });
+
+      for (const n of neighbors4({ x: cx, y: cy })) {
         if (!inBounds(n.x, n.y)) continue;
         const ni = idx(n.x, n.y);
         if (!visited[ni] && tiles[ni] !== Tile.Wall && tiles[ni] !== Tile.DoorLocked) {
@@ -317,7 +320,7 @@
     }
 
     const occItems = new Set([...nearDoor, idx(playerStart.x, playerStart.y), idx(down.x, down.y), idx(up.x, up.y)]);
-    
+
     // Spawn keys in safe zone
     if (safeZone.length > 0) {
       for (let i = 0; i < numLocked; i++) {
@@ -343,13 +346,13 @@
         occItems.add(ii); pos = p; break;
       }
       if (!pos) break;
-      
+
       let tp = ITEM_TYPES.potion;
       if (isSpecialLevel && specialsSpawned < 1 && rng() < 0.6) {
         tp = choose(rng, [ITEM_TYPES.armor, ITEM_TYPES.charm]);
         specialsSpawned++;
       }
-      
+
       items.push({ id: `${depth}-${seed}-it-${i}-${tp.id}`, typeId: tp.id, name: tp.name, cssClass: tp.cssClass, pos });
     }
 
@@ -360,13 +363,13 @@
       if (et.va > depth + 5) weight = 0; // Too strong
       return { et, weight };
     }).filter(w => w.weight > 0);
-    
+
     let totalWeight = enemyWeights.reduce((sum, w) => sum + w.weight, 0);
     if (totalWeight === 0) {
       enemyWeights.push({ et: availableMonsters[0], weight: 1 });
       totalWeight = 1;
     }
-    
+
     const pickMonster = () => {
       let r = rng() * totalWeight;
       for (let w of enemyWeights) {
@@ -394,7 +397,7 @@
       let va = et.va;
       let maxHp = et.maxHp;
       let atk = [...et.atk];
-      
+
       if (depth > et.va + 50) {
         const mod = Math.floor(rng() * 3);
         if (mod === 0) {
@@ -411,7 +414,7 @@
           atk[0] += 10; atk[1] += 10;
         }
       }
-      
+
       enemies.push({
         id: `${depth}-${seed}-${i}-${et.id}`, typeId: et.id, name, article: et.article, va,
         glyph: et.glyph, cssClass: et.cssClass, pos, hp: maxHp, maxHp: maxHp, atk
@@ -426,7 +429,7 @@
   let _audioCtx = null;
   function getAudioCtx() {
     if (!_audioCtx) {
-      try { _audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+      try { _audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { }
     }
     return _audioCtx;
   }
@@ -436,7 +439,7 @@
     if (!ctx) return;
     try {
       const osc = ctx.createOscillator();
-      const g   = ctx.createGain();
+      const g = ctx.createGain();
       osc.connect(g); g.connect(ctx.destination);
       osc.type = type;
       osc.frequency.setValueAtTime(freq, ctx.currentTime + delay);
@@ -444,28 +447,28 @@
       g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + dur);
       osc.start(ctx.currentTime + delay);
       osc.stop(ctx.currentTime + delay + dur + 0.01);
-    } catch(e) {}
+    } catch (e) { }
   }
 
   const sfx = {
     // Jogador ataca
-    attack:  () => { beep(330, 0.06, "sawtooth", 0.18); beep(200, 0.08, "sawtooth", 0.10, 0.05); },
+    attack: () => { beep(330, 0.06, "sawtooth", 0.18); beep(200, 0.08, "sawtooth", 0.10, 0.05); },
     // Inimigo morre
-    kill:    () => { beep(440, 0.07, "square", 0.16); beep(330, 0.07, "square", 0.12, 0.08); beep(220, 0.10, "square", 0.08, 0.16); },
+    kill: () => { beep(440, 0.07, "square", 0.16); beep(330, 0.07, "square", 0.12, 0.08); beep(220, 0.10, "square", 0.08, 0.16); },
     // Jogador é atingido
-    hit:     () => { beep(140, 0.10, "sawtooth", 0.25); beep(100, 0.12, "sawtooth", 0.14, 0.07); },
+    hit: () => { beep(140, 0.10, "sawtooth", 0.25); beep(100, 0.12, "sawtooth", 0.14, 0.07); },
     // Jogador esquiva
-    dodge:   () => beep(660, 0.06, "sine", 0.12),
+    dodge: () => beep(660, 0.06, "sine", 0.12),
     // Apanhar item
-    pickup:  () => { beep(523, 0.07, "sine", 0.16); beep(659, 0.09, "sine", 0.11, 0.07); },
+    pickup: () => { beep(523, 0.07, "sine", 0.16); beep(659, 0.09, "sine", 0.11, 0.07); },
     // Subir de nível
     levelUp: () => [523, 659, 784, 1047].forEach((f, i) => beep(f, 0.13, "sine", 0.18, i * 0.10)),
     // Abrir porta
-    door:    () => beep(180, 0.07, "square", 0.12),
+    door: () => beep(180, 0.07, "square", 0.12),
     // Usar escadas
-    stairs:  () => { beep(330, 0.08, "sine", 0.13); beep(440, 0.10, "sine", 0.11, 0.09); },
+    stairs: () => { beep(330, 0.08, "sine", 0.13); beep(440, 0.10, "sine", 0.11, 0.09); },
     // Morte do jogador
-    death:   () => [220, 165, 110, 82].forEach((f, i) => beep(f, 0.22, "sawtooth", 0.24, i * 0.20)),
+    death: () => [220, 165, 110, 82].forEach((f, i) => beep(f, 0.22, "sawtooth", 0.24, i * 0.20)),
   };
 
   // ── DOM ──────────────────────────────────────────────────────────────────────
@@ -476,32 +479,32 @@
     return node;
   }
 
-  const gridEl          = el("grid");
-  const logEl           = el("log");
-  const depthVal        = el("depthVal");
-  const hpVal           = el("hpVal");
-  const lvlVal          = el("lvlVal");
-  const xpVal           = el("xpVal");
-  const armVal          = el("armVal");
-  const chaVal          = el("chaVal");
-  const seedVal         = el("seedVal");
-  const pointsVal       = el("pointsVal");
-  const newGameBtn      = el("newGameBtn");
-  const helpBtn         = el("helpBtn");
-  const scoresBtn       = el("scoresBtn");
-  const invEl           = el("inv");
-  const gameOverModal   = el("gameOverModal");
-  const gameOverMsg     = el("gameOverMsg");
-  const restartBtnSim   = el("restartBtnSim");
-  const restartBtnNao   = el("restartBtnNao");
-  const scoresModal     = el("scoresModal");
-  const closeScoresBtn  = el("closeScoresBtn");
-  const helpModal       = el("helpModal");
-  const closeHelpBtn    = el("closeHelpBtn");
-  const startModal      = el("startModal");
+  const gridEl = el("grid");
+  const logEl = el("log");
+  const depthVal = el("depthVal");
+  const hpVal = el("hpVal");
+  const lvlVal = el("lvlVal");
+  const xpVal = el("xpVal");
+  const armVal = el("armVal");
+  const chaVal = el("chaVal");
+  const seedVal = el("seedVal");
+  const pointsVal = el("pointsVal");
+  const newGameBtn = el("newGameBtn");
+  const helpBtn = el("helpBtn");
+  const scoresBtn = el("scoresBtn");
+  const invEl = el("inv");
+  const gameOverModal = el("gameOverModal");
+  const gameOverMsg = el("gameOverMsg");
+  const restartBtnSim = el("restartBtnSim");
+  const restartBtnNao = el("restartBtnNao");
+  const scoresModal = el("scoresModal");
+  const closeScoresBtn = el("closeScoresBtn");
+  const helpModal = el("helpModal");
+  const closeHelpBtn = el("closeHelpBtn");
+  const startModal = el("startModal");
   const playerNameInput = el("playerNameInput");
-  const startBtn        = el("startBtn");
-  const scoresEl        = el("scores");
+  const startBtn = el("startBtn");
+  const scoresEl = el("scores");
 
   const cells = [];
   for (let i = 0; i < VIEW_W * VIEW_H; i++) {
@@ -514,7 +517,7 @@
   gridEl.addEventListener("click", () => gridEl.focus());
 
   function pushLog(text, kind = "info") {
-    const p   = document.createElement("p");
+    const p = document.createElement("p");
     p.className = "logLine";
     const tag = document.createElement("span");
     tag.className = "tag";
@@ -529,13 +532,13 @@
   }
 
   function cellForTile(t) {
-    if (t === Tile.Wall)       return "tileWall";
-    if (t === Tile.Floor)      return "tileFloor";
-    if (t === Tile.Up)         return "tileStairsUp";
-    if (t === Tile.Down)       return "tileStairsDown";
-    if (t === Tile.Corpse)     return "tileCorpse";
+    if (t === Tile.Wall) return "tileWall";
+    if (t === Tile.Floor) return "tileFloor";
+    if (t === Tile.Up) return "tileStairsUp";
+    if (t === Tile.Down) return "tileStairsDown";
+    if (t === Tile.Corpse) return "tileCorpse";
     if (t === Tile.DoorClosed) return "tileDoorClosed";
-    if (t === Tile.DoorOpen)   return "tileDoorOpen";
+    if (t === Tile.DoorOpen) return "tileDoorOpen";
     if (t === Tile.DoorLocked) return "tileDoorLocked";
     return "tileFloor";
   }
@@ -545,28 +548,60 @@
 
   // ── Pontuações ───────────────────────────────────────────────────────────────
 
-  function getScores() {
-    try { return JSON.parse(localStorage.getItem("deepcrawler_scores") || "[]"); }
-    catch { return []; }
+  async function getScores() {
+    if (SUPABASE_URL === "SUA_SUPABASE_URL_AQUI") {
+      try { return JSON.parse(localStorage.getItem("deepcrawler_scores") || "[]"); }
+      catch { return []; }
+    }
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/scores?select=*&order=points.desc&limit=10`, {
+        headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
+      });
+      if (!res.ok) throw new Error("Erro de rede ao ler Supabase.");
+      return await res.json();
+    } catch (e) {
+      console.error(e);
+      return [];
+    }
   }
 
-  function saveScore() {
-    const scores = getScores();
-    scores.push({
-      name:      state.playerName || "Anónimo",
+  async function saveScore() {
+    const scoreData = {
+      name: state.playerName || "Anónimo",
       archetype: state.archetype,
-      points:    state.points,
-      depth:     state.depth,
-      lvl:       state.lvl,
-      date:      new Date().toLocaleDateString("pt-PT"),
-    });
-    scores.sort((a, b) => b.points - a.points);
-    localStorage.setItem("deepcrawler_scores", JSON.stringify(scores.slice(0, 10)));
-    renderScores();
+      points: state.points,
+      depth: state.depth,
+      lvl: state.lvl,
+      date: new Date().toLocaleDateString("pt-PT"),
+    };
+
+    if (SUPABASE_URL === "SUA_SUPABASE_URL_AQUI") {
+      const scores = await getScores();
+      scores.push(scoreData);
+      scores.sort((a, b) => b.points - a.points);
+      localStorage.setItem("deepcrawler_scores", JSON.stringify(scores.slice(0, 10)));
+      return;
+    }
+
+    try {
+      await fetch(`${SUPABASE_URL}/rest/v1/scores`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": SUPABASE_KEY,
+          "Authorization": `Bearer ${SUPABASE_KEY}`,
+          "Prefer": "return=minimal"
+        },
+        body: JSON.stringify(scoreData)
+      });
+    } catch (e) {
+      console.error(e);
+    }
   }
 
-  function renderScores() {
-    const scores = getScores();
+  async function renderScores() {
+    scoresEl.innerHTML = "<p class='muted scoresEmpty'>A carregar pontuações...</p>";
+    const scores = await getScores();
     scoresEl.innerHTML = "";
     if (!scores.length) {
       const p = document.createElement("p");
@@ -580,7 +615,7 @@
       row.className = "scoreRow" + (i === 0 ? " scoreTop" : "");
       const safeName = (s.name || "?").replaceAll("&", "&amp;").replaceAll("<", "&lt;");
       const arch = s.archetype ? ` <span class="scoreArch">${s.archetype}</span>` : "";
-      row.innerHTML = `<span class="scoreRank">${i+1}</span><span class="scoreName">${safeName}${arch}</span><span class="scoreDepth">Andar ${s.depth}</span><span class="scoreLvl">Nív.&nbsp;${s.lvl}</span><span class="scorePoints">${s.points}&nbsp;pts</span><span class="scoreDate">${s.date}</span>`;
+      row.innerHTML = `<span class="scoreRank">${i + 1}</span><span class="scoreName">${safeName}${arch}</span><span class="scoreDepth">Andar ${s.depth}</span><span class="scoreLvl">Nív.&nbsp;${s.lvl}</span><span class="scorePoints">${s.points}&nbsp;pts</span><span class="scoreDate">${s.date}</span>`;
       scoresEl.appendChild(row);
     });
   }
@@ -603,7 +638,7 @@
 
   startBtn.addEventListener("click", startFromModal);
   playerNameInput.addEventListener("keydown", e => {
-    if (e.key === "Enter")  { e.preventDefault(); startFromModal(); }
+    if (e.key === "Enter") { e.preventDefault(); startFromModal(); }
     if (e.key === "Escape" && state) { hideModal(); gridEl.focus(); }
   });
 
@@ -614,7 +649,7 @@
 
     // Arquétipo aleatório baseado na seed
     const archRng = mulberry32(seed ^ 0xA1C1234);
-    const arch    = choose(archRng, PLAYER_ARCHETYPES);
+    const arch = choose(archRng, PLAYER_ARCHETYPES);
 
     state = {
       seed, playerName, archetype: arch.name,
@@ -687,7 +722,7 @@
   function xpToNext(lvl) { return 8 + (lvl - 1) * 6; }
 
   function grantXp(amount) {
-    state.xp += amount; 
+    state.xp += amount;
     pushLog(`Ganhaste **${amount}** XP.`, "good");
     while (state.xp >= xpToNext(state.lvl)) {
       state.xp -= xpToNext(state.lvl);
@@ -762,7 +797,7 @@
     }
 
     if (t === Tile.Down) { goDepth(state.depth + 1, "down"); return true; }
-    if (t === Tile.Up)   { goDepth(Math.max(1, state.depth - 1), "up"); return true; }
+    if (t === Tile.Up) { goDepth(Math.max(1, state.depth - 1), "up"); return true; }
     return true;
   }
 
@@ -773,7 +808,7 @@
     state.pos = dir === "down" ? { ...lvl.up } : { ...lvl.down };
     sfx.stairs();
     if (dir === "down") { state.points += 25; pushLog(`Desceste para o andar **${newDepth}** (+25 pontos).`, "info"); }
-    else                { pushLog(`Subiste para o andar **${newDepth}**.`, "info"); }
+    else { pushLog(`Subiste para o andar **${newDepth}**.`, "info"); }
   }
 
   function playerWait() {
@@ -782,18 +817,18 @@
     return true;
   }
 
-  
+
   function itemDrop(slotIdx) {
     if (!state.alive) return false;
     const item = state.inv[slotIdx];
     if (!item) return false;
-    
+
     const lvl = getLevel(state.depth);
     if (lvl.items.some(i => i.pos.x === state.pos.x && i.pos.y === state.pos.y)) {
       pushLog("Já existe um item no chão. Move-te primeiro.", "bad");
       return false;
     }
-    
+
     lvl.items.push({ ...item, pos: { x: state.pos.x, y: state.pos.y } });
     state.inv[slotIdx] = null;
     sfx.pickup(); // reuse pickup sound for dropping
@@ -834,7 +869,7 @@
   function bresenhamLine(a, b) {
     const pts = [];
     let x0 = a.x, y0 = a.y;
-    const dx = Math.abs(b.x-x0), dy = -Math.abs(b.y-y0);
+    const dx = Math.abs(b.x - x0), dy = -Math.abs(b.y - y0);
     const sx = x0 < b.x ? 1 : -1, sy = y0 < b.y ? 1 : -1;
     let err = dx + dy;
     while (true) {
@@ -854,7 +889,7 @@
       for (let x = origin.x - radius; x <= origin.x + radius; x++) {
         if (!inBounds(x, y)) continue;
         const dx = x - origin.x, dy = y - origin.y;
-        if (dx*dx + dy*dy > r2) continue;
+        if (dx * dx + dy * dy > r2) continue;
         const line = bresenhamLine(origin, { x, y });
         for (let i = 0; i < line.length; i++) {
           const p = line[i], ii = idx(p.x, p.y);
@@ -869,14 +904,14 @@
   function bfsNextStep(level, from, to, blocked) {
     const startI = idx(from.x, from.y), goalI = idx(to.x, to.y);
     const prev = new Int32Array(LEVEL_W * LEVEL_H).fill(-1);
-    const q    = new Int32Array(LEVEL_W * LEVEL_H);
+    const q = new Int32Array(LEVEL_W * LEVEL_H);
     let qh = 0, qt = 0;
     q[qt++] = startI; prev[startI] = startI;
     while (qh < qt) {
       const curI = q[qh++];
       if (curI === goalI) break;
       const cx = curI % LEVEL_W, cy = (curI / LEVEL_W) | 0;
-      for (const [nx, ny] of [[cx+1,cy],[cx-1,cy],[cx,cy+1],[cx,cy-1]]) {
+      for (const [nx, ny] of [[cx + 1, cy], [cx - 1, cy], [cx, cy + 1], [cx, cy - 1]]) {
         if (!inBounds(nx, ny)) continue;
         const ni = idx(nx, ny);
         if (prev[ni] !== -1 || blocked(nx, ny)) continue;
@@ -905,7 +940,7 @@
     for (const e of lvl.enemies) {
       if (e.hp <= 0 || !state.alive) continue;
       const dist = manhattan(e.pos, state.pos);
-      const et   = ENEMY_TYPES[e.typeId];
+      const et = ENEMY_TYPES[e.typeId];
 
       if (dist === 1) {
         // Carisma: 10% de esquiva por ponto
@@ -921,7 +956,7 @@
       let next = null;
       if (dist <= 8) next = bfsNextStep(lvl, e.pos, state.pos, blockedForEnemy);
       if (!next) {
-        const dirs = [{ x:1,y:0 },{ x:-1,y:0 },{ x:0,y:1 },{ x:0,y:-1 }];
+        const dirs = [{ x: 1, y: 0 }, { x: -1, y: 0 }, { x: 0, y: 1 }, { x: 0, y: -1 }];
         const d = choose(combatRng, dirs);
         const nx = e.pos.x + d.x, ny = e.pos.y + d.y;
         const nt = lvl.tiles[idx(nx, ny)];
@@ -944,9 +979,9 @@
   function renderInventory() {
     invEl.innerHTML = "";
     for (let i = 0; i < 9; i++) {
-      const row  = document.createElement("div"); row.className = "invRow";
+      const row = document.createElement("div"); row.className = "invRow";
       const left = document.createElement("div"); left.className = "left";
-      const slot = document.createElement("div"); slot.className = "invSlot"; slot.textContent = String(i+1);
+      const slot = document.createElement("div"); slot.className = "invSlot"; slot.textContent = String(i + 1);
       const name = document.createElement("div"); name.className = "invName";
       name.textContent = state.inv[i] ? state.inv[i].name : "—";
       left.appendChild(slot); left.appendChild(name); row.appendChild(left); invEl.appendChild(row);
@@ -955,20 +990,20 @@
 
   function render() {
     const lvl = getLevel(state.depth);
-    depthVal.textContent  = String(state.depth);
-    hpVal.textContent     = `${state.hp}/${state.maxHp}`;
-    lvlVal.textContent    = String(state.lvl);
-    xpVal.textContent     = `${state.xp}/${xpToNext(state.lvl)}`;
-    armVal.textContent    = `${state.armor}/${ARMOR_MAX}`;
-    chaVal.textContent    = String(state.charisma);
-    seedVal.textContent   = String(state.seed >>> 0);
+    depthVal.textContent = String(state.depth);
+    hpVal.textContent = `${state.hp}/${state.maxHp}`;
+    lvlVal.textContent = String(state.lvl);
+    xpVal.textContent = `${state.xp}/${xpToNext(state.lvl)}`;
+    armVal.textContent = `${state.armor}/${ARMOR_MAX}`;
+    chaVal.textContent = String(state.charisma);
+    seedVal.textContent = String(state.seed >>> 0);
     pointsVal.textContent = String(state.points);
 
     const visible = computeFov(lvl, state.pos, 8);
 
     let startX = state.pos.x - Math.floor(VIEW_W / 2);
     let startY = state.pos.y - Math.floor(VIEW_H / 2);
-    
+
     startX = clamp(startX, 0, LEVEL_W - VIEW_W);
     startY = clamp(startY, 0, LEVEL_H - VIEW_H);
 
@@ -978,7 +1013,7 @@
         const ly = startY + vy;
         const vi = vy * VIEW_W + vx;
         const li = idx(lx, ly);
-        
+
         const fog = visible[li] ? "fogVisible" : lvl.explored[li] ? "fogExplored" : "fogHidden";
         cells[vi].className = `cell ${cellForTile(lvl.tiles[li])} ${fog}`;
         cells[vi].textContent = "";
@@ -993,7 +1028,7 @@
         cells[vi].className = `cell ${it.cssClass} fogVisible`;
       }
     }
-    
+
     for (const e of lvl.enemies) {
       if (e.hp <= 0) continue;
       if (e.pos.x >= startX && e.pos.x < startX + VIEW_W && e.pos.y >= startY && e.pos.y < startY + VIEW_H) {
@@ -1004,7 +1039,7 @@
         cells[vi].textContent = "";
       }
     }
-    
+
     if (state.pos.x >= startX && state.pos.x < startX + VIEW_W && state.pos.y >= startY && state.pos.y < startY + VIEW_H) {
       const vi = (state.pos.y - startY) * VIEW_W + (state.pos.x - startX);
       cells[vi].className = "cell tilePlayer";
@@ -1021,11 +1056,11 @@
   function onKeyDown(e) {
     if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
     if (e.key === "Tab") return;
-    if (["ArrowUp","ArrowDown","ArrowLeft","ArrowRight","w","a","s","d","W","A","S","D"," ","1","2","3","4","5","6","7","8","9"].includes(e.key))
+    if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "w", "a", "s", "d", "W", "A", "S", "D", " ", "1", "2", "3", "4", "5", "6", "7", "8", "9"].includes(e.key))
       e.preventDefault();
     if (!state) return;
     let acted = false;
-    
+
     if (e.code && e.code.startsWith("Digit") && e.code.length === 6) {
       const num = Number(e.code[5]);
       if (num >= 1 && num <= 9) {
@@ -1035,10 +1070,10 @@
       }
     } else {
       switch (e.key) {
-        case "ArrowUp":    case "w": case "W": acted = playerTryMove(0, -1); break;
-        case "ArrowDown":  case "s": case "S": acted = playerTryMove(0,  1); break;
-        case "ArrowLeft":  case "a": case "A": acted = playerTryMove(-1, 0); break;
-        case "ArrowRight": case "d": case "D": acted = playerTryMove( 1, 0); break;
+        case "ArrowUp": case "w": case "W": acted = playerTryMove(0, -1); break;
+        case "ArrowDown": case "s": case "S": acted = playerTryMove(0, 1); break;
+        case "ArrowLeft": case "a": case "A": acted = playerTryMove(-1, 0); break;
+        case "ArrowRight": case "d": case "D": acted = playerTryMove(1, 0); break;
         case " ": acted = playerWait(); break;
         default: return;
       }
@@ -1055,14 +1090,17 @@
     gameOverModal.setAttribute("hidden", "");
     newGame((Math.random() * 2 ** 32) >>> 0, state.playerName);
   });
-  restartBtnNao.addEventListener("click", () => {
+  restartBtnNao.addEventListener("click", async () => {
     gameOverModal.setAttribute("hidden", "");
-    renderScores();
     scoresModal.removeAttribute("hidden");
+    await renderScores();
   });
   helpBtn.addEventListener("click", () => helpModal.removeAttribute("hidden"));
   closeHelpBtn.addEventListener("click", () => helpModal.setAttribute("hidden", ""));
-  scoresBtn.addEventListener("click", () => { renderScores(); scoresModal.removeAttribute("hidden"); });
+  scoresBtn.addEventListener("click", async () => {
+    scoresModal.removeAttribute("hidden");
+    await renderScores();
+  });
   closeScoresBtn.addEventListener("click", () => scoresModal.setAttribute("hidden", ""));
 
   renderScores();
