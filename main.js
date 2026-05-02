@@ -513,14 +513,18 @@
   const invEl = el("inv");
   const depthVal = el("depthVal");
   const hpVal = el("hpVal");
+  const hpBar = el("hpBar");
   const lvlVal = el("lvlVal");
   const xpVal = el("xpVal");
+  const xpBar = el("xpBar");
   const chaVal = el("chaVal");
+  const chaBar = el("chaBar");
   const seedVal = el("seedVal");
   const pointsVal = el("pointsVal");
   const heroEmoji = el("heroEmoji");
   const heroName  = el("heroName");
   const heroArchetype = el("heroArchetype");
+  const compassEl = el("compassEl");
   const newGameBtn = el("newGameBtn");
   const helpBtn = el("helpBtn");
   const scoresBtn = el("scoresBtn");
@@ -538,7 +542,6 @@
   const scoresEl = el("scores");
   const archetypeGrid = el("archetypeGrid");
   const muteBtn = el("muteBtn");
-  const stairsVal = el("stairsVal");
   const continueBtn = el("continueBtn");
   const continueSection = el("continueSection");
 
@@ -953,6 +956,137 @@
   }
 
 
+  // ── Efeitos aleatórios ────────────────────────────────────────────────────
+
+  const POTION_POOL = [
+    "heal_sm","heal_sm","heal_sm",
+    "heal_lg","heal_lg",
+    "xp_sm","xp_sm",
+    "armor",
+    "teleport",
+    "curse",
+  ];
+  const SCROLL_POOL = [
+    "heal_lg","heal_lg",
+    "xp_sm","xp_sm",
+    "xp_lg",
+    "reveal_map","reveal_map",
+    "kill_room","kill_room",
+    "carisma",
+    "points_sm",
+    "curse",
+  ];
+  const CHARM_POOL = [
+    "carisma","carisma","carisma",
+    "armor","armor",
+    "xp_sm","xp_sm",
+    "points_sm",
+    "curse",
+  ];
+
+  function killRoom(lvl) {
+    const visited = new Set();
+    const queue = [idx(state.pos.x, state.pos.y)];
+    while (queue.length && visited.size < 120) {
+      const ci = queue.shift();
+      if (visited.has(ci)) continue;
+      visited.add(ci);
+      const cx = ci % LEVEL_W, cy = (ci / LEVEL_W) | 0;
+      for (const n of neighbors4({ x: cx, y: cy })) {
+        if (inBounds(n.x, n.y) && !visited.has(idx(n.x, n.y)) && !isBlockingTile(lvl.tiles[idx(n.x, n.y)]))
+          queue.push(idx(n.x, n.y));
+      }
+    }
+    let killed = 0;
+    for (const e of lvl.enemies) {
+      if (e.hp > 0 && visited.has(idx(e.pos.x, e.pos.y))) { e.hp = 0; killed++; }
+    }
+    return killed;
+  }
+
+  function teleportPlayer(lvl) {
+    const floors = [];
+    for (let i = 0; i < lvl.tiles.length; i++)
+      if (isWalkableTile(lvl.tiles[i])) floors.push(i);
+    if (!floors.length) return;
+    const ti = choose(combatRng, floors);
+    state.pos = { x: ti % LEVEL_W, y: (ti / LEVEL_W) | 0 };
+  }
+
+  function applyRandomEffect(pool) {
+    const effectId = choose(combatRng, pool);
+    const lvl = getLevel(state.depth);
+    switch (effectId) {
+      case "heal_sm": {
+        const h = Math.min(state.maxHp - state.hp, roll(combatRng, 3, 6));
+        state.hp += h; state.points += 5; sfx.pickup();
+        showFloat(state.pos.x, state.pos.y, `+${h} HP`, "floatHeal");
+        pushLog(h > 0 ? `Curaste **${h}** HP (+5 pontos).` : "Já tens HP máximo.", h > 0 ? "good" : "info");
+        break;
+      }
+      case "heal_lg": {
+        const h = Math.min(state.maxHp - state.hp, roll(combatRng, 7, 12));
+        state.hp += h; state.points += 10; sfx.pickup();
+        showFloat(state.pos.x, state.pos.y, `+${h} HP`, "floatHeal");
+        pushLog(h > 0 ? `Cura poderosa! **+${h}** HP (+10 pontos).` : "Já tens HP máximo.", h > 0 ? "good" : "info");
+        break;
+      }
+      case "xp_sm": {
+        const xp = roll(combatRng, 5, 15);
+        grantXp(xp); state.points += 5;
+        break;
+      }
+      case "xp_lg": {
+        const xp = roll(combatRng, 20, 40);
+        grantXp(xp); state.points += 10;
+        break;
+      }
+      case "armor": {
+        if (state.armor >= ARMOR_MAX) {
+          pushLog("Armadura já ao máximo! Energia desperdiçada.", "info");
+        } else {
+          state.armor += 1; state.points += 15; sfx.pickup();
+          pushLog(`Armadura reforçada! +**1** armadura [${state.armor}/${ARMOR_MAX}] (+15 pontos).`, "good");
+        }
+        break;
+      }
+      case "carisma": {
+        state.charisma += 1; state.points += 10; sfx.pickup();
+        pushLog(`Carisma aumentou! +**1** (${state.charisma * 10}% esquiva, +10 pontos).`, "good");
+        break;
+      }
+      case "reveal_map": {
+        lvl.explored.fill(1); state.points += 20; sfx.pickup();
+        pushLog("O mapa revelou os seus segredos! (+20 pontos).", "good");
+        break;
+      }
+      case "kill_room": {
+        const killed = killRoom(lvl);
+        state.points += killed * 10; sfx.pickup();
+        pushLog(killed > 0 ? `Poder destrutivo! **${killed}** inimigos eliminados (+${killed * 10} pontos).` : "A sala estava vazia.", killed > 0 ? "good" : "info");
+        break;
+      }
+      case "teleport": {
+        teleportPlayer(lvl); sfx.stairs();
+        pushLog("Foste teleportado para um local desconhecido!", "info");
+        break;
+      }
+      case "points_sm": {
+        const pts = roll(combatRng, 25, 75);
+        state.points += pts; sfx.pickup();
+        showFloat(state.pos.x, state.pos.y, `+${pts} pts`, "floatHeal");
+        pushLog(`Fortuna! **+${pts}** pontos.`, "good");
+        break;
+      }
+      case "curse": {
+        const dmg = roll(combatRng, 2, 8);
+        state.hp = Math.max(1, state.hp - dmg);
+        pushLog(`Estava amaldiçoado! -**${dmg}** HP.`, "bad");
+        break;
+      }
+    }
+  }
+
   function itemDrop(slotIdx) {
     if (!state.alive) return false;
     const item = state.inv[slotIdx];
@@ -976,12 +1110,7 @@
     if (!item) return false;
 
     if (item.typeId === "potion") {
-      const before = state.hp;
-      state.hp = Math.min(state.maxHp, state.hp + 4);
-      state.points += 10;
-      sfx.pickup();
-      showFloat(state.pos.x, state.pos.y, `+${state.hp - before} hp`, "floatHeal");
-      pushLog(`Bebeste uma poção (+**${state.hp - before}** HP, +10 pontos).`, "good");
+      applyRandomEffect(POTION_POOL);
     } else if (item.typeId === "armor") {
       if (state.armor >= ARMOR_MAX) {
         pushLog(`A armadura já está ao máximo (**${ARMOR_MAX}**). Guarda para mais tarde.`, "info");
@@ -991,9 +1120,7 @@
       sfx.pickup();
       pushLog(`Equipaste armadura (+**1** armadura, +15 pontos). [${state.armor}/${ARMOR_MAX}]`, "good");
     } else if (item.typeId === "charm") {
-      state.charisma += 1; state.points += 15;
-      sfx.pickup();
-      pushLog(`Usaste um amuleto (+**1** carisma → **${state.charisma * 10}%** de esquiva, +15 pontos).`, "good");
+      applyRandomEffect(CHARM_POOL);
     } else if (item.typeId === "sword") {
       state.atk[0] += 1; state.atk[1] += 1; state.points += 20;
       state.weaponUpgrades = (state.weaponUpgrades || 0) + 1;
@@ -1003,11 +1130,7 @@
       showFloat(state.pos.x, state.pos.y, `ATK+1`, "floatHeal");
       pushLog(`Equipaste **${state.weaponName}** (ATK **+1/+1**, +20 pontos). [${state.atk[0]}–${state.atk[1]}]`, "good");
     } else if (item.typeId === "scroll") {
-      const before = state.hp;
-      state.hp = Math.min(state.maxHp, state.hp + 8); state.points += 12;
-      sfx.pickup();
-      showFloat(state.pos.x, state.pos.y, `+${state.hp - before} hp`, "floatHeal");
-      pushLog(`Usaste um Pergaminho de cura (+**${state.hp - before}** HP, +12 pontos).`, "good");
+      applyRandomEffect(SCROLL_POOL);
     } else { return false; }
 
     state.inv[slotIdx] = null;
@@ -1238,14 +1361,27 @@
 
   let viewOriginX = 0, viewOriginY = 0;
 
-  function stairsCompass(lvl) {
-    if (!lvl?.down) return "—";
+  function renderCompass(lvl) {
+    if (!lvl?.down) { compassEl.innerHTML = ""; return; }
     const dx = lvl.down.x - state.pos.x, dy = lvl.down.y - state.pos.y;
     const dist = Math.abs(dx) + Math.abs(dy);
-    if (dist === 0) return "aqui";
-    const dirs = ["→", "↘", "↓", "↙", "←", "↖", "↑", "↗"];
-    const angle = Math.round(Math.atan2(dy, dx) * 4 / Math.PI);
-    return dirs[((angle % 8) + 8) % 8] + " " + dist;
+    const angle = dist === 0 ? 0 : (Math.atan2(dy, dx) * 180 / Math.PI + 90);
+    const distLabel = dist === 0
+      ? `<text x="30" y="30" text-anchor="middle" dominant-baseline="central" fill="rgba(52,211,153,.8)" font-size="10" font-family="system-ui,sans-serif">!</text>`
+      : `<text x="30" y="42" text-anchor="middle" dominant-baseline="central" fill="rgba(148,163,184,.45)" font-size="6.5" font-family="system-ui,sans-serif">${dist}</text>`;
+    compassEl.innerHTML = `<svg viewBox="0 0 60 60" width="60" height="60" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="30" cy="30" r="28" fill="rgba(15,23,42,.85)" stroke="rgba(255,255,255,.14)" stroke-width="1"/>
+      <text x="30" y="10" text-anchor="middle" dominant-baseline="central" fill="rgba(52,211,153,.9)" font-size="9" font-weight="700" font-family="system-ui,sans-serif">N</text>
+      <text x="30" y="50" text-anchor="middle" dominant-baseline="central" fill="rgba(148,163,184,.45)" font-size="8" font-family="system-ui,sans-serif">S</text>
+      <text x="50" y="30" text-anchor="middle" dominant-baseline="central" fill="rgba(148,163,184,.45)" font-size="8" font-family="system-ui,sans-serif">E</text>
+      <text x="10" y="30" text-anchor="middle" dominant-baseline="central" fill="rgba(148,163,184,.45)" font-size="8" font-family="system-ui,sans-serif">O</text>
+      <g transform="rotate(${angle.toFixed(1)}, 30, 30)">
+        <polygon points="30,13 27,28 33,28" fill="#34d399" opacity="0.92"/>
+        <rect x="28.5" y="32" width="3" height="13" rx="1.5" fill="rgba(148,163,184,.32)"/>
+      </g>
+      <circle cx="30" cy="30" r="2.8" fill="rgba(226,232,240,.75)" stroke="rgba(0,0,0,.5)" stroke-width="0.8"/>
+      ${distLabel}
+    </svg>`;
   }
 
   function showFloat(wx, wy, text, cssClass) {
@@ -1262,18 +1398,41 @@
 
   function render() {
     const lvl = getLevel(state.depth);
-    const arch = PLAYER_ARCHETYPES.find(a => a.name === state.archetype) || PLAYER_ARCHETYPES[0];
+    const archIdx = PLAYER_ARCHETYPES.findIndex(a => a.name === state.archetype);
+    const arch = archIdx >= 0 ? PLAYER_ARCHETYPES[archIdx] : PLAYER_ARCHETYPES[0];
+    const meta = ARCH_META[Math.max(0, archIdx)];
+
+    // Hero badge
     heroEmoji.textContent = arch.emoji || "⚔";
+    heroEmoji.style.background = meta.color + "28";
+    heroEmoji.style.borderColor = meta.color + "88";
     heroName.textContent  = state.playerName;
     heroArchetype.textContent = state.archetype;
+
     depthVal.textContent  = String(state.depth);
-    hpVal.textContent     = `${state.hp}/${state.maxHp}`;
     lvlVal.textContent    = String(state.lvl);
-    xpVal.textContent     = `${state.xp}/${xpToNext(state.lvl)}`;
-    chaVal.textContent    = state.charisma > 0 ? `${state.charisma} (${state.charisma * 10}% esquiva)` : "0";
     seedVal.textContent   = String(state.seed >>> 0);
     pointsVal.textContent = String(state.points);
-    stairsVal.textContent = stairsCompass(lvl);
+
+    // HP bar (green → yellow → red)
+    hpVal.textContent = `${state.hp}/${state.maxHp}`;
+    const hpPct = Math.max(0, Math.min(100, (state.hp / state.maxHp) * 100));
+    hpBar.style.width = hpPct + "%";
+    hpBar.style.background = hpPct < 30 ? "#ef4444" : hpPct < 60 ? "#f59e0b" : "#34d399";
+
+    // XP bar (accent)
+    xpVal.textContent = `${state.xp}/${xpToNext(state.lvl)}`;
+    const xpPct = Math.max(0, Math.min(100, (state.xp / xpToNext(state.lvl)) * 100));
+    xpBar.style.width = xpPct + "%";
+    xpBar.style.background = "#a78bfa";
+
+    // Carisma bar (amber, capped at 10)
+    chaVal.textContent = String(state.charisma);
+    const chaPct = Math.max(0, Math.min(100, (state.charisma / 10) * 100));
+    chaBar.style.width = chaPct + "%";
+    chaBar.style.background = "#f59e0b";
+
+    renderCompass(lvl);
 
     const visible = computeFov(lvl, state.pos, 8);
 
@@ -1362,11 +1521,11 @@
         // Diagonal — numpad + VI-keys
         case "7": case "y": case "Y": acted = playerTryMove(-1, -1); break; // ↖
         case "9": case "u": case "U": acted = playerTryMove( 1, -1); break; // ↗
-        case "1": case "b": case "B": acted = playerTryMove(-1,  1); break; // ↙
+        case "1":                     acted = playerTryMove(-1,  1); break; // ↙
         case "3": case "n": case "N": acted = playerTryMove( 1,  1); break; // ↘
         case " ": case "5": acted = playerWait(); break;
-        case "b": acted = itemUseFirst("potion"); break;
-        case "l": acted = itemUseFirst("scroll"); break;
+        case "b": case "B": acted = itemUseFirst("potion"); break;
+        case "l": case "L": acted = itemUseFirst("scroll"); break;
         default: return;
       }
     }
