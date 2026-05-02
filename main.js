@@ -1718,17 +1718,16 @@
     const arch = archIdx >= 0 ? PLAYER_ARCHETYPES[archIdx] : PLAYER_ARCHETYPES[0];
     const meta = ARCH_META[Math.max(0, archIdx)];
 
-    // Hero badge — portrait image with archetype colour tint; red death state when dead
+    // Hero badge — portrait image; red glow overlay when dead
+    heroEmoji.innerHTML = `<img src="${meta.img}" alt="${arch.name}">`;
     if (!state.alive) {
       heroEmoji.style.background = "rgba(239,68,68,0.18)";
       heroEmoji.style.borderColor = "rgba(239,68,68,0.7)";
       heroEmoji.style.boxShadow = "0 0 18px 4px rgba(239,68,68,0.45)";
-      heroEmoji.innerHTML = `<span style="font-size:2rem;line-height:1">😵</span>`;
     } else {
       heroEmoji.style.background = meta.color + "28";
       heroEmoji.style.borderColor = meta.color + "88";
       heroEmoji.style.boxShadow = "";
-      heroEmoji.innerHTML = `<img src="${meta.img}" alt="${arch.name}">`;
     }
     heroName.textContent  = state.playerName;
     heroArchetype.textContent = state.archetype;
