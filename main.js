@@ -314,6 +314,20 @@
       ? startRoom  // o startRoom já é a sala onde o jogador começa — vamos colocar o Up aqui
       : otherRooms[Math.min(roll(rng, 1, Math.min(3, otherRooms.length - 1)), otherRooms.length - 1)] || startRoom;
 
+    // Garantir que upRoom não fica isolada por portas trancadas.
+    // O jogador chega aqui ao descer do piso superior — não pode ficar preso.
+    let numLockedAdjusted = numLocked;
+    if (depth > 1) {
+      for (let i = 0; i < tiles.length; i++) {
+        if (tiles[i] !== Tile.DoorLocked) continue;
+        const px = i % LEVEL_W, py = (i / LEVEL_W) | 0;
+        let adj = posInRoom({ x: px, y: py }, upRoom);
+        if (!adj) for (const n of neighbors4({ x: px, y: py })) if (posInRoom(n, upRoom)) { adj = true; break; }
+        if (adj) { tiles[i] = Tile.DoorClosed; numLockedAdjusted--; }
+      }
+      numLockedAdjusted = Math.max(0, numLockedAdjusted);
+    }
+
     const stairExclude = new Set([...nearDoor, idx(playerStart.x, playerStart.y)]);
     const down = safeFloor(rng, downRoom, stairExclude);
     stairExclude.add(idx(down.x, down.y));
@@ -359,7 +373,7 @@
 
     // Spawn keys in safe zone
     if (safeZone.length > 0) {
-      for (let i = 0; i < numLocked; i++) {
+      for (let i = 0; i < numLockedAdjusted; i++) {
         let pos = null;
         for (let t = 0; t < 50; t++) {
           const p = choose(rng, safeZone);
@@ -529,30 +543,29 @@
     if (!_menuPlaying || soundMuted) return;
     const ctx = getAudioCtx();
     if (!ctx) return;
-    ctx.resume().then(() => {
-      if (!_menuPlaying || soundMuted) return;
-      let t = ctx.currentTime + 0.02;
-      let total = 0;
-      for (const [freq, beats] of MENU_MELODY) {
-        const dur = beats * MENU_BEAT;
-        try {
-          const osc = ctx.createOscillator();
-          const g   = ctx.createGain();
-          osc.connect(g); g.connect(ctx.destination);
-          osc.type = "square";
-          osc.frequency.setValueAtTime(freq, t);
-          g.gain.setValueAtTime(0.07, t);
-          g.gain.exponentialRampToValueAtTime(0.001, t + dur * 0.8);
-          osc.start(t);
-          osc.stop(t + dur);
-          _menuNodes.push(osc);
-        } catch(e) {}
-        t += dur;
-        total += dur;
-      }
-      _menuTimer = setTimeout(() => { _menuNodes = []; _scheduleMenuLoop(); }, (total - 0.05) * 1000);
-    });
+    let t = ctx.currentTime + 0.02;
+    let total = 0;
+    for (const [freq, beats] of MENU_MELODY) {
+      const dur = beats * MENU_BEAT;
+      try {
+        const osc = ctx.createOscillator();
+        const g   = ctx.createGain();
+        osc.connect(g); g.connect(ctx.destination);
+        osc.type = "square";
+        osc.frequency.setValueAtTime(freq, t);
+        g.gain.setValueAtTime(0.07, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + dur * 0.8);
+        osc.start(t);
+        osc.stop(t + dur);
+        _menuNodes.push(osc);
+      } catch(e) {}
+      t += dur;
+      total += dur;
+    }
+    _menuTimer = setTimeout(() => { _menuNodes = []; _scheduleMenuLoop(); }, (total - 0.05) * 1000);
   }
+
+  let _menuGestureFn = null;
 
   function playMenuMusic() {
     if (_menuPlaying || soundMuted) return;
@@ -566,6 +579,11 @@
     _menuTimer = null;
     _menuNodes.forEach(n => { try { n.stop(); } catch(e){} });
     _menuNodes = [];
+    if (_menuGestureFn) {
+      document.removeEventListener("pointerdown", _menuGestureFn);
+      document.removeEventListener("keydown", _menuGestureFn);
+      _menuGestureFn = null;
+    }
   }
 
   // ── DOM ──────────────────────────────────────────────────────────────────────
@@ -846,7 +864,17 @@
     buildArchetypePicker();
     continueSection.hidden = !hasSave();
     setTimeout(() => playerNameInput.focus(), 50);
-    playMenuMusic();
+    // Música só arranca no primeiro gesto (exigência do autoplay dos browsers)
+    if (!_menuGestureFn) {
+      _menuGestureFn = () => {
+        document.removeEventListener("pointerdown", _menuGestureFn);
+        document.removeEventListener("keydown",     _menuGestureFn);
+        _menuGestureFn = null;
+        if (!startModal.hasAttribute("hidden")) playMenuMusic();
+      };
+      document.addEventListener("pointerdown", _menuGestureFn);
+      document.addEventListener("keydown",     _menuGestureFn);
+    }
   }
 
   function hideModal() { startModal.setAttribute("hidden", ""); stopMenuMusic(); }
@@ -1068,6 +1096,18 @@
         sfx.pickup();
         showFloat(state.pos.x, state.pos.y, `ATK+1`, "floatHeal");
         pushLog(`Equipaste **${state.weaponName}** (ATK **+1/+1**). [${state.atk[0]}–${state.atk[1]}]`, "good");
+      } else if (it.typeId === "armor") {
+        lvl.items = lvl.items.filter(x => x.id !== it.id);
+        if (state.armor >= ARMOR_MAX) {
+          state.points += 5;
+          sfx.pickup();
+          pushLog(`Armadura já ao máximo (**${ARMOR_MAX}**). Bónus descartado.`, "info");
+        } else {
+          state.armor += 1; state.points += 15;
+          sfx.pickup();
+          showFloat(state.pos.x, state.pos.y, `ARM+1`, "floatHeal");
+          pushLog(`Armadura equipada! +**1** armadura [${state.armor}/${ARMOR_MAX}].`, "good");
+        }
       } else {
         const freeSlot = state.inv.findIndex(x => x === null);
         if (freeSlot !== -1) {
