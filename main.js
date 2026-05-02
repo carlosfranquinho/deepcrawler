@@ -80,12 +80,12 @@
 
   // Arquétipos de jogador — valores tabelados
   const PLAYER_ARCHETYPES = [
-    { name: "Guerreiro", maxHp: 14, atk: [2, 5], armor: 1, charisma: 0, emoji: "😠" },
-    { name: "Ladrão", maxHp: 9, atk: [3, 5], armor: 0, charisma: 3, emoji: "😈" },
-    { name: "Mago", maxHp: 8, atk: [1, 7], armor: 0, charisma: 1, emoji: "🧐" },
-    { name: "Paladino", maxHp: 12, atk: [2, 4], armor: 1, charisma: 2, emoji: "😇" },
-    { name: "Bárbaro", maxHp: 16, atk: [3, 6], armor: 0, charisma: 0, emoji: "🤬" },
-    { name: "Turista", maxHp: 10, atk: [1, 3], armor: 0, charisma: 1, emoji: "🤪" },
+    { name: "Guerreiro", maxHp: 18, atk: [3, 6], armor: 1, charisma: 0, emoji: "😠" },
+    { name: "Ladrão",   maxHp: 13, atk: [3, 5], armor: 0, charisma: 3, emoji: "😈" },
+    { name: "Mago",     maxHp: 12, atk: [1, 8], armor: 0, charisma: 1, emoji: "🧐" },
+    { name: "Paladino", maxHp: 16, atk: [2, 5], armor: 2, charisma: 2, emoji: "😇" },
+    { name: "Bárbaro",  maxHp: 22, atk: [3, 7], armor: 0, charisma: 0, emoji: "🤬" },
+    { name: "Turista",  maxHp: 10, atk: [1, 3], armor: 0, charisma: 1, emoji: "🤪" },
   ];
 
   // RNG de combate global — avança ao longo de toda a sessão
@@ -384,10 +384,11 @@
     }
 
     const availableMonsters = Object.values(ENEMY_TYPES);
+    const spawnCap = depth + 3; // inimigos muito acima do nível do piso não aparecem
     const enemyWeights = availableMonsters.map(et => {
       let diff = Math.abs(et.va - depth);
       let weight = Math.max(0, 100 - diff * 15);
-      if (et.va > depth + 5) weight = 0; // Too strong
+      if (et.va > spawnCap) weight = 0;
       return { et, weight };
     }).filter(w => w.weight > 0);
 
@@ -406,16 +407,18 @@
       return enemyWeights[enemyWeights.length - 1].et;
     };
 
-    // Inimigos
+    // Inimigos — escala suave: 3-5 no piso 1, crescendo com a profundidade
     const enemies = [];
-    const enemyCount = Math.floor(rooms.length * (1 + rng()));
+    const baseCount = 3 + Math.floor(depth * 0.7);
+    const enemyCount = baseCount + Math.floor(rng() * (2 + Math.floor(depth * 0.3)));
+    const safeRadius = depth <= 4 ? 6 : 4; // mais espaço seguro nos primeiros pisos
     const occEnemies = new Set([...nearDoor, idx(playerStart.x, playerStart.y), idx(down.x, down.y), idx(up.x, up.y)]);
     for (let i = 0; i < enemyCount; i++) {
       let pos = null;
       for (let t = 0; t < 500; t++) {
         const p = randomFloorFromRoom(rng, choose(rng, rooms));
         const ii = idx(p.x, p.y);
-        if (occEnemies.has(ii) || manhattan(p, playerStart) < 4) continue;
+        if (occEnemies.has(ii) || manhattan(p, playerStart) < safeRadius) continue;
         occEnemies.add(ii); pos = p; break;
       }
       if (!pos) break;
@@ -620,6 +623,9 @@
       state = s;
       state.weaponName = state.weaponName || "Mãos";
       state.weaponUpgrades = state.weaponUpgrades || 0;
+      state.lockAttempts = state.lockAttempts || {};
+      state.regenCounter = state.regenCounter || 0;
+      if (state.tourismLifeline === undefined) state.tourismLifeline = true;
       selectedArchIdx = PLAYER_ARCHETYPES.findIndex(a => a.name === state.archetype);
       if (selectedArchIdx < 0) selectedArchIdx = 0;
       combatRng = mulberry32((state.seed ^ state.points) >>> 0);
@@ -709,13 +715,22 @@
   let selectedArchIdx = 0;
 
   const ARCH_META = [
-    { color: "#38bdf8", tagline: "Tanque resistente e confiável", img: "arquetipos/guerreiro.png" },
-    { color: "#f59e0b", tagline: "Ágil, furtivo, esquiva elevada", img: "arquetipos/ladrao.png" },
-    { color: "#a78bfa", tagline: "Frágil mas com dano explosivo", img: "arquetipos/mago.png" },
-    { color: "#34d399", tagline: "Proteção e equilíbrio total", img: "arquetipos/paladino.png" },
-    { color: "#ef4444", tagline: "Força bruta sem recuo", img: "arquetipos/barbaro.png" },
-    { color: "#fbbf24", tagline: "Perdido, confuso mas sortudo!", img: "arquetipos/turista.png" },
+    { color: "#38bdf8", tagline: "Críticos devastadores em combate (20%)", img: "arquetipos/guerreiro.png" },
+    { color: "#f59e0b", tagline: "Mestre de fechaduras e esquiva elevada", img: "arquetipos/ladrao.png" },
+    { color: "#a78bfa", tagline: "Imune a maldições de itens mágicos", img: "arquetipos/mago.png" },
+    { color: "#34d399", tagline: "Regenera 1 HP a cada 8 turnos", img: "arquetipos/paladino.png" },
+    { color: "#ef4444", tagline: "Entra em fúria (+3 ATK) abaixo de 40% HP", img: "arquetipos/barbaro.png" },
+    { color: "#fbbf24", tagline: "Sobrevive 1 golpe fatal por piso… com sorte", img: "arquetipos/turista.png" },
   ];
+
+  const ARCH_ABILITY = {
+    "Guerreiro": "Crítico: 20% de duplo dano",
+    "Ladrão":    "Gazua: arrombas fechaduras em 2 tentativas",
+    "Mago":      "Sentido Arcano: itens mágicos nunca te amaldiçoam",
+    "Paladino":  "Regeneração Sagrada: +1 HP a cada 8 turnos",
+    "Bárbaro":   "Fúria: +3 ATK quando HP ≤ 40%",
+    "Turista":   "Última Sorte: sobrevives 1 golpe fatal por piso",
+  };
 
   function archStatBar(val, max, color) {
     return Array.from({ length: 5 }, (_, i) => {
@@ -792,6 +807,7 @@
       armor: arch.armor, charisma: arch.charisma,
       atk: [...arch.atk], inv: new Array(9).fill(null), points: 0,
       weaponName: "Mãos", weaponUpgrades: 0,
+      lockAttempts: {}, regenCounter: 0, tourismLifeline: true,
     };
 
     const lvl = getLevel(1);
@@ -838,6 +854,13 @@
     state.hp -= mitigated;
     showFloat(state.pos.x, state.pos.y, `-${mitigated}`, "floatHit");
     if (state.hp <= 0) {
+      if (state.archetype === "Turista" && state.tourismLifeline) {
+        state.hp = 1;
+        state.tourismLifeline = false;
+        sfx.hit();
+        pushLog(`**Sorte incrível!** Sobreviveste por um triz! (não há segunda desta vez)`, "good");
+        return;
+      }
       state.hp = 0; state.alive = false;
       sfx.death();
       clearSave();
@@ -881,7 +904,13 @@
 
     const targetEnemy = enemyAt(lvl, nx, ny);
     if (targetEnemy) {
-      const dmg = roll(combatRng, state.atk[0], state.atk[1]);
+      let dmg = roll(combatRng, state.atk[0], state.atk[1]);
+      if (state.archetype === "Guerreiro" && combatRng() < 0.20) {
+        dmg *= 2;
+        pushLog(`Golpe crítico! **${dmg}** de dano!`, "good");
+      } else if (state.archetype === "Bárbaro" && state.hp <= Math.floor(state.maxHp * 0.40)) {
+        dmg += 3;
+      }
       dealDamageToEnemy(targetEnemy, dmg);
       if (targetEnemy.hp <= 0) {
         grantXp(2 + Math.floor(targetEnemy.maxHp / 2));
@@ -906,6 +935,19 @@
         sfx.door();
         pushLog("Destrancaste a porta com uma Chave.", "good");
         renderInventory();
+        return true;
+      } else if (state.archetype === "Ladrão") {
+        const doorKey = `${nx},${ny}`;
+        state.lockAttempts[doorKey] = (state.lockAttempts[doorKey] || 0) + 1;
+        if (state.lockAttempts[doorKey] >= 2) {
+          delete state.lockAttempts[doorKey];
+          lvl.tiles[idx(nx, ny)] = Tile.DoorOpen;
+          sfx.door();
+          pushLog("Arrombaste a fechadura com mestria!", "good");
+        } else {
+          beep(200, 0.06, "square", 0.12);
+          pushLog("A fechadura resiste… mais uma tentativa.", "info");
+        }
         return true;
       } else {
         beep(120, 0.08, "square", 0.15);
@@ -939,6 +981,8 @@
   function goDepth(newDepth, dir) {
     if (newDepth === state.depth) return;
     state.depth = newDepth;
+    state.lockAttempts = {};
+    if (state.archetype === "Turista") state.tourismLifeline = true;
     const lvl = getLevel(newDepth);
     state.pos = dir === "down" ? { ...lvl.up } : { ...lvl.down };
     sfx.stairs();
