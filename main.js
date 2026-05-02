@@ -303,7 +303,11 @@
     const otherRooms = rooms.filter(r => r !== startRoom);
     otherRooms.sort((a, b) => manhattan({ x: b.cx, y: b.cy }, playerStart) - manhattan({ x: a.cx, y: a.cy }, playerStart));
     const downRoom = otherRooms[0] || startRoom;
-    const upRoom = otherRooms[Math.min(roll(rng, 1, Math.min(3, otherRooms.length - 1)), otherRooms.length - 1)] || startRoom;
+    // No nível 1, o jogador começa na sala das escadas de saída (up)
+    // Noutros níveis: numa sala intermédia
+    const upRoom = depth === 1
+      ? startRoom  // o startRoom já é a sala onde o jogador começa — vamos colocar o Up aqui
+      : otherRooms[Math.min(roll(rng, 1, Math.min(3, otherRooms.length - 1)), otherRooms.length - 1)] || startRoom;
 
     const stairExclude = new Set([...nearDoor, idx(playerStart.x, playerStart.y)]);
     const down = safeFloor(rng, downRoom, stairExclude);
@@ -974,7 +978,14 @@
     }
 
     if (t === Tile.Down) { goDepth(state.depth + 1, "down"); return true; }
-    if (t === Tile.Up) { goDepth(Math.max(1, state.depth - 1), "up"); return true; }
+    if (t === Tile.Up) {
+      if (state.depth <= 1) {
+        // Mostrar modal de saída da masmorra
+        showEscapeModal();
+        return false;
+      }
+      goDepth(state.depth - 1, "up"); return true;
+    }
     return true;
   }
 
@@ -988,6 +999,45 @@
     sfx.stairs();
     if (dir === "down") { state.points += 25; pushLog(`Desceste para o piso **${newDepth}**.`, "info"); }
     else { pushLog(`Subiste para o piso **${newDepth}**.`, "info"); }
+  }
+
+  function showEscapeModal() {
+    const modal = el("escapeModal");
+    modal.hidden = false;
+  }
+
+  function escapeGame() {
+    el("escapeModal").hidden = true;
+    // Mostrar stats finais no game over modal
+    const goModal = el("gameOverModal");
+    const msg = el("gameOverMsg");
+    const kills = state.kills || 0;
+    msg.innerHTML = `
+      <div style="text-align:center">
+        <div style="font-size:40px;margin-bottom:8px">🏆</div>
+        <strong>${state.playerName}</strong> escapou da masmorra!<br><br>
+        <table style="margin:0 auto;text-align:left;line-height:2;font-size:15px">
+          <tr><td style="color:var(--muted);padding-right:16px">Piso máximo</td><td><strong>Piso ${state.depth}</strong></td></tr>
+          <tr><td style="color:var(--muted)">Nível do heroi</td><td><strong>${state.lvl}</strong></td></tr>
+          <tr><td style="color:var(--muted)">HP restante</td><td><strong>${state.hp}/${state.maxHp}</strong></td></tr>
+          <tr><td style="color:var(--muted)">Inimigos vencidos</td><td><strong>${kills}</strong></td></tr>
+          <tr><td style="color:var(--muted)">Arma</td><td><strong>${state.weaponName || "Mãos"}</strong></td></tr>
+          <tr><td style="color:var(--muted)">Pontuação</td><td><strong>${state.points} pts</strong></td></tr>
+        </table>
+      </div>`;
+    // Mudar título do modal para vitória
+    const title = goModal.querySelector("h2");
+    if (title) {
+      title.textContent = "Escapaste!";
+      title.style.background = "linear-gradient(to right, #34d399, #38bdf8)";
+      title.style.webkitBackgroundClip = "text";
+      title.style.webkitTextFillColor = "transparent";
+    }
+    const subtitle = goModal.querySelector("h3");
+    if (subtitle) subtitle.textContent = "Jogar novamente?";
+    state.alive = false;
+    goModal.hidden = false;
+    saveScore();
   }
 
   function playerWait() {
@@ -1328,14 +1378,15 @@
         continue;
       }
 
-      // ALCANCE — ataca à dist ≤ 3 com LoS, recua se o jogador estiver perto de mais
+      // ALCANCE — agora persegue como qualquer inimigo, apenas ataca ao contato
+      // (ataque à distância temporariamente desativado — demasiado punitivo)
       if (BEHAVIORS.ranged.has(e.typeId)) {
-        const inRange = dist <= 3 && hasLos(e.pos, state.pos);
-        if (inRange) {
+        if (dist === 1) {
           tryAttack(e);
-          if (dist <= 2) moveAway(e, state.pos);
-        } else {
+        } else if (dist <= 10) {
           moveTowards(e, state.pos);
+        } else {
+          wander(e);
         }
         continue;
       }
@@ -1596,6 +1647,11 @@
     gameOverModal.setAttribute("hidden", "");
     scoresModal.removeAttribute("hidden");
     await renderScores();
+  });
+  el("escapeBtnSim").addEventListener("click", () => escapeGame());
+  el("escapeBtnNao").addEventListener("click", () => {
+    el("escapeModal").hidden = true;
+    gridEl.focus();
   });
   helpBtn.addEventListener("click", () => helpModal.removeAttribute("hidden"));
   closeHelpBtn.addEventListener("click", () => helpModal.setAttribute("hidden", ""));
