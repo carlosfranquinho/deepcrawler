@@ -869,7 +869,7 @@
       state.atk = [state.atk[0] + 1, state.atk[1] + 1];
       state.points += 50;
       sfx.levelUp();
-      pushLog(`Subiste de nível! Agora és nível **${state.lvl}** (+50 pontos).`, "good");
+      pushLog(`Subiste de nível! Agora és nível **${state.lvl}**.`, "good");
     }
   }
 
@@ -887,7 +887,6 @@
         grantXp(2 + Math.floor(targetEnemy.maxHp / 2));
         const pts = (targetEnemy.va * 10) + (state.depth * 2);
         state.points += pts;
-        pushLog(`Recebeste **${pts}** pontos extra.`, "good");
       }
       return true;
     }
@@ -895,9 +894,7 @@
     const t = lvl.tiles[idx(nx, ny)];
     if (t === Tile.DoorClosed) {
       lvl.tiles[idx(nx, ny)] = Tile.DoorOpen;
-      state.points += 1;
       sfx.door();
-      pushLog("Abriste uma porta (+1 ponto).", "info");
       return true;
     }
     if (t === Tile.DoorLocked) {
@@ -907,7 +904,7 @@
         lvl.tiles[idx(nx, ny)] = Tile.DoorOpen;
         state.points += 5;
         sfx.door();
-        pushLog("Destrancaste a porta com uma Chave (+5 pontos).", "good");
+        pushLog("Destrancaste a porta com uma Chave.", "good");
         renderInventory();
         return true;
       } else {
@@ -928,7 +925,7 @@
         lvl.items = lvl.items.filter(x => x.id !== it.id);
         state.points += 5;
         sfx.pickup();
-        pushLog(`Apanhaste **${it.name}** (+5 pontos).`, "info");
+        pushLog(`Apanhaste **${it.name}**.`, "info");
       } else {
         pushLog("Inventário cheio (máx. 9 slots). Larga um item primeiro.", "bad");
       }
@@ -945,7 +942,7 @@
     const lvl = getLevel(newDepth);
     state.pos = dir === "down" ? { ...lvl.up } : { ...lvl.down };
     sfx.stairs();
-    if (dir === "down") { state.points += 25; pushLog(`Desceste para o piso **${newDepth}** (+25 pontos).`, "info"); }
+    if (dir === "down") { state.points += 25; pushLog(`Desceste para o piso **${newDepth}**.`, "info"); }
     else { pushLog(`Subiste para o piso **${newDepth}**.`, "info"); }
   }
 
@@ -1025,21 +1022,21 @@
         const h = Math.min(state.maxHp - state.hp, roll(combatRng, 3, 6));
         state.hp += h; state.points += 5; sfx.pickup();
         showFloat(state.pos.x, state.pos.y, `+${h} HP`, "floatHeal");
-        pushLog(h > 0 ? `Curaste **${h}** HP (+5 pontos).` : "Já tens HP máximo.", h > 0 ? "good" : "info");
+        pushLog(h > 0 ? `Curaste **${h}** HP.` : "Já tens HP máximo.", h > 0 ? "good" : "info");
         break;
       }
       case "heal_lg": {
         const h = Math.min(state.maxHp - state.hp, roll(combatRng, 7, 12));
         state.hp += h; state.points += 10; sfx.pickup();
         showFloat(state.pos.x, state.pos.y, `+${h} HP`, "floatHeal");
-        pushLog(h > 0 ? `Cura poderosa! **+${h}** HP (+10 pontos).` : "Já tens HP máximo.", h > 0 ? "good" : "info");
+        pushLog(h > 0 ? `Cura poderosa! **+${h}** HP.` : "Já tens HP máximo.", h > 0 ? "good" : "info");
         break;
       }
       case "heal_full": {
         const h = state.maxHp - state.hp;
         state.hp = state.maxHp; state.points += 20; sfx.pickup();
         showFloat(state.pos.x, state.pos.y, `+${h} HP`, "floatHeal");
-        pushLog(h > 0 ? `Elixir raro! HP completamente restaurado (**+${h}**, +20 pontos).` : "Já tens HP máximo.", h > 0 ? "good" : "info");
+        pushLog(h > 0 ? `Elixir raro! HP completamente restaurado (**+${h}**).` : "Já tens HP máximo.", h > 0 ? "good" : "info");
         break;
       }
       case "xp_sm": {
@@ -1057,24 +1054,24 @@
           pushLog("Armadura já ao máximo! Energia desperdiçada.", "info");
         } else {
           state.armor += 1; state.points += 15; sfx.pickup();
-          pushLog(`Armadura reforçada! +**1** armadura [${state.armor}/${ARMOR_MAX}] (+15 pontos).`, "good");
+          pushLog(`Armadura reforçada! +**1** armadura [${state.armor}/${ARMOR_MAX}].`, "good");
         }
         break;
       }
       case "carisma": {
         state.charisma += 1; state.points += 10; sfx.pickup();
-        pushLog(`Carisma aumentou! +**1** (${state.charisma * 10}% esquiva, +10 pontos).`, "good");
+        pushLog(`Carisma aumentou! +**1** (${state.charisma * 10}% esquiva).`, "good");
         break;
       }
       case "reveal_map": {
         lvl.explored.fill(1); state.points += 20; sfx.pickup();
-        pushLog("O mapa revelou os seus segredos! (+20 pontos).", "good");
+        pushLog("O mapa revelou os seus segredos!", "good");
         break;
       }
       case "kill_room": {
         const killed = killRoom(lvl);
         state.points += killed * 10; sfx.pickup();
-        pushLog(killed > 0 ? `Poder destrutivo! **${killed}** inimigos eliminados (+${killed * 10} pontos).` : "A sala estava vazia.", killed > 0 ? "good" : "info");
+        pushLog(killed > 0 ? `Poder destrutivo! **${killed}** inimigos eliminados.` : "A sala estava vazia.", killed > 0 ? "good" : "info");
         break;
       }
       case "teleport": {
@@ -1086,7 +1083,7 @@
         const pts = roll(combatRng, 25, 75);
         state.points += pts; sfx.pickup();
         showFloat(state.pos.x, state.pos.y, `+${pts} pts`, "floatHeal");
-        pushLog(`Fortuna! **+${pts}** pontos.`, "good");
+        pushLog(`Fortuna! Ganhaste pontos bónus.`, "good");
         break;
       }
       case "curse": {
@@ -1129,7 +1126,7 @@
       }
       state.armor += 1; state.points += 15;
       sfx.pickup();
-      pushLog(`Equipaste armadura (+**1** armadura, +15 pontos). [${state.armor}/${ARMOR_MAX}]`, "good");
+      pushLog(`Equipaste armadura (+**1** armadura). [${state.armor}/${ARMOR_MAX}]`, "good");
     } else if (item.typeId === "charm") {
       applyRandomEffect(CHARM_POOL);
     } else if (item.typeId === "sword") {
@@ -1139,7 +1136,7 @@
       state.weaponName = wnames[Math.min(state.weaponUpgrades, wnames.length - 1)];
       sfx.pickup();
       showFloat(state.pos.x, state.pos.y, `ATK+1`, "floatHeal");
-      pushLog(`Equipaste **${state.weaponName}** (ATK **+1/+1**, +20 pontos). [${state.atk[0]}–${state.atk[1]}]`, "good");
+      pushLog(`Equipaste **${state.weaponName}** (ATK **+1/+1**). [${state.atk[0]}–${state.atk[1]}]`, "good");
     } else if (item.typeId === "scroll") {
       applyRandomEffect(SCROLL_POOL);
     } else { return false; }
@@ -1360,9 +1357,8 @@
       invEl.appendChild(div);
     };
 
-    row("tileItemSword",  "Arma",       `${state.weaponName || "Mãos"}  [${state.atk[0]}–${state.atk[1]}]`);
-    row("tileItemArmor",  "Armadura",   pips(state.armor, ARMOR_MAX, "tileItemArmor"));
-    row("tileItemCharm",  "Carisma",    pips(Math.min(state.charisma, 5), 5, "tileItemCharm"));
+    row("tileItemSword",  "Arma",     `${state.weaponName || "Mãos"}  [${state.atk[0]}–${state.atk[1]}]`);
+    row("tileItemArmor",  "Armadura", pips(state.armor, ARMOR_MAX, "tileItemArmor"));
     row("tileItemPotion", "Poções",     potions ? String(potions) : "—",
         potions ? () => { if (state?.alive) { const a = itemUseFirst("potion"); if (a) doTurn(true); } } : null);
     row("tileItemScroll", "Pergaminhos", scrolls ? String(scrolls) : "—",
