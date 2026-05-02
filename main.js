@@ -630,6 +630,7 @@
       state.lockAttempts = state.lockAttempts || {};
       state.regenCounter = state.regenCounter || 0;
       if (state.tourismLifeline === undefined) state.tourismLifeline = true;
+      state.killLog = state.killLog || {};
       selectedArchIdx = PLAYER_ARCHETYPES.findIndex(a => a.name === state.archetype);
       if (selectedArchIdx < 0) selectedArchIdx = 0;
       combatRng = mulberry32((state.seed ^ state.points) >>> 0);
@@ -811,7 +812,7 @@
       armor: arch.armor, charisma: arch.charisma,
       atk: [...arch.atk], inv: new Array(9).fill(null), points: 0,
       weaponName: "Mãos", weaponUpgrades: 0,
-      lockAttempts: {}, regenCounter: 0, tourismLifeline: true,
+      lockAttempts: {}, regenCounter: 0, tourismLifeline: true, killLog: {},
     };
 
     const lvl = getLevel(1);
@@ -842,6 +843,7 @@
     showFloat(enemy.pos.x, enemy.pos.y, `-${amount}`, "floatDmg");
     if (enemy.hp <= 0) {
       enemy.hp = 0;
+      if (state?.killLog) state.killLog[enemy.name] = (state.killLog[enemy.name] || 0) + 1;
       sfx.kill();
       pushLog(`Derrotaste ${enemy.article === "a" ? "a" : "o"} **${enemy.name}**.`, "good");
     } else {
@@ -872,7 +874,33 @@
       pushLog(`Foste morto por um${art === "a" ? "a" : ""} **${sourceName}**. Fim de jogo.`, "bad");
       pushLog(`Pontuação final: **${state.points}** pts (piso ${state.depth}, nível ${state.lvl}).`, "bad");
       pushLog("Clica em **Novo jogo** para tentar novamente.", "bad");
-      gameOverMsg.innerHTML = `<b>${state.playerName}</b>, ${state.archetype} de nível ${state.lvl}, foi morto por um${art === "a" ? "a" : ""} <b>${sourceName}</b> no piso ${state.depth}.<br><br>Pontuação final: <b>${state.points}</b> pts`;
+      const killEntries = Object.entries(state.killLog || {}).sort((a, b) => b[1] - a[1]);
+      const totalKills = killEntries.reduce((s, [, n]) => s + n, 0);
+      const killListHtml = killEntries.length > 0
+        ? `<div style="margin-top:14px;font-size:14px">
+            <div style="color:var(--muted);margin-bottom:6px">Monstros abatidos: <strong>${totalKills}</strong></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px 16px;text-align:left">
+              ${killEntries.map(([n, c]) => `<span>${c}× ${n}</span>`).join("")}
+            </div>
+          </div>`
+        : `<div style="color:var(--muted);font-size:14px;margin-top:10px">Nenhum monstro abatido.</div>`;
+      const goH2 = gameOverModal.querySelector("h2");
+      if (goH2) { goH2.textContent = "Fim de Jogo"; goH2.style.background = "linear-gradient(to right, #fca5a5, #ef4444)"; goH2.style.webkitBackgroundClip = "text"; goH2.style.webkitTextFillColor = "transparent"; }
+      gameOverMsg.innerHTML = `
+        <div style="text-align:center">
+          <div style="font-size:56px;line-height:1;margin-bottom:10px">🪦</div>
+          <div style="font-size:19px;font-weight:700;margin-bottom:3px">${state.playerName}</div>
+          <div style="color:var(--muted);font-size:14px;margin-bottom:14px">${state.archetype} · Nível ${state.lvl}</div>
+          <div style="font-size:15px;margin-bottom:16px">Morto por ${art === "a" ? "uma" : "um"} <b>${sourceName}</b> no piso ${state.depth}.</div>
+          <table style="margin:0 auto;text-align:left;font-size:14px;line-height:2">
+            <tr><td style="color:var(--muted);padding-right:20px">ATK</td><td><strong>${state.atk[0]}–${state.atk[1]}</strong></td></tr>
+            <tr><td style="color:var(--muted)">Armadura</td><td><strong>${state.armor}</strong></td></tr>
+            <tr><td style="color:var(--muted)">Carisma</td><td><strong>${state.charisma}</strong></td></tr>
+            <tr><td style="color:var(--muted)">Arma</td><td><strong>${state.weaponName || "Mãos"}</strong></td></tr>
+            <tr><td style="color:var(--muted)">Pontuação</td><td><strong>${state.points} pts</strong></td></tr>
+          </table>
+          ${killListHtml}
+        </div>`;
       gameOverModal.removeAttribute("hidden");
     } else {
       sfx.hit();
@@ -965,15 +993,26 @@
 
     const it = lvl.items.find(ii => ii.pos.x === nx && ii.pos.y === ny) || null;
     if (it) {
-      const freeSlot = state.inv.findIndex(x => x === null);
-      if (freeSlot !== -1) {
-        state.inv[freeSlot] = { id: it.id, typeId: it.typeId, name: it.name, cssClass: it.cssClass };
+      if (it.typeId === "sword") {
         lvl.items = lvl.items.filter(x => x.id !== it.id);
-        state.points += 5;
+        state.atk[0] += 1; state.atk[1] += 1; state.points += 20;
+        state.weaponUpgrades = (state.weaponUpgrades || 0) + 1;
+        const wnames = ["Mãos", "Espada", "Espada Afiada", "Espada de Batalha", "Espada Lendária"];
+        state.weaponName = wnames[Math.min(state.weaponUpgrades, wnames.length - 1)];
         sfx.pickup();
-        pushLog(`Apanhaste **${it.name}**.`, "info");
+        showFloat(state.pos.x, state.pos.y, `ATK+1`, "floatHeal");
+        pushLog(`Equipaste **${state.weaponName}** (ATK **+1/+1**). [${state.atk[0]}–${state.atk[1]}]`, "good");
       } else {
-        pushLog("Inventário cheio (máx. 9 slots). Larga um item primeiro.", "bad");
+        const freeSlot = state.inv.findIndex(x => x === null);
+        if (freeSlot !== -1) {
+          state.inv[freeSlot] = { id: it.id, typeId: it.typeId, name: it.name, cssClass: it.cssClass };
+          lvl.items = lvl.items.filter(x => x.id !== it.id);
+          state.points += 5;
+          sfx.pickup();
+          pushLog(`Apanhaste **${it.name}**.`, "info");
+        } else {
+          pushLog("Inventário cheio (máx. 9 slots). Larga um item primeiro.", "bad");
+        }
       }
     }
 
@@ -1011,7 +1050,7 @@
     // Mostrar stats finais no game over modal
     const goModal = el("gameOverModal");
     const msg = el("gameOverMsg");
-    const kills = state.kills || 0;
+    const kills = Object.values(state.killLog || {}).reduce((s, n) => s + n, 0);
     msg.innerHTML = `
       <div style="text-align:center">
         <div style="font-size:40px;margin-bottom:8px">🏆</div>
