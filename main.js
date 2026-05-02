@@ -512,6 +512,59 @@
     death: () => [220, 165, 110, 82].forEach((f, i) => beep(f, 0.22, "sawtooth", 0.24, i * 0.20)),
   };
 
+  // ── Música do menu (PC speaker style) ────────────────────────────────────────
+  // Melodia em lá menor, 32 tempos, loop contínuo
+  const MENU_MELODY = [
+    [330,1],[392,1],[440,2],[392,1],[330,1],[294,1],[330,1],
+    [262,1],[330,1],[392,2],[440,1],[392,1],[330,2],
+    [294,1],[349,1],[440,2],[392,1],[349,1],[330,1],[294,1],
+    [262,2],[330,1],[294,1],[262,2],[220,2]
+  ];
+  const MENU_BEAT = 0.13;
+  let _menuPlaying = false;
+  let _menuTimer   = null;
+  let _menuNodes   = [];
+
+  function _scheduleMenuLoop() {
+    if (!_menuPlaying || soundMuted) return;
+    const ctx = getAudioCtx();
+    if (!ctx) return;
+    let t = ctx.currentTime + 0.02;
+    let total = 0;
+    for (const [freq, beats] of MENU_MELODY) {
+      const dur = beats * MENU_BEAT;
+      try {
+        const osc = ctx.createOscillator();
+        const g   = ctx.createGain();
+        osc.connect(g); g.connect(ctx.destination);
+        osc.type = "square";
+        osc.frequency.setValueAtTime(freq, t);
+        g.gain.setValueAtTime(0.07, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + dur * 0.8);
+        osc.start(t);
+        osc.stop(t + dur);
+        _menuNodes.push(osc);
+      } catch(e) {}
+      t += dur;
+      total += dur;
+    }
+    _menuTimer = setTimeout(() => { _menuNodes = []; _scheduleMenuLoop(); }, (total - 0.05) * 1000);
+  }
+
+  function playMenuMusic() {
+    if (_menuPlaying || soundMuted) return;
+    _menuPlaying = true;
+    _scheduleMenuLoop();
+  }
+
+  function stopMenuMusic() {
+    _menuPlaying = false;
+    clearTimeout(_menuTimer);
+    _menuTimer = null;
+    _menuNodes.forEach(n => { try { n.stop(); } catch(e){} });
+    _menuNodes = [];
+  }
+
   // ── DOM ──────────────────────────────────────────────────────────────────────
 
   function el(id) {
@@ -790,9 +843,10 @@
     buildArchetypePicker();
     continueSection.hidden = !hasSave();
     setTimeout(() => playerNameInput.focus(), 50);
+    playMenuMusic();
   }
 
-  function hideModal() { startModal.setAttribute("hidden", ""); }
+  function hideModal() { startModal.setAttribute("hidden", ""); stopMenuMusic(); }
 
   function startFromModal() {
     const name = playerNameInput.value.trim() || "Anónimo";
@@ -1714,6 +1768,8 @@
   muteBtn.addEventListener("click", () => {
     soundMuted = !soundMuted;
     muteBtn.textContent = soundMuted ? "Sem som" : "Som";
+    if (soundMuted) stopMenuMusic();
+    else if (!startModal.hasAttribute("hidden")) playMenuMusic();
   });
 
   ["dpadUp","dpadDown","dpadLeft","dpadRight",
