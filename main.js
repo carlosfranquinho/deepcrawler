@@ -1037,7 +1037,7 @@
       state.points += Math.floor(drop / 10);
       pushLog(`Derrotaste ${enemy.article === "a" ? "a" : "o"} **${enemy.name}** [+${fmtEuro(drop)}].`, "good");
       // Hominídeos podem largar equipamento
-      if (HUMANOIDS.has(enemy.id) && combatRng() < 0.25) {
+      if (HUMANOIDS.has(enemy.typeId) && combatRng() < 0.25) {
         const lvl = getLevel(state.depth);
         const dropWeapon = combatRng() < 0.55;
         const dt = dropWeapon ? ITEM_TYPES.sword : ITEM_TYPES.armor;
@@ -1116,7 +1116,7 @@
       gameOverModal.removeAttribute("hidden");
     } else {
       sfx.hit();
-      const verb = ATTACK_VERBS[sourceEnemy.id] || "atacou";
+      const verb = ATTACK_VERBS[sourceEnemy.typeId] || "atacou";
       if (state.armor > 0 && mitigated !== amount)
         pushLog(`${Art} **${sourceName}** ${verb}-te! (armadura bloqueou **${amount - mitigated}**).`, "bad");
       else
