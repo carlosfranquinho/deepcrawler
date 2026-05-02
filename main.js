@@ -882,7 +882,7 @@
       row.className = "scoreRow" + (i === 0 ? " scoreTop" : "");
       const safeName = (s.name || "?").replaceAll("&", "&amp;").replaceAll("<", "&lt;");
       const arch = s.archetype ? ` <span class="scoreArch">${s.archetype}</span>` : "";
-      row.innerHTML = `<span class="scoreRank">${i + 1}</span><span class="scoreName">${safeName}${arch}</span><span class="scoreDepth">Piso ${s.depth}</span><span class="scoreLvl">Nív.&nbsp;${s.lvl}</span><span class="scorePoints">${s.points}&nbsp;pts</span><span class="scoreDate">${s.date}</span>`;
+      row.innerHTML = `<span class="scoreRank">${i + 1}</span><span class="scoreName">${safeName}${arch}</span><span class="scoreDepth">Piso ${-s.depth}</span><span class="scoreLvl">Nív.&nbsp;${s.lvl}</span><span class="scorePoints">${s.points}&nbsp;pts</span><span class="scoreDate">${s.date}</span>`;
       scoresEl.appendChild(row);
     });
   }
@@ -1046,7 +1046,7 @@
           typeId: dt.id, name: dt.name, cssClass: dt.cssClass,
           pos: { x: enemy.pos.x, y: enemy.pos.y },
         });
-        pushLog(`${enemy.name} largou **${dt.name}**!`, "info");
+        pushLog(`${enemy.article === "a" ? "A" : "O"} **${enemy.name}** largou **${dt.name}**!`, "info");
       }
     } else {
       sfx.attack();
@@ -1083,7 +1083,7 @@
       clearSave();
       saveScore();
       pushLog(`Foste morto por um${art === "a" ? "a" : ""} **${sourceName}**. Fim de jogo.`, "bad");
-      pushLog(`Pontuação final: **${state.points}** pts (piso ${state.depth}, nível ${state.lvl}).`, "bad");
+      pushLog(`Pontuação final: **${state.points}** pts (piso ${-state.depth}, nível ${state.lvl}).`, "bad");
       pushLog("Clica em **Novo jogo** para tentar novamente.", "bad");
       const killEntries = Object.entries(state.killLog || {}).sort((a, b) => b[1] - a[1]);
       const totalKills = killEntries.reduce((s, [, n]) => s + n, 0);
@@ -1102,7 +1102,7 @@
           <div style="font-size:56px;line-height:1;margin-bottom:10px">🪦</div>
           <div style="font-size:19px;font-weight:700;margin-bottom:3px">${state.playerName}</div>
           <div style="color:var(--muted);font-size:14px;margin-bottom:14px">${state.archetype} · Nível ${state.lvl}</div>
-          <div style="font-size:15px;margin-bottom:16px">Morto por ${art === "a" ? "uma" : "um"} <b>${sourceName}</b> no piso ${state.depth}.</div>
+          <div style="font-size:15px;margin-bottom:16px">Morto por ${art === "a" ? "uma" : "um"} <b>${sourceName}</b> no piso ${-state.depth}.</div>
           <table style="margin:0 auto;text-align:left;font-size:14px;line-height:2">
             <tr><td style="color:var(--muted);padding-right:20px">ATK</td><td><strong>${state.atk[0]}–${state.atk[1]}</strong></td></tr>
             <tr><td style="color:var(--muted)">Armadura</td><td><strong>${state.armor}</strong></td></tr>
@@ -1269,8 +1269,8 @@
     const lvl = getLevel(newDepth);
     state.pos = dir === "down" ? { ...lvl.up } : { ...lvl.down };
     sfx.stairs();
-    if (dir === "down") { state.points += 25; pushLog(`Desceste para o piso **${newDepth}**.`, "info"); }
-    else { pushLog(`Subiste para o piso **${newDepth}**.`, "info"); }
+    if (dir === "down") { state.points += 25; pushLog(`Desceste para o piso **${-newDepth}**.`, "info"); }
+    else { pushLog(`Subiste para o piso **${-newDepth}**.`, "info"); }
   }
 
   function showEscapeModal() {
@@ -1289,7 +1289,7 @@
         <div style="font-size:40px;margin-bottom:8px">🏆</div>
         <strong>${state.playerName}</strong> escapou da masmorra!<br><br>
         <table style="margin:0 auto;text-align:left;line-height:2;font-size:15px">
-          <tr><td style="color:var(--muted);padding-right:16px">Piso máximo</td><td><strong>Piso ${state.depth}</strong></td></tr>
+          <tr><td style="color:var(--muted);padding-right:16px">Piso máximo</td><td><strong>Piso ${-state.depth}</strong></td></tr>
           <tr><td style="color:var(--muted)">Nível do heroi</td><td><strong>${state.lvl}</strong></td></tr>
           <tr><td style="color:var(--muted)">HP restante</td><td><strong>${state.hp}/${state.maxHp}</strong></td></tr>
           <tr><td style="color:var(--muted)">Inimigos vencidos</td><td><strong>${kills}</strong></td></tr>
@@ -1791,7 +1791,7 @@
     heroName.textContent  = state.playerName;
     heroArchetype.textContent = state.archetype;
 
-    depthVal.textContent  = String(state.depth);
+    depthVal.textContent  = String(-state.depth);
     lvlVal.textContent    = String(state.lvl);
     seedVal.textContent   = String(state.seed >>> 0);
     pointsVal.textContent = String(state.points);
