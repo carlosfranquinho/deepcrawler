@@ -798,6 +798,8 @@ body{
 .toastMsg.fadeOut {
   animation: fadeOutMsg 0.5s ease forwards;
 }
+.toastMsg.good { border-color: rgba(52, 211, 153, 0.4); color: #34d399; }
+.toastMsg.bad  { border-color: rgba(251, 113, 113, 0.4); color: #fb7185; }
 @keyframes slideUpFade{
   0% { opacity: 0; transform: translateY(20px); }
   100% { opacity: 1; transform: translateY(0); }

@@ -26,8 +26,8 @@
     morcego_das_cavernas: { id: "morcego_das_cavernas", name: "Morcego das cavernas", article: "o", glyph: "f", va: 1, cssClass: "tileEnemyG", maxHp: 3, atk: [1, 2] },
     beringela_radioativa: { id: "beringela_radioativa", name: "Beringela Radioativa", article: "a", glyph: "d", va: 2, cssClass: "tileEnemyG", maxHp: 5, atk: [2, 3] },
     gnomo_das_trevas: { id: "gnomo_das_trevas", name: "Gnomo das Trevas", article: "o", glyph: "k", va: 2, cssClass: "tileEnemyG", maxHp: 5, atk: [2, 3] },
-    homunculo: { id: "homunculo", name: "Homúnculo", article: "o", glyph: "i", va: 2, cssClass: "tileEnemyG", maxHp: 5, atk: [2, 3] },
-    raposa: { id: "raposa", name: "Raposa", article: "a", glyph: "d", va: 2, cssClass: "tileEnemyG", maxHp: 5, atk: [2, 3] },
+    homunculo: { id: "homunculo", name: "Coelho Desnorteado", article: "o", glyph: "i", va: 2, cssClass: "tileEnemyG", maxHp: 5, atk: [2, 3] },
+    raposa: { id: "raposa", name: "Raposa no Cio", article: "a", glyph: "d", va: 2, cssClass: "tileEnemyG", maxHp: 5, atk: [2, 3] },
     formiga_gigante: { id: "formiga_gigante", name: "Formiga gigante", article: "a", glyph: "a", va: 3, cssClass: "tileEnemyG", maxHp: 6, atk: [2, 4] },
     bolha_acida: { id: "bolha_acida", name: "Bolha ácida", article: "a", glyph: "b", va: 3, cssClass: "tileEnemyG", maxHp: 6, atk: [2, 4] },
     lagarto_das_rochas: { id: "lagarto_das_rochas", name: "Lagarto das rochas", article: "o", glyph: ":", va: 3, cssClass: "tileEnemyG", maxHp: 6, atk: [2, 4] },
@@ -36,8 +36,8 @@
     goblin: { id: "goblin", name: "Goblin", article: "o", glyph: "o", va: 4, cssClass: "tileEnemyG", maxHp: 8, atk: [3, 4] },
     serpente: { id: "serpente", name: "Serpente", article: "a", glyph: "S", va: 4, cssClass: "tileEnemyG", maxHp: 8, atk: [3, 4] },
     orc: { id: "orc", name: "Orc", article: "o", glyph: "o", va: 5, cssClass: "tileEnemyG", maxHp: 9, atk: [3, 5] },
-    perfurador_de_rocha: { id: "perfurador_de_rocha", name: "Perfurador de Rocha", article: "o", glyph: "p", va: 6, cssClass: "tileEnemyO", maxHp: 11, atk: [4, 6] },
-    geleia_ocre: { id: "geleia_ocre", name: "Geleia Ocre", article: "a", glyph: "j", va: 7, cssClass: "tileEnemyO", maxHp: 12, atk: [4, 6] },
+    berbequim_descontrolado: { id: "berbequim_descontrolado", name: "Berbequim Descontrolado", article: "o", glyph: "p", va: 6, cssClass: "tileEnemyO", maxHp: 11, atk: [4, 6] },
+    geleia_ocre: { id: "geleia_ocre", name: "Pudim fora de prazo", article: "o", glyph: "j", va: 7, cssClass: "tileEnemyO", maxHp: 12, atk: [4, 6] },
     besta_chifruda: { id: "besta_chifruda", name: "Besta chifruda", article: "a", glyph: "q", va: 8, cssClass: "tileEnemyO", maxHp: 14, atk: [5, 7] },
     urso_coruja: { id: "urso_coruja", name: "Urso-Coruja", article: "o", glyph: "h", va: 10, cssClass: "tileEnemyO", maxHp: 17, atk: [6, 8] },
     tigre_dentes_de_sabre: { id: "tigre_dentes_de_sabre", name: "Tigre dentes-de-sabre", article: "o", glyph: "f", va: 10, cssClass: "tileEnemyO", maxHp: 17, atk: [6, 8] },
@@ -50,7 +50,7 @@
     ogre: { id: "ogre", name: "Ogre", article: "o", glyph: "O", va: 18, cssClass: "tileEnemySK", maxHp: 29, atk: [10, 14] },
     mosca_choca: { id: "mosca_choca", name: "Mosca Choca", article: "a", glyph: "x", va: 20, cssClass: "tileEnemySK", maxHp: 32, atk: [11, 15] },
     limo_verde: { id: "limo_verde", name: "Limo Verde", article: "o", glyph: "P", va: 22, cssClass: "tileEnemySK", maxHp: 35, atk: [12, 16] },
-    gigante_das_colinas: { id: "gigante_das_colinas", name: "Gigante das Colinas", article: "o", glyph: "H", va: 24, cssClass: "tileEnemySK", maxHp: 38, atk: [13, 18] },
+    gigante_das_colinas: { id: "gigante_das_colinas", name: "Funcionário das Finanças", article: "o", glyph: "H", va: 24, cssClass: "tileEnemySK", maxHp: 38, atk: [13, 18] },
     brutamontes: { id: "brutamontes", name: "Brutamontes", article: "o", glyph: "U", va: 26, cssClass: "tileEnemyTR", maxHp: 41, atk: [14, 19] },
     troll: { id: "troll", name: "Troll", article: "o", glyph: "T", va: 28, cssClass: "tileEnemyTR", maxHp: 44, atk: [15, 20] },
     elemental_do_fogo: { id: "elemental_do_fogo", name: "Elemental do Fogo", article: "o", glyph: "E", va: 30, cssClass: "tileEnemyTR", maxHp: 47, atk: [16, 22] },
@@ -513,7 +513,6 @@
   const newGameBtn = el("newGameBtn");
   const helpBtn = el("helpBtn");
   const scoresBtn = el("scoresBtn");
-  const invEl = el("inv");
   const gameOverModal = el("gameOverModal");
   const gameOverMsg = el("gameOverMsg");
   const restartBtnSim = el("restartBtnSim");
