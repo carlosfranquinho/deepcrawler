@@ -1,8 +1,8 @@
 (() => {
   "use strict";
 
-  const LEVEL_W = 41;
-  const LEVEL_H = 41;
+  let LEVEL_W = 41;
+  let LEVEL_H = 41;
   const VIEW_W = 21;
   const VIEW_H = 21;
   const ARMOR_MAX = 5;
@@ -239,11 +239,16 @@
     const seed = mixSeed(baseSeed, depth);
     const rng = mulberry32(seed);
 
-    const tiles = new Array(LEVEL_W * LEVEL_H).fill(Tile.Wall);
+    const sizeBonus = Math.floor((depth - 1) / 10);
+    const mapW = 41 + sizeBonus * 2;
+    const mapH = mapW;
+    LEVEL_W = mapW; LEVEL_H = mapH;
+
+    const tiles = new Array(mapW * mapH).fill(Tile.Wall);
     ensureBorderWalls(tiles);
 
     const rooms = [];
-    const targetRooms = clamp(8 + Math.floor(depth * 0.3), 8, 15);
+    const targetRooms = clamp(8 + Math.floor(depth * 0.3), 8, 15 + sizeBonus * 2);
     for (let tries = 0; tries < 500 && rooms.length < targetRooms; tries++) {
       const w = roll(rng, 6, 9), h = roll(rng, 6, 9);
       const x = roll(rng, 1, LEVEL_W - w - 2), y = roll(rng, 1, LEVEL_H - h - 2);
@@ -455,7 +460,7 @@
       });
     }
 
-    return { depth, seed, tiles, playerStart, up, down, enemies, items, explored: new Uint8Array(LEVEL_W * LEVEL_H) };
+    return { depth, seed, tiles, mapW, mapH, playerStart, up, down, enemies, items, explored: new Uint8Array(mapW * mapH) };
   }
 
   // ── Sons (Web Audio API) ─────────────────────────────────────────────────────
@@ -623,7 +628,10 @@
       const raw = localStorage.getItem("deepcrawler_save");
       if (!raw) return false;
       const s = JSON.parse(raw);
-      s.levels = new Map(s.levels.map(([d, l]) => [d, { ...l, explored: new Uint8Array(l.explored) }]));
+      s.levels = new Map(s.levels.map(([d, l]) => {
+        const mapW = l.mapW || (41 + 2 * Math.floor((d - 1) / 10));
+        return [d, { ...l, mapW, mapH: l.mapH || mapW, explored: new Uint8Array(l.explored) }];
+      }));
       state = s;
       state.weaponName = state.weaponName || "Mãos";
       state.weaponUpgrades = state.weaponUpgrades || 0;
@@ -826,6 +834,7 @@
   function getLevel(depth) {
     let lvl = state.levels.get(depth);
     if (!lvl) { lvl = generateLevel(depth, state.seed); state.levels.set(depth, lvl); }
+    LEVEL_W = lvl.mapW; LEVEL_H = lvl.mapH;
     return lvl;
   }
 
