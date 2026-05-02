@@ -264,6 +264,15 @@ body{
   position: relative;
   box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
 }
+.tilePlayerDead{
+  background-color: rgba(239,68,68,.22) !important;
+  box-shadow: 0 0 18px 4px rgba(239,68,68,.55) !important;
+  animation: pulseGlowDead 1.4s infinite ease-in-out !important;
+}
+@keyframes pulseGlowDead {
+  0%,100% { box-shadow: 0 0 14px 3px rgba(239,68,68,.45); }
+  50%      { box-shadow: 0 0 26px 8px rgba(239,68,68,.75); }
+}
 .tileStairsDown{
   background-color:rgba(52,211,153,.15);
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Cpath d='M9 3v8' stroke='%2334d399' stroke-width='2.5' stroke-linecap='round'/%3E%3Cpath d='M5.5 9.5 9 13l3.5-3.5' fill='none' stroke='%2334d399' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Crect x='3' y='15' width='12' height='2' rx='1' fill='%2334d399' opacity='0.8'/%3E%3C/svg%3E");
@@ -515,6 +524,13 @@ body{
   background-color:rgba(167,139,250,.12);
   background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2018%2018%27%3E%3Crect%20x%3D%274%27%20y%3D%275%27%20width%3D%2710%27%20height%3D%2710%27%20rx%3D%272%27%20fill%3D%27none%27%20stroke%3D%27%23c4b5fd%27%20stroke-width%3D%271.5%27/%3E%3Cpath%20d%3D%27M7%208h4M7%2011h3%27%20stroke%3D%27%23c4b5fd%27%20stroke-width%3D%271.2%27%20stroke-linecap%3D%27round%27%20opacity%3D%27.7%27/%3E%3Cpath%20d%3D%27M4%207c0-2%2010-2%2010%200%27%20fill%3D%27none%27%20stroke%3D%27%23c4b5fd%27%20stroke-width%3D%271.5%27/%3E%3C/svg%3E");
   animation: floatItem 2.6s infinite ease-in-out;
+  z-index: 4;
+  position: relative;
+}
+.tileItemChest{
+  background-color:rgba(251,191,36,.15);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Crect x='2' y='8' width='14' height='8' rx='1.5' fill='%23b45309' opacity='0.85'/%3E%3Crect x='2' y='5' width='14' height='4' rx='1.5' fill='%23d97706' opacity='0.9'/%3E%3Crect x='7' y='7' width='4' height='4' rx='1' fill='%23fbbf24'/%3E%3Ccircle cx='9' cy='9' r='1' fill='%23b45309'/%3E%3C/svg%3E");
+  animation: floatItem 2.2s infinite ease-in-out;
   z-index: 4;
   position: relative;
 }

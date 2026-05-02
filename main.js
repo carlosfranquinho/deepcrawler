@@ -78,6 +78,23 @@
     pack:      new Set(["goblin","soldado_anao","orc","policia_bebado","carnical"]),
   };
 
+  // Hominídeos — podem apanhar e largar equipamento
+  const HUMANOIDS = new Set([
+    "gnomo_das_trevas","goblin","orc","soldado_anao","duende_ladrao",
+    "comedor_de_miolos","gnomo_feiticeiro","ogre","gigante_das_colinas",
+    "brutamontes","troll","policia_bebado","carnical","vampiro",
+    "necromante","vlad_o_empalador","feiticeiro_das_trevas",
+  ]);
+
+  // Nomes de armas por nível de upgrade (0 = sem arma)
+  const WEAPON_NAMES = [
+    "Mãos", "Canivete Suíço", "Faca de Cozinha", "Punhal",
+    "Machadinha", "Espada Curta", "Espada", "Espada Afiada",
+    "Cimitarra", "Espada Longa", "Espada de Batalha",
+    "Machado de Guerra", "Alabarda", "Espada Rúnica",
+    "Lâmina do Caos", "Espada Lendária",
+  ];
+
   // Arquétipos de jogador — valores tabelados
   const PLAYER_ARCHETYPES = [
     { name: "Guerreiro", maxHp: 18, atk: [3, 6], armor: 1, charisma: 0, emoji: "😠" },
@@ -233,7 +250,15 @@
     key: { id: "key", name: "Chave", cssClass: "tileItemKey" },
     sword: { id: "sword", name: "Espada", cssClass: "tileItemSword" },
     scroll: { id: "scroll", name: "Pergaminho", cssClass: "tileItemScroll" },
+    chest: { id: "chest", name: "Baú", cssClass: "tileItemChest" },
   };
+
+  function fmtEuro(cents) {
+    const e = Math.floor(cents / 100);
+    const c = cents % 100;
+    const euroStr = e.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    return `${euroStr},${String(c).padStart(2, "0")} €`;
+  }
 
   function generateLevel(depth, baseSeed) {
     const seed = mixSeed(baseSeed, depth);
@@ -404,6 +429,23 @@
       }
 
       items.push({ id: `${depth}-${seed}-it-${i}-${tp.id}`, typeId: tp.id, name: tp.name, cssClass: tp.cssClass, pos });
+    }
+
+    // Baús — mais raros e mais ricos nos pisos profundos
+    const chestCount = rng() < (0.3 + Math.min(0.5, depth * 0.04)) ? (rng() < 0.35 ? 2 : 1) : 0;
+    for (let ci = 0; ci < chestCount; ci++) {
+      let pos = null;
+      for (let t = 0; t < 200; t++) {
+        const p = randomFloorFromRoom(rng, choose(rng, rooms));
+        const ii = idx(p.x, p.y);
+        if (occItems.has(ii) || tiles[ii] !== Tile.Floor) continue;
+        occItems.add(ii); pos = p; break;
+      }
+      if (!pos) break;
+      const goldMin = Math.max(10, depth * 80);
+      const goldMax = Math.max(goldMin + 1, depth * 800);
+      const gold = roll(rng, goldMin, goldMax);
+      items.push({ id: `${depth}-${seed}-chest-${ci}`, typeId: "chest", name: "Baú", cssClass: "tileItemChest", pos, gold });
     }
 
     const availableMonsters = Object.values(ENEMY_TYPES);
@@ -905,7 +947,7 @@
       armor: arch.armor, charisma: arch.charisma,
       atk: [...arch.atk], inv: new Array(9).fill(null), points: 0,
       weaponName: "Mãos", weaponUpgrades: 0,
-      lockAttempts: {}, regenCounter: 0, tourismLifeline: true, killLog: {},
+      lockAttempts: {}, regenCounter: 0, tourismLifeline: true, killLog: {}, money: 0,
     };
 
     const lvl = getLevel(1);
@@ -939,7 +981,25 @@
       enemy.hp = 0;
       if (state?.killLog) state.killLog[enemy.name] = (state.killLog[enemy.name] || 0) + 1;
       sfx.kill();
-      pushLog(`Derrotaste ${enemy.article === "a" ? "a" : "o"} **${enemy.name}**.`, "good");
+      const va = enemy.va || 1;
+      const dropMin = Math.max(1, Math.round(va * 2));
+      const dropMax = Math.max(dropMin + 1, Math.round(va * 20));
+      const drop = roll(combatRng, dropMin, dropMax);
+      state.money = (state.money || 0) + drop;
+      state.points += Math.floor(drop / 10);
+      pushLog(`Derrotaste ${enemy.article === "a" ? "a" : "o"} **${enemy.name}** [+${fmtEuro(drop)}].`, "good");
+      // Hominídeos podem largar equipamento
+      if (HUMANOIDS.has(enemy.id) && combatRng() < 0.25) {
+        const lvl = getLevel(state.depth);
+        const dropWeapon = combatRng() < 0.55;
+        const dt = dropWeapon ? ITEM_TYPES.sword : ITEM_TYPES.armor;
+        lvl.items.push({
+          id: `drop-${enemy.id}-${state.depth}-${Date.now()}`,
+          typeId: dt.id, name: dt.name, cssClass: dt.cssClass,
+          pos: { x: enemy.pos.x, y: enemy.pos.y },
+        });
+        pushLog(`${enemy.name} largou **${dt.name}**!`, "info");
+      }
     } else {
       sfx.attack();
       pushLog(`Acertaste n${enemy.article === "a" ? "a" : "o"} **${enemy.name}** em **${amount}**.`, "info");
@@ -991,6 +1051,7 @@
             <tr><td style="color:var(--muted)">Armadura</td><td><strong>${state.armor}</strong></td></tr>
             <tr><td style="color:var(--muted)">Carisma</td><td><strong>${state.charisma}</strong></td></tr>
             <tr><td style="color:var(--muted)">Arma</td><td><strong>${state.weaponName || "Mãos"}</strong></td></tr>
+            <tr><td style="color:var(--muted)">Dinheiro</td><td><strong>${fmtEuro(state.money || 0)}</strong></td></tr>
             <tr><td style="color:var(--muted)">Pontuação</td><td><strong>${state.points} pts</strong></td></tr>
           </table>
           ${killListHtml}
@@ -1091,8 +1152,7 @@
         lvl.items = lvl.items.filter(x => x.id !== it.id);
         state.atk[0] += 1; state.atk[1] += 1; state.points += 20;
         state.weaponUpgrades = (state.weaponUpgrades || 0) + 1;
-        const wnames = ["Mãos", "Espada", "Espada Afiada", "Espada de Batalha", "Espada Lendária"];
-        state.weaponName = wnames[Math.min(state.weaponUpgrades, wnames.length - 1)];
+        state.weaponName = WEAPON_NAMES[Math.min(state.weaponUpgrades, WEAPON_NAMES.length - 1)];
         sfx.pickup();
         showFloat(state.pos.x, state.pos.y, `ATK+1`, "floatHeal");
         pushLog(`Equipaste **${state.weaponName}** (ATK **+1/+1**). [${state.atk[0]}–${state.atk[1]}]`, "good");
@@ -1108,6 +1168,14 @@
           showFloat(state.pos.x, state.pos.y, `ARM+1`, "floatHeal");
           pushLog(`Armadura equipada! +**1** armadura [${state.armor}/${ARMOR_MAX}].`, "good");
         }
+      } else if (it.typeId === "chest") {
+        lvl.items = lvl.items.filter(x => x.id !== it.id);
+        const gold = it.gold || 0;
+        state.money = (state.money || 0) + gold;
+        state.points += Math.floor(gold / 5);
+        sfx.pickup();
+        showFloat(state.pos.x, state.pos.y, `+${fmtEuro(gold)}`, "floatHeal");
+        pushLog(`Abriste um baú! Encontraste **${fmtEuro(gold)}**.`, "good");
       } else {
         const freeSlot = state.inv.findIndex(x => x === null);
         if (freeSlot !== -1) {
@@ -1167,6 +1235,7 @@
           <tr><td style="color:var(--muted)">HP restante</td><td><strong>${state.hp}/${state.maxHp}</strong></td></tr>
           <tr><td style="color:var(--muted)">Inimigos vencidos</td><td><strong>${kills}</strong></td></tr>
           <tr><td style="color:var(--muted)">Arma</td><td><strong>${state.weaponName || "Mãos"}</strong></td></tr>
+          <tr><td style="color:var(--muted)">Dinheiro</td><td><strong>${fmtEuro(state.money || 0)}</strong></td></tr>
           <tr><td style="color:var(--muted)">Pontuação</td><td><strong>${state.points} pts</strong></td></tr>
         </table>
       </div>`;
@@ -1371,8 +1440,7 @@
     } else if (item.typeId === "sword") {
       state.atk[0] += 1; state.atk[1] += 1; state.points += 20;
       state.weaponUpgrades = (state.weaponUpgrades || 0) + 1;
-      const wnames = ["Mãos", "Espada", "Espada Afiada", "Espada de Batalha", "Espada Lendária"];
-      state.weaponName = wnames[Math.min(state.weaponUpgrades, wnames.length - 1)];
+      state.weaponName = WEAPON_NAMES[Math.min(state.weaponUpgrades, WEAPON_NAMES.length - 1)];
       sfx.pickup();
       showFloat(state.pos.x, state.pos.y, `ATK+1`, "floatHeal");
       pushLog(`Equipaste **${state.weaponName}** (ATK **+1/+1**). [${state.atk[0]}–${state.atk[1]}]`, "good");
@@ -1597,6 +1665,7 @@
       invEl.appendChild(div);
     };
 
+    row("tileItemChest",  "Dinheiro", fmtEuro(state.money || 0));
     row("tileItemSword",  "Arma",     `${state.weaponName || "Mãos"}  [${state.atk[0]}–${state.atk[1]}]`);
     row("tileItemArmor",  "Armadura", pips(state.armor, ARMOR_MAX, "tileItemArmor"));
     row("tileItemPotion", "Poções",     potions ? String(potions) : "—",
@@ -1649,10 +1718,18 @@
     const arch = archIdx >= 0 ? PLAYER_ARCHETYPES[archIdx] : PLAYER_ARCHETYPES[0];
     const meta = ARCH_META[Math.max(0, archIdx)];
 
-    // Hero badge — portrait image with archetype colour tint
-    heroEmoji.style.background = meta.color + "28";
-    heroEmoji.style.borderColor = meta.color + "88";
-    heroEmoji.innerHTML = `<img src="${meta.img}" alt="${arch.name}">`;
+    // Hero badge — portrait image with archetype colour tint; red death state when dead
+    if (!state.alive) {
+      heroEmoji.style.background = "rgba(239,68,68,0.18)";
+      heroEmoji.style.borderColor = "rgba(239,68,68,0.7)";
+      heroEmoji.style.boxShadow = "0 0 18px 4px rgba(239,68,68,0.45)";
+      heroEmoji.innerHTML = `<span style="font-size:2rem;line-height:1">😵</span>`;
+    } else {
+      heroEmoji.style.background = meta.color + "28";
+      heroEmoji.style.borderColor = meta.color + "88";
+      heroEmoji.style.boxShadow = "";
+      heroEmoji.innerHTML = `<img src="${meta.img}" alt="${arch.name}">`;
+    }
     heroName.textContent  = state.playerName;
     heroArchetype.textContent = state.archetype;
 
@@ -1726,9 +1803,14 @@
 
     if (state.pos.x >= startX && state.pos.x < startX + VIEW_W && state.pos.y >= startY && state.pos.y < startY + VIEW_H) {
       const vi = (state.pos.y - startY) * VIEW_W + (state.pos.x - startX);
-      cells[vi].className = "cell tilePlayer";
       const arch = PLAYER_ARCHETYPES.find(a => a.name === state.archetype) || PLAYER_ARCHETYPES[0];
-      cells[vi].textContent = arch.emoji;
+      if (!state.alive) {
+        cells[vi].className = "cell tilePlayer tilePlayerDead";
+        cells[vi].textContent = "😵";
+      } else {
+        cells[vi].className = "cell tilePlayer";
+        cells[vi].textContent = arch.emoji;
+      }
     }
 
     renderInventory();
