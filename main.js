@@ -96,51 +96,51 @@
   ];
 
   const ATTACK_VERBS = {
-    ratazana_de_esgoto:       "morde",
-    morcego_das_cavernas:     "morde",
-    beringela_radioativa:     "irradia",
-    gnomo_das_trevas:         "golpeia",
-    homunculo:                "morde",
-    raposa:                   "arranha",
-    formiga_gigante:          "morde",
-    bolha_acida:              "corrói",
-    lagarto_das_rochas:       "morde",
-    luz_de_presenca:          "ofusca",
-    lobo_selvagem:            "morde",
-    goblin:                   "sova",
-    serpente:                 "morde",
-    orc:                      "soca",
-    berbequim_descontrolado:  "perfura",
-    geleia_ocre:              "corrói",
-    besta_chifruda:           "chifra",
-    urso_coruja:              "arranha",
-    tigre_dentes_de_sabre:    "morde",
-    geleia_azul:              "corrói",
-    soldado_anao:             "golpeia",
-    duende_ladrao:            "golpeia",
-    comedor_de_miolos:        "devora",
-    mimico:                   "golpeia",
-    gnomo_feiticeiro:         "fulmina",
-    ogre:                     "esmaga",
-    mosca_choca:              "pica",
-    limo_verde:               "corrói",
-    gigante_das_colinas:      "espanca",
-    brutamontes:              "espanca",
-    troll:                    "esmaga",
-    elemental_do_fogo:        "abrasa",
-    basilisco:                "morde",
-    sombra_veloz:             "arranha",
-    policia_bebado:           "espanca",
-    carnical:                 "dilacera",
-    vampiro:                  "morde",
-    necromante:               "amaldiçoa",
-    espectro:                 "drena",
-    dragao:                   "abrasa",
-    balrog:                   "abrasa",
-    medusa:                   "petrifica",
-    feiticeiro_das_trevas:    "fulmina",
-    vlad_o_empalador:         "empala",
-    devorador_de_almas:       "devora",
+    ratazana_de_esgoto:       "mordeu",
+    morcego_das_cavernas:     "mordeu",
+    beringela_radioativa:     "irradiou",
+    gnomo_das_trevas:         "golpeou",
+    homunculo:                "mordeu",
+    raposa:                   "arranhou",
+    formiga_gigante:          "mordeu",
+    bolha_acida:              "corroeu",
+    lagarto_das_rochas:       "mordeu",
+    luz_de_presenca:          "encandeou",
+    lobo_selvagem:            "mordeu",
+    goblin:                   "sovou",
+    serpente:                 "mordeu",
+    orc:                      "socou",
+    berbequim_descontrolado:  "perfurou",
+    geleia_ocre:              "corroeu",
+    besta_chifruda:           "chifrou",
+    urso_coruja:              "arranhou",
+    tigre_dentes_de_sabre:    "mordeu",
+    geleia_azul:              "corroeu",
+    soldado_anao:             "golpeou",
+    duende_ladrao:            "golpeou",
+    comedor_de_miolos:        "devorou",
+    mimico:                   "golpeou",
+    gnomo_feiticeiro:         "fulminou",
+    ogre:                     "esmagou",
+    mosca_choca:              "picou",
+    limo_verde:               "corroeu",
+    gigante_das_colinas:      "espancou",
+    brutamontes:              "espancou",
+    troll:                    "esmagou",
+    elemental_do_fogo:        "abrasou",
+    basilisco:                "mordeu",
+    sombra_veloz:             "arranhou",
+    policia_bebado:           "espancou",
+    carnical:                 "dilacerou",
+    vampiro:                  "mordeu",
+    necromante:               "amaldiçoou",
+    espectro:                 "drenou",
+    dragao:                   "abrasou",
+    balrog:                   "abrasou",
+    medusa:                   "petrificou",
+    feiticeiro_das_trevas:    "fulminou",
+    vlad_o_empalador:         "empalou",
+    devorador_de_almas:       "devorou",
   };
 
   // Arquétipos de jogador — valores tabelados
@@ -1050,7 +1050,16 @@
       }
     } else {
       sfx.attack();
-      pushLog(`Infligiste **${amount}** de dano n${enemy.article === "a" ? "a" : "o"} **${enemy.name}**.`, "info");
+      const art = enemy.article === "a" ? "a" : "o";
+      const contractArt = enemy.article === "a" ? "na" : "no";
+      const hitMsgs = [
+        `Golpeaste ${art} **${enemy.name}**!`,
+        `**${enemy.name}** levou uma boa pancada!`,
+        `Acertaste em cheio ${contractArt} **${enemy.name}**!`,
+        `**${enemy.name}** recua a sangrar!`,
+        `Atingiste ${art} **${enemy.name}** com força!`,
+      ];
+      pushLog(hitMsgs[Math.floor(combatRng() * hitMsgs.length)], "info");
     }
   }
 
@@ -1107,11 +1116,11 @@
       gameOverModal.removeAttribute("hidden");
     } else {
       sfx.hit();
-      const verb = ATTACK_VERBS[sourceEnemy.id] || "ataca";
+      const verb = ATTACK_VERBS[sourceEnemy.id] || "atacou";
       if (state.armor > 0 && mitigated !== amount)
-        pushLog(`${Art} **${sourceName}** ${verb}-te em **${mitigated}** (armadura bloqueou **${amount - mitigated}**).`, "bad");
+        pushLog(`${Art} **${sourceName}** ${verb}-te! (armadura bloqueou **${amount - mitigated}**).`, "bad");
       else
-        pushLog(`${Art} **${sourceName}** ${verb}-te em **${mitigated}**.`, "bad");
+        pushLog(`${Art} **${sourceName}** ${verb}-te!`, "bad");
     }
   }
 
