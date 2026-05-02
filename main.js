@@ -500,7 +500,8 @@
   }
 
   const gridEl = el("grid");
-  const logEl = el("log");
+  const toastContainer = el("toastContainer");
+  const invEl = el("inv");
   const depthVal = el("depthVal");
   const hpVal = el("hpVal");
   const lvlVal = el("lvlVal");
@@ -542,18 +543,31 @@
   gridEl.addEventListener("click", () => gridEl.focus());
 
   function pushLog(text, kind = "info") {
-    const p = document.createElement("p");
-    p.className = "logLine";
-    const tag = document.createElement("span");
-    tag.className = "tag";
-    tag.textContent = kind === "info" ? "•" : kind === "good" ? "✓" : "!";
-    const msg = document.createElement("span");
-    msg.innerHTML = " " + text
+    const msg = document.createElement("div");
+    msg.className = `toastMsg ${kind}`;
+    msg.innerHTML = text
       .replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")
       .replaceAll(/\*\*(.+?)\*\*/g, `<span class="${kind === "bad" ? "bad" : kind === "good" ? "good" : "tag"}">$1</span>`);
-    p.appendChild(tag); p.appendChild(msg);
-    logEl.prepend(p);
-    while (logEl.childNodes.length > 60) logEl.removeChild(logEl.lastChild);
+    
+    // Icon based on kind
+    const icon = kind === "good" ? "✓ " : kind === "bad" ? "⚠ " : "";
+    msg.innerHTML = icon + msg.innerHTML;
+
+    toastContainer.appendChild(msg);
+
+    // Keep max 3 toasts at a time
+    while (toastContainer.childNodes.length > 3) {
+      toastContainer.removeChild(toastContainer.firstChild);
+    }
+
+    setTimeout(() => {
+      if (msg.parentNode) {
+        msg.classList.add("fadeOut");
+        setTimeout(() => {
+          if (msg.parentNode) msg.parentNode.removeChild(msg);
+        }, 500); // Wait for fadeOut animation
+      }
+    }, 3000); // Visible for 3 seconds
   }
 
   function cellForTile(t) {

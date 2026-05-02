@@ -769,6 +769,43 @@ body{
   text-shadow:0 1px 4px rgba(0,0,0,.9);
   white-space:nowrap;
 }
+.toastContainer{
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+  z-index: 50;
+  width: 90%;
+}
+.toastMsg{
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  animation: slideUpFade 0.3s ease forwards;
+  text-align: center;
+  backdrop-filter: blur(8px);
+}
+.toastMsg.fadeOut {
+  animation: fadeOutMsg 0.5s ease forwards;
+}
+@keyframes slideUpFade{
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeOutMsg{
+  0% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-10px); }
+}
 .floatDmg{color:#fbbf24}
 .floatHit{color:var(--danger)}
 .floatHeal{color:var(--ok)}
@@ -822,7 +859,7 @@ body{
   }
   
   /* Hide unnecessary elements on mobile to save space */
-  .logPanel { display: none !important; }
+  .toastContainer { bottom: 80px; width: 95%; }
   .title p { display: none; }
   .startModalHero { display: none; } /* also save space in modal */
   
