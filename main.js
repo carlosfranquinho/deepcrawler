@@ -529,26 +529,29 @@
     if (!_menuPlaying || soundMuted) return;
     const ctx = getAudioCtx();
     if (!ctx) return;
-    let t = ctx.currentTime + 0.02;
-    let total = 0;
-    for (const [freq, beats] of MENU_MELODY) {
-      const dur = beats * MENU_BEAT;
-      try {
-        const osc = ctx.createOscillator();
-        const g   = ctx.createGain();
-        osc.connect(g); g.connect(ctx.destination);
-        osc.type = "square";
-        osc.frequency.setValueAtTime(freq, t);
-        g.gain.setValueAtTime(0.07, t);
-        g.gain.exponentialRampToValueAtTime(0.001, t + dur * 0.8);
-        osc.start(t);
-        osc.stop(t + dur);
-        _menuNodes.push(osc);
-      } catch(e) {}
-      t += dur;
-      total += dur;
-    }
-    _menuTimer = setTimeout(() => { _menuNodes = []; _scheduleMenuLoop(); }, (total - 0.05) * 1000);
+    ctx.resume().then(() => {
+      if (!_menuPlaying || soundMuted) return;
+      let t = ctx.currentTime + 0.02;
+      let total = 0;
+      for (const [freq, beats] of MENU_MELODY) {
+        const dur = beats * MENU_BEAT;
+        try {
+          const osc = ctx.createOscillator();
+          const g   = ctx.createGain();
+          osc.connect(g); g.connect(ctx.destination);
+          osc.type = "square";
+          osc.frequency.setValueAtTime(freq, t);
+          g.gain.setValueAtTime(0.07, t);
+          g.gain.exponentialRampToValueAtTime(0.001, t + dur * 0.8);
+          osc.start(t);
+          osc.stop(t + dur);
+          _menuNodes.push(osc);
+        } catch(e) {}
+        t += dur;
+        total += dur;
+      }
+      _menuTimer = setTimeout(() => { _menuNodes = []; _scheduleMenuLoop(); }, (total - 0.05) * 1000);
+    });
   }
 
   function playMenuMusic() {
