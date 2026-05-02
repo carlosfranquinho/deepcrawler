@@ -657,7 +657,7 @@
       catch { return []; }
     }
     try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/scores?select=*&order=points.desc&limit=10`, {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/scores?select=*&name=neq.An%C3%B3nimo&order=points.desc&limit=10`, {
         headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
       });
       if (!res.ok) throw new Error("Erro de rede ao ler Supabase.");
@@ -704,7 +704,7 @@
 
   async function renderScores() {
     scoresEl.innerHTML = "<p class='muted scoresEmpty'>A carregar pontuações...</p>";
-    const scores = await getScores();
+    const scores = (await getScores()).filter(s => (s.name || "").toLowerCase() !== "anónimo");
     scoresEl.innerHTML = "";
     if (!scores.length) {
       const p = document.createElement("p");
