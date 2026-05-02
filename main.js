@@ -958,28 +958,32 @@
 
   // ── Efeitos aleatórios ────────────────────────────────────────────────────
 
+  // Poções — sempre afetam HP (80% positivas, 20% negativas)
   const POTION_POOL = [
-    "heal_sm","heal_sm","heal_sm",
-    "heal_lg","heal_lg",
-    "xp_sm","xp_sm",
-    "armor",
-    "teleport",
-    "curse",
+    "heal_sm","heal_sm","heal_sm","heal_sm",  // 40%
+    "heal_lg","heal_lg","heal_lg",             // 30%
+    "heal_full",                               // 10%
+    "curse","curse",                           // 20%
   ];
+  // Pergaminhos — qualquer stat (90% positivos)
   const SCROLL_POOL = [
-    "heal_lg","heal_lg",
     "xp_sm","xp_sm",
     "xp_lg",
-    "reveal_map","reveal_map",
-    "kill_room","kill_room",
+    "reveal_map",
+    "kill_room",
     "carisma",
+    "armor",
     "points_sm",
+    "heal_lg",
     "curse",
   ];
+  // Amuletos — magia de aura/proteção (90% positivos)
   const CHARM_POOL = [
     "carisma","carisma","carisma",
     "armor","armor",
-    "xp_sm","xp_sm",
+    "xp_sm",
+    "reveal_map",
+    "teleport",
     "points_sm",
     "curse",
   ];
@@ -1029,6 +1033,13 @@
         state.hp += h; state.points += 10; sfx.pickup();
         showFloat(state.pos.x, state.pos.y, `+${h} HP`, "floatHeal");
         pushLog(h > 0 ? `Cura poderosa! **+${h}** HP (+10 pontos).` : "Já tens HP máximo.", h > 0 ? "good" : "info");
+        break;
+      }
+      case "heal_full": {
+        const h = state.maxHp - state.hp;
+        state.hp = state.maxHp; state.points += 20; sfx.pickup();
+        showFloat(state.pos.x, state.pos.y, `+${h} HP`, "floatHeal");
+        pushLog(h > 0 ? `Elixir raro! HP completamente restaurado (**+${h}**, +20 pontos).` : "Já tens HP máximo.", h > 0 ? "good" : "info");
         break;
       }
       case "xp_sm": {
@@ -1351,7 +1362,7 @@
 
     row("tileItemSword",  "Arma",       `${state.weaponName || "Mãos"}  [${state.atk[0]}–${state.atk[1]}]`);
     row("tileItemArmor",  "Armadura",   pips(state.armor, ARMOR_MAX, "tileItemArmor"));
-    row("tileItemCharm",  "Amuleto",    pips(Math.min(state.charisma, 5), 5, "tileItemCharm"));
+    row("tileItemCharm",  "Carisma",    pips(Math.min(state.charisma, 5), 5, "tileItemCharm"));
     row("tileItemPotion", "Poções",     potions ? String(potions) : "—",
         potions ? () => { if (state?.alive) { const a = itemUseFirst("potion"); if (a) doTurn(true); } } : null);
     row("tileItemScroll", "Pergaminhos", scrolls ? String(scrolls) : "—",
@@ -1402,10 +1413,10 @@
     const arch = archIdx >= 0 ? PLAYER_ARCHETYPES[archIdx] : PLAYER_ARCHETYPES[0];
     const meta = ARCH_META[Math.max(0, archIdx)];
 
-    // Hero badge
-    heroEmoji.textContent = arch.emoji || "⚔";
+    // Hero badge — portrait image with archetype colour tint
     heroEmoji.style.background = meta.color + "28";
     heroEmoji.style.borderColor = meta.color + "88";
+    heroEmoji.innerHTML = `<img src="${meta.img}" alt="${arch.name}">`;
     heroName.textContent  = state.playerName;
     heroArchetype.textContent = state.archetype;
 
