@@ -95,6 +95,54 @@
     "Lâmina do Caos", "Espada Lendária",
   ];
 
+  const ATTACK_VERBS = {
+    ratazana_de_esgoto:       "morde",
+    morcego_das_cavernas:     "morde",
+    beringela_radioativa:     "irradia",
+    gnomo_das_trevas:         "golpeia",
+    homunculo:                "morde",
+    raposa:                   "arranha",
+    formiga_gigante:          "morde",
+    bolha_acida:              "corrói",
+    lagarto_das_rochas:       "morde",
+    luz_de_presenca:          "ofusca",
+    lobo_selvagem:            "morde",
+    goblin:                   "sova",
+    serpente:                 "morde",
+    orc:                      "soca",
+    berbequim_descontrolado:  "perfura",
+    geleia_ocre:              "corrói",
+    besta_chifruda:           "chifra",
+    urso_coruja:              "arranha",
+    tigre_dentes_de_sabre:    "morde",
+    geleia_azul:              "corrói",
+    soldado_anao:             "golpeia",
+    duende_ladrao:            "golpeia",
+    comedor_de_miolos:        "devora",
+    mimico:                   "golpeia",
+    gnomo_feiticeiro:         "fulmina",
+    ogre:                     "esmaga",
+    mosca_choca:              "pica",
+    limo_verde:               "corrói",
+    gigante_das_colinas:      "espanca",
+    brutamontes:              "espanca",
+    troll:                    "esmaga",
+    elemental_do_fogo:        "abrasa",
+    basilisco:                "morde",
+    sombra_veloz:             "arranha",
+    policia_bebado:           "espanca",
+    carnical:                 "dilacera",
+    vampiro:                  "morde",
+    necromante:               "amaldiçoa",
+    espectro:                 "drena",
+    dragao:                   "abrasa",
+    balrog:                   "abrasa",
+    medusa:                   "petrifica",
+    feiticeiro_das_trevas:    "fulmina",
+    vlad_o_empalador:         "empala",
+    devorador_de_almas:       "devora",
+  };
+
   // Arquétipos de jogador — valores tabelados
   const PLAYER_ARCHETYPES = [
     { name: "Guerreiro", maxHp: 18, atk: [3, 6], armor: 1, charisma: 0, emoji: "😠" },
@@ -1002,7 +1050,7 @@
       }
     } else {
       sfx.attack();
-      pushLog(`Acertaste n${enemy.article === "a" ? "a" : "o"} **${enemy.name}** em **${amount}**.`, "info");
+      pushLog(`Infligiste **${amount}** de dano n${enemy.article === "a" ? "a" : "o"} **${enemy.name}**.`, "info");
     }
   }
 
@@ -1059,10 +1107,11 @@
       gameOverModal.removeAttribute("hidden");
     } else {
       sfx.hit();
+      const verb = ATTACK_VERBS[sourceEnemy.id] || "ataca";
       if (state.armor > 0 && mitigated !== amount)
-        pushLog(`${Art} **${sourceName}** acerta-te em **${mitigated}** (armadura bloqueou **${amount - mitigated}**).`, "bad");
+        pushLog(`${Art} **${sourceName}** ${verb}-te em **${mitigated}** (armadura bloqueou **${amount - mitigated}**).`, "bad");
       else
-        pushLog(`${Art} **${sourceName}** acerta-te em **${mitigated}**.`, "bad");
+        pushLog(`${Art} **${sourceName}** ${verb}-te em **${mitigated}**.`, "bad");
     }
   }
 
@@ -1183,7 +1232,8 @@
           lvl.items = lvl.items.filter(x => x.id !== it.id);
           state.points += 5;
           sfx.pickup();
-          pushLog(`Apanhaste **${it.name}**.`, "info");
+          const pickArt = { potion: "uma", scroll: "um", key: "uma" }[it.typeId] || "um";
+          pushLog(`Apanhaste ${pickArt} **${it.name}**.`, "info");
         } else {
           pushLog("Inventário cheio (máx. 9 slots). Larga um item primeiro.", "bad");
         }
