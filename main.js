@@ -1665,7 +1665,6 @@
       invEl.appendChild(div);
     };
 
-    row("tileItemChest",  "Dinheiro", fmtEuro(state.money || 0));
     row("tileItemSword",  "Arma",     `${state.weaponName || "Mãos"}  [${state.atk[0]}–${state.atk[1]}]`);
     row("tileItemArmor",  "Armadura", pips(state.armor, ARMOR_MAX, "tileItemArmor"));
     row("tileItemPotion", "Poções",     potions ? String(potions) : "—",
@@ -1673,6 +1672,7 @@
     row("tileItemScroll", "Pergaminhos", scrolls ? String(scrolls) : "—",
         scrolls ? () => { if (state?.alive) { const a = itemUseFirst("scroll"); if (a) doTurn(true); } } : null);
     row("tileItemKey",    "Chaves",     keys    ? String(keys)    : "—");
+    row("tileItemChest",  "Dinheiro", fmtEuro(state.money || 0));
   }
 
   let viewOriginX = 0, viewOriginY = 0;
