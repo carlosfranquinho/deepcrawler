@@ -7,8 +7,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./styles.css?v=9" />
-    <link rel="stylesheet" href="./monsters.css?v=9" />
+    <link rel="stylesheet" href="./styles.css?v=11" />
+    <link rel="stylesheet" href="./monsters.css?v=11" />
   </head>
   <body>
     <div class="app">
@@ -17,25 +17,11 @@
           <h1>DeepCrawler</h1>
           <p>Roguelike por turnos numa masmorra procedural infinitamente profunda.</p>
         </div>
-
-        <div class="hud">
-          <div class="hudRow">
-            <div class="pill"><span class="label">Andar</span> <span id="depthVal">1</span></div>
-            <div class="pill"><span class="label">HP</span> <span id="hpVal">10</span></div>
-            <div class="pill"><span class="label">Nível</span> <span id="lvlVal">1</span></div>
-            <div class="pill"><span class="label">XP</span> <span id="xpVal">0</span></div>
-            <div class="pill"><span class="label">Armadura</span> <span id="armVal">0</span></div>
-            <div class="pill"><span class="label">Carisma</span> <span id="chaVal">0</span></div>
-            <div class="pill"><span class="label">Pontos</span> <span id="pointsVal">0</span></div>
-            <div class="pill"><span class="label">Descida</span> <span id="stairsVal">—</span></div>
-            <div class="pill"><span class="label">Seed</span> <span id="seedVal">—</span></div>
-          </div>
-          <div class="hudRow">
-            <button id="newGameBtn" class="btn">Novo jogo</button>
-            <button id="scoresBtn" class="btn btnGhost">Pontuações</button>
-            <button id="helpBtn" class="btn btnGhost" aria-expanded="false">Ajuda</button>
-            <button id="muteBtn" class="btn btnGhost">Som</button>
-          </div>
+        <div class="hudRow">
+          <button id="newGameBtn" class="btn">Novo jogo</button>
+          <button id="scoresBtn" class="btn btnGhost">Pontuações</button>
+          <button id="helpBtn" class="btn btnGhost" aria-expanded="false">Ajuda</button>
+          <button id="muteBtn" class="btn btnGhost">Som</button>
         </div>
       </header>
 
@@ -43,6 +29,13 @@
         <section class="panel">
           <div id="grid" class="grid" role="application" aria-label="Grelha do jogo">
             <div id="toastContainer" class="toastContainer" aria-live="polite"></div>
+            <div class="mapOverlay">
+              <span class="mapBadge">Piso <span id="depthVal">1</span></span>
+              <span class="mapBadge mapBadgeSub" id="stairsVal">—</span>
+            </div>
+          </div>
+          <div class="mapMeta">
+            <span class="seedTxt">seed <span id="seedVal">—</span></span>
           </div>
           <div class="dpad" aria-label="Controlos de direção">
             <div class="dpadRow">
@@ -64,18 +57,26 @@
         </section>
 
         <aside class="sidebar">
-          <div style="text-align: center; margin-bottom: 16px;">
-            <span class="muted" style="font-size: 13px;">Dica: clica na grelha para focar os controlos do teclado.</span>
+          <div class="heroCard">
+            <div id="heroEmoji" class="heroEmoji">⚔</div>
+            <div class="heroInfo">
+              <div id="heroName" class="heroName">—</div>
+              <div class="heroSub"><span id="heroArchetype">—</span> · Nível <span id="lvlVal">1</span></div>
+            </div>
+          </div>
+          <div class="statsList">
+            <div class="statRow"><span class="statLbl">HP</span><span id="hpVal" class="statVal">—</span></div>
+            <div class="statRow"><span class="statLbl">XP</span><span id="xpVal" class="statVal">—</span></div>
+            <div class="statRow"><span class="statLbl">Carisma</span><span id="chaVal" class="statVal">—</span></div>
+            <div class="statRow"><span class="statLbl">Pontos</span><span id="pointsVal" class="statVal">—</span></div>
           </div>
           <section class="invPanel" style="box-shadow: none; border: none; padding: 0; background: transparent;">
             <h2>Inventário</h2>
             <div id="inv" class="inv"></div>
-            <p class="muted invHint">Carrega em <b>1–9</b> para usar. <b>Shift + 1–9</b> para largar.</p>
+            <p class="muted invHint"><b>B</b> beber poção · <b>L</b> ler pergaminho · clica para usar</p>
           </section>
         </aside>
       </main>
-
-
 
       <footer class="footer">
         <span class="muted">&copy; Carlos Franquinho 2026</span>
@@ -154,11 +155,13 @@
             <li><b>Descer</b>: Pisar em <b>&gt;</b></li>
             <li><b>Subir</b>: Pisar em <b>&lt;</b></li>
             <li><b>Atacar</b>: Andar contra um inimigo</li>
-            <li><b>Usar item</b>: Carregar em <b>1–9</b> (slots do inventário)</li>
+            <li><b>Beber poção</b>: <b>B</b></li>
+            <li><b>Ler pergaminho</b>: <b>L</b></li>
+            <li><b>Usar item</b>: Clica no inventário ou <b>1–9</b></li>
           </ul>
           <p class="muted" style="text-align: left; margin-top: 12px;">
             Cada tecla é um turno: <b>tu ages</b>, depois <b>os inimigos agem</b>.
-            A masmorra é infinita: novos andares são gerados ao descer.
+            A masmorra é infinita: novos pisos são gerados ao descer.
           </p>
           <p class="muted" style="text-align: left;">
             <b>Carisma</b>: cada ponto dá 10% de chance de esquivar ataques inimigos.<br>
@@ -169,6 +172,6 @@
       </div>
     </div>
 
-    <script src="./main.js?v=5"></script>
+    <script src="./main.js?v=7"></script>
   </body>
 </html>

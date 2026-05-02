@@ -69,6 +69,15 @@
     devorador_de_almas: { id: "devorador_de_almas", name: "Devorador de Almas", article: "o", glyph: "&", va: 95, cssClass: "tileEnemyD", maxHp: 144, atk: [48, 65] },
   };
 
+  // Comportamentos dos inimigos
+  const BEHAVIORS = {
+    static:    new Set(["bolha_acida","geleia_ocre","geleia_azul","limo_verde","luz_de_presenca","mimico"]),
+    timid:     new Set(["ratazana_de_esgoto","morcego_das_cavernas","homunculo","beringela_radioativa"]),
+    berserker: new Set(["brutamontes","berbequim_descontrolado","besta_chifruda","balrog","tigre_dentes_de_sabre"]),
+    ranged:    new Set(["gnomo_feiticeiro","necromante","gnomo_das_trevas","feiticeiro_das_trevas","medusa","mosca_choca"]),
+    pack:      new Set(["goblin","soldado_anao","orc","policia_bebado","carnical"]),
+  };
+
   // Arquétipos de jogador — valores tabelados
   const PLAYER_ARCHETYPES = [
     { name: "Guerreiro", maxHp: 14, atk: [2, 5], armor: 1, charisma: 0, emoji: "😠" },
@@ -506,10 +515,12 @@
   const hpVal = el("hpVal");
   const lvlVal = el("lvlVal");
   const xpVal = el("xpVal");
-  const armVal = el("armVal");
   const chaVal = el("chaVal");
   const seedVal = el("seedVal");
   const pointsVal = el("pointsVal");
+  const heroEmoji = el("heroEmoji");
+  const heroName  = el("heroName");
+  const heroArchetype = el("heroArchetype");
   const newGameBtn = el("newGameBtn");
   const helpBtn = el("helpBtn");
   const scoresBtn = el("scoresBtn");
@@ -604,6 +615,8 @@
       const s = JSON.parse(raw);
       s.levels = new Map(s.levels.map(([d, l]) => [d, { ...l, explored: new Uint8Array(l.explored) }]));
       state = s;
+      state.weaponName = state.weaponName || "Mãos";
+      state.weaponUpgrades = state.weaponUpgrades || 0;
       selectedArchIdx = PLAYER_ARCHETYPES.findIndex(a => a.name === state.archetype);
       if (selectedArchIdx < 0) selectedArchIdx = 0;
       combatRng = mulberry32((state.seed ^ state.points) >>> 0);
@@ -683,7 +696,7 @@
       row.className = "scoreRow" + (i === 0 ? " scoreTop" : "");
       const safeName = (s.name || "?").replaceAll("&", "&amp;").replaceAll("<", "&lt;");
       const arch = s.archetype ? ` <span class="scoreArch">${s.archetype}</span>` : "";
-      row.innerHTML = `<span class="scoreRank">${i + 1}</span><span class="scoreName">${safeName}${arch}</span><span class="scoreDepth">Andar ${s.depth}</span><span class="scoreLvl">Nív.&nbsp;${s.lvl}</span><span class="scorePoints">${s.points}&nbsp;pts</span><span class="scoreDate">${s.date}</span>`;
+      row.innerHTML = `<span class="scoreRank">${i + 1}</span><span class="scoreName">${safeName}${arch}</span><span class="scoreDepth">Piso ${s.depth}</span><span class="scoreLvl">Nív.&nbsp;${s.lvl}</span><span class="scorePoints">${s.points}&nbsp;pts</span><span class="scoreDate">${s.date}</span>`;
       scoresEl.appendChild(row);
     });
   }
@@ -775,6 +788,7 @@
       alive: true, xp: 0, lvl: 1,
       armor: arch.armor, charisma: arch.charisma,
       atk: [...arch.atk], inv: new Array(9).fill(null), points: 0,
+      weaponName: "Mãos", weaponUpgrades: 0,
     };
 
     const lvl = getLevel(1);
@@ -826,9 +840,9 @@
       clearSave();
       saveScore();
       pushLog(`Foste morto por um${art === "a" ? "a" : ""} **${sourceName}**. Fim de jogo.`, "bad");
-      pushLog(`Pontuação final: **${state.points}** pts (andar ${state.depth}, nível ${state.lvl}).`, "bad");
+      pushLog(`Pontuação final: **${state.points}** pts (piso ${state.depth}, nível ${state.lvl}).`, "bad");
       pushLog("Clica em **Novo jogo** para tentar novamente.", "bad");
-      gameOverMsg.innerHTML = `<b>${state.playerName}</b>, ${state.archetype} de nível ${state.lvl}, foi morto por um${art === "a" ? "a" : ""} <b>${sourceName}</b> no andar ${state.depth}.<br><br>Pontuação final: <b>${state.points}</b> pts`;
+      gameOverMsg.innerHTML = `<b>${state.playerName}</b>, ${state.archetype} de nível ${state.lvl}, foi morto por um${art === "a" ? "a" : ""} <b>${sourceName}</b> no piso ${state.depth}.<br><br>Pontuação final: <b>${state.points}</b> pts`;
       gameOverModal.removeAttribute("hidden");
     } else {
       sfx.hit();
@@ -928,8 +942,8 @@
     const lvl = getLevel(newDepth);
     state.pos = dir === "down" ? { ...lvl.up } : { ...lvl.down };
     sfx.stairs();
-    if (dir === "down") { state.points += 25; pushLog(`Desceste para o andar **${newDepth}** (+25 pontos).`, "info"); }
-    else { pushLog(`Subiste para o andar **${newDepth}**.`, "info"); }
+    if (dir === "down") { state.points += 25; pushLog(`Desceste para o piso **${newDepth}** (+25 pontos).`, "info"); }
+    else { pushLog(`Subiste para o piso **${newDepth}**.`, "info"); }
   }
 
   function playerWait() {
@@ -982,9 +996,12 @@
       pushLog(`Usaste um amuleto (+**1** carisma → **${state.charisma * 10}%** de esquiva, +15 pontos).`, "good");
     } else if (item.typeId === "sword") {
       state.atk[0] += 1; state.atk[1] += 1; state.points += 20;
+      state.weaponUpgrades = (state.weaponUpgrades || 0) + 1;
+      const wnames = ["Mãos", "Espada", "Espada Afiada", "Espada de Batalha", "Espada Lendária"];
+      state.weaponName = wnames[Math.min(state.weaponUpgrades, wnames.length - 1)];
       sfx.pickup();
       showFloat(state.pos.x, state.pos.y, `ATK+1`, "floatHeal");
-      pushLog(`Equipaste uma Espada (ATK **+1/+1**, +20 pontos). [${state.atk[0]}-${state.atk[1]}]`, "good");
+      pushLog(`Equipaste **${state.weaponName}** (ATK **+1/+1**, +20 pontos). [${state.atk[0]}–${state.atk[1]}]`, "good");
     } else if (item.typeId === "scroll") {
       const before = state.hp;
       state.hp = Math.min(state.maxHp, state.hp + 8); state.points += 12;
@@ -995,6 +1012,15 @@
 
     state.inv[slotIdx] = null;
     return true;
+  }
+
+  function itemUseFirst(typeId) {
+    const slot = state.inv.findIndex(it => it?.typeId === typeId);
+    if (slot === -1) {
+      pushLog(`Não tens ${typeId === "scroll" ? "nenhum Pergaminho" : "nenhuma Poção"} no inventário.`, "info");
+      return false;
+    }
+    return itemUse(slot);
   }
 
   function blocksSight(t) { return t === Tile.Wall || t === Tile.DoorClosed || t === Tile.DoorLocked; }
@@ -1070,32 +1096,96 @@
       return occ.has(idx(x, y));
     };
 
+    const hasLos = (a, b) => {
+      const line = bresenhamLine(a, b);
+      for (let i = 1; i < line.length - 1; i++) {
+        if (blocksSight(lvl.tiles[idx(line[i].x, line[i].y)])) return false;
+      }
+      return true;
+    };
+
+    const tryAttack = (e, bonus = 0) => {
+      if (state.charisma > 0 && combatRng() < state.charisma * 0.10) {
+        sfx.dodge();
+        pushLog(`Esquivaste-te do ataque d${e.article} **${e.name}**! (Carisma)`, "good");
+        return;
+      }
+      dealDamageToPlayer(roll(combatRng, e.atk[0], e.atk[1]) + bonus, e);
+    };
+
+    const moveTowards = (e, target) => {
+      const next = bfsNextStep(lvl, e.pos, target, blockedForEnemy);
+      if (next) { occ.delete(idx(e.pos.x, e.pos.y)); e.pos = next; occ.add(idx(e.pos.x, e.pos.y)); }
+    };
+
+    const moveAway = (e, target) => {
+      const dirs = [{ x: 1, y: 0 }, { x: -1, y: 0 }, { x: 0, y: 1 }, { x: 0, y: -1 }];
+      const best = dirs
+        .map(d => { const nx = e.pos.x + d.x, ny = e.pos.y + d.y; return blockedForEnemy(nx, ny) ? null : { pos: { x: nx, y: ny }, dist: manhattan({ x: nx, y: ny }, target) }; })
+        .filter(Boolean).sort((a, b) => b.dist - a.dist);
+      if (best.length) { occ.delete(idx(e.pos.x, e.pos.y)); e.pos = best[0].pos; occ.add(idx(e.pos.x, e.pos.y)); }
+    };
+
+    const wander = (e) => {
+      const dirs = [{ x: 1, y: 0 }, { x: -1, y: 0 }, { x: 0, y: 1 }, { x: 0, y: -1 }];
+      const d = choose(combatRng, dirs);
+      const nx = e.pos.x + d.x, ny = e.pos.y + d.y;
+      const nt = lvl.tiles[idx(nx, ny)];
+      if (!blockedForEnemy(nx, ny) && nt !== Tile.Up && nt !== Tile.Down) {
+        occ.delete(idx(e.pos.x, e.pos.y)); e.pos = { x: nx, y: ny }; occ.add(idx(e.pos.x, e.pos.y));
+      }
+    };
+
     for (const e of lvl.enemies) {
       if (e.hp <= 0 || !state.alive) continue;
       const dist = manhattan(e.pos, state.pos);
-      const et = ENEMY_TYPES[e.typeId];
 
-      if (dist === 1) {
-        // Carisma: 10% de esquiva por ponto
-        if (state.charisma > 0 && combatRng() < state.charisma * 0.10) {
-          sfx.dodge();
-          pushLog(`Esquivaste-te do ataque de **${e.name}**! (Carisma)`, "good");
-          continue;
-        }
-        dealDamageToPlayer(roll(combatRng, e.atk[0], e.atk[1]), e);
+      // IMÓVEL — nunca se move, só ataca se adjacente
+      if (BEHAVIORS.static.has(e.typeId)) {
+        if (dist === 1) tryAttack(e);
         continue;
       }
 
-      let next = null;
-      if (dist <= 8) next = bfsNextStep(lvl, e.pos, state.pos, blockedForEnemy);
-      if (!next) {
-        const dirs = [{ x: 1, y: 0 }, { x: -1, y: 0 }, { x: 0, y: 1 }, { x: 0, y: -1 }];
-        const d = choose(combatRng, dirs);
-        const nx = e.pos.x + d.x, ny = e.pos.y + d.y;
-        const nt = lvl.tiles[idx(nx, ny)];
-        if (!blockedForEnemy(nx, ny) && nt !== Tile.Up && nt !== Tile.Down) next = { x: nx, y: ny };
+      // COVARDE — foge quando HP < 50%; defende-se se encurralado
+      if (BEHAVIORS.timid.has(e.typeId) && e.hp < e.maxHp * 0.5) {
+        if (dist === 1) tryAttack(e);
+        else moveAway(e, state.pos);
+        continue;
       }
-      if (next) { occ.delete(idx(e.pos.x, e.pos.y)); e.pos = next; occ.add(idx(e.pos.x, e.pos.y)); }
+
+      // ALCANCE — ataca à dist ≤ 3 com LoS, recua se o jogador estiver perto de mais
+      if (BEHAVIORS.ranged.has(e.typeId)) {
+        const inRange = dist <= 3 && hasLos(e.pos, state.pos);
+        if (inRange) {
+          tryAttack(e);
+          if (dist <= 2) moveAway(e, state.pos);
+        } else {
+          moveTowards(e, state.pos);
+        }
+        continue;
+      }
+
+      // ALCATEIA — bónus de ATK por aliados adjacentes (máx +3)
+      if (BEHAVIORS.pack.has(e.typeId)) {
+        if (dist === 1) {
+          const allies = lvl.enemies.filter(o => o.id !== e.id && o.hp > 0 && manhattan(o.pos, e.pos) === 1).length;
+          const bonus = Math.min(3, allies);
+          if (bonus > 0) pushLog(`**${e.name}** ataca em grupo! (+${bonus} ATK)`, "bad");
+          tryAttack(e, bonus);
+        } else if (dist <= 8) {
+          moveTowards(e, state.pos);
+        } else {
+          wander(e);
+        }
+        continue;
+      }
+
+      // BERSERKER — persegue sempre sem limite de distância
+      // DEFAULT — persegue até dist 8, depois vagueia
+      if (dist === 1) { tryAttack(e); continue; }
+      const chaseRange = BEHAVIORS.berserker.has(e.typeId) ? Infinity : 8;
+      if (dist <= chaseRange) moveTowards(e, state.pos);
+      else wander(e);
     }
   }
 
@@ -1110,34 +1200,40 @@
   }
 
   function renderInventory() {
-    const keyCount = state.inv.filter(it => it?.typeId === "key").length;
     invEl.innerHTML = "";
-    for (let i = 0; i < 9; i++) {
-      const row = document.createElement("div"); row.className = "invRow";
-      const left = document.createElement("div"); left.className = "left";
-      const slot = document.createElement("div"); slot.className = "invSlot"; slot.textContent = String(i + 1);
-      const name = document.createElement("div"); name.className = "invName";
-      const item = state.inv[i];
-      name.textContent = item
-        ? (item.typeId === "key" && keyCount > 1 ? `${item.name} ×${keyCount}` : item.name)
-        : "—";
-      left.appendChild(slot); left.appendChild(name); row.appendChild(left); invEl.appendChild(row);
+    const potions = state.inv.filter(it => it?.typeId === "potion").length;
+    const scrolls = state.inv.filter(it => it?.typeId === "scroll").length;
+    const keys    = state.inv.filter(it => it?.typeId === "key").length;
 
-      if (item) {
-        row.style.cursor = "pointer";
-        row.addEventListener("click", () => {
-          if (!state || state.hp <= 0) return;
-          const acted = itemUse(i);
-          if (acted) doTurn(true);
-        });
-        row.addEventListener("contextmenu", (e) => {
-          e.preventDefault();
-          if (!state || state.hp <= 0) return;
-          const acted = itemDrop(i);
-          if (acted) doTurn(true);
-        });
+    const pips = (filled, total, iconCls) => {
+      const wrap = document.createElement("div"); wrap.className = "invPips";
+      for (let i = 0; i < total; i++) {
+        const p = document.createElement("div");
+        p.className = `invPip ${iconCls}${i < filled ? " on" : ""}`;
+        wrap.appendChild(p);
       }
-    }
+      return wrap;
+    };
+
+    const row = (iconCls, label, content, clickFn) => {
+      const div  = document.createElement("div"); div.className = "invCat";
+      const icon = document.createElement("div"); icon.className = `invCatIcon ${iconCls}`;
+      const lbl  = document.createElement("span"); lbl.className = "invCatLabel"; lbl.textContent = label;
+      const val  = document.createElement("span"); val.className = "invCatValue";
+      typeof content === "string" ? (val.textContent = content) : val.appendChild(content);
+      div.appendChild(icon); div.appendChild(lbl); div.appendChild(val);
+      if (clickFn) { div.style.cursor = "pointer"; div.addEventListener("click", clickFn); }
+      invEl.appendChild(div);
+    };
+
+    row("tileItemSword",  "Arma",       `${state.weaponName || "Mãos"}  [${state.atk[0]}–${state.atk[1]}]`);
+    row("tileItemArmor",  "Armadura",   pips(state.armor, ARMOR_MAX, "tileItemArmor"));
+    row("tileItemCharm",  "Amuleto",    pips(Math.min(state.charisma, 5), 5, "tileItemCharm"));
+    row("tileItemPotion", "Poções",     potions ? String(potions) : "—",
+        potions ? () => { if (state?.alive) { const a = itemUseFirst("potion"); if (a) doTurn(true); } } : null);
+    row("tileItemScroll", "Pergaminhos", scrolls ? String(scrolls) : "—",
+        scrolls ? () => { if (state?.alive) { const a = itemUseFirst("scroll"); if (a) doTurn(true); } } : null);
+    row("tileItemKey",    "Chaves",     keys    ? String(keys)    : "—");
   }
 
   let viewOriginX = 0, viewOriginY = 0;
@@ -1166,13 +1262,16 @@
 
   function render() {
     const lvl = getLevel(state.depth);
-    depthVal.textContent = String(state.depth);
-    hpVal.textContent = `${state.hp}/${state.maxHp}`;
-    lvlVal.textContent = String(state.lvl);
-    xpVal.textContent = `${state.xp}/${xpToNext(state.lvl)}`;
-    armVal.textContent = `${state.armor}/${ARMOR_MAX}`;
-    chaVal.textContent = String(state.charisma);
-    seedVal.textContent = String(state.seed >>> 0);
+    const arch = PLAYER_ARCHETYPES.find(a => a.name === state.archetype) || PLAYER_ARCHETYPES[0];
+    heroEmoji.textContent = arch.emoji || "⚔";
+    heroName.textContent  = state.playerName;
+    heroArchetype.textContent = state.archetype;
+    depthVal.textContent  = String(state.depth);
+    hpVal.textContent     = `${state.hp}/${state.maxHp}`;
+    lvlVal.textContent    = String(state.lvl);
+    xpVal.textContent     = `${state.xp}/${xpToNext(state.lvl)}`;
+    chaVal.textContent    = state.charisma > 0 ? `${state.charisma} (${state.charisma * 10}% esquiva)` : "0";
+    seedVal.textContent   = String(state.seed >>> 0);
     pointsVal.textContent = String(state.points);
     stairsVal.textContent = stairsCompass(lvl);
 
@@ -1240,6 +1339,7 @@
     if (e.key === "Tab") return;
     if (["ArrowUp","ArrowDown","ArrowLeft","ArrowRight","w","a","s","d","W","A","S","D"," ",
          "y","u","b","n","Y","U","B","N",
+         "b","l",
          "1","2","3","4","5","6","7","8","9"].includes(e.key))
       e.preventDefault();
     if (!state) return;
@@ -1265,6 +1365,8 @@
         case "1": case "b": case "B": acted = playerTryMove(-1,  1); break; // ↙
         case "3": case "n": case "N": acted = playerTryMove( 1,  1); break; // ↘
         case " ": case "5": acted = playerWait(); break;
+        case "b": acted = itemUseFirst("potion"); break;
+        case "l": acted = itemUseFirst("scroll"); break;
         default: return;
       }
     }
