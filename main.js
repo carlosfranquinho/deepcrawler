@@ -1823,7 +1823,60 @@
       }
     }
 
+    renderMinimap(lvl, visible);
     renderInventory();
+  }
+
+  function renderMinimap(lvl, visible) {
+    const canvas = document.getElementById("minimapCanvas");
+    if (!canvas) return;
+    const scale = Math.max(2, Math.floor(200 / LEVEL_W));
+    canvas.width  = LEVEL_W * scale;
+    canvas.height = LEVEL_H * scale;
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    for (let y = 0; y < LEVEL_H; y++) {
+      for (let x = 0; x < LEVEL_W; x++) {
+        const i = y * LEVEL_W + x;
+        if (!lvl.explored[i]) continue;
+        const isVis = visible[i];
+        const t = lvl.tiles[i];
+        let color;
+        if (t === Tile.Wall) {
+          color = isVis ? "#1e293b" : "#111827";
+        } else if (t === Tile.DoorClosed || t === Tile.DoorLocked) {
+          color = isVis ? "#d97706" : "#78350f";
+        } else if (t === Tile.Down) {
+          color = "#60a5fa";
+        } else if (t === Tile.Up) {
+          color = "#a78bfa";
+        } else {
+          color = isVis ? "#4b5563" : "#1f2937";
+        }
+        ctx.fillStyle = color;
+        ctx.fillRect(x * scale, y * scale, scale, scale);
+      }
+    }
+
+    const dot = Math.max(1, scale - 1);
+    const off = Math.floor((scale - dot) / 2);
+
+    for (const it of lvl.items) {
+      if (!lvl.explored[it.pos.y * LEVEL_W + it.pos.x]) continue;
+      ctx.fillStyle = "#34d399";
+      ctx.fillRect(it.pos.x * scale + off, it.pos.y * scale + off, dot, dot);
+    }
+
+    for (const e of lvl.enemies) {
+      if (e.hp <= 0) continue;
+      if (!visible[e.pos.y * LEVEL_W + e.pos.x]) continue;
+      ctx.fillStyle = "#ef4444";
+      ctx.fillRect(e.pos.x * scale + off, e.pos.y * scale + off, dot, dot);
+    }
+
+    ctx.fillStyle = "#f8fafc";
+    ctx.fillRect(state.pos.x * scale, state.pos.y * scale, scale, scale);
   }
 
   function doTurn(playerActed) {

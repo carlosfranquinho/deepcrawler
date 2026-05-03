@@ -361,6 +361,16 @@ body{
   flex-direction:column;
   gap:20px;
 }
+.minimapPanel{ padding-bottom: 14px; }
+.minimapCanvas{
+  display:block;
+  margin:0 auto;
+  image-rendering:pixelated;
+  image-rendering:crisp-edges;
+  border-radius:6px;
+  max-width:100%;
+  opacity:.92;
+}
 .help, .logPanel, .invPanel{
   border:1px solid rgba(255,255,255,.08);
   border-radius:20px;

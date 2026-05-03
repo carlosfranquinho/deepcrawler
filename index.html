@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./styles.css?v=14" />
+    <link rel="stylesheet" href="./styles.css?v=15" />
     <link rel="stylesheet" href="./monsters.css?v=11" />
   </head>
   <body>
@@ -91,6 +91,11 @@
             </div>
             <div class="statRow"><span class="statLbl">Pontos</span><span id="pointsVal" class="statVal">—</span></div>
           </div>
+          <section class="minimapPanel invPanel">
+            <h2>Minimapa</h2>
+            <canvas id="minimapCanvas" class="minimapCanvas"></canvas>
+          </section>
+
           <section class="invPanel" style="box-shadow: none; border: none; padding: 0; background: transparent;">
             <h2>Inventário</h2>
             <div id="inv" class="inv"></div>
@@ -240,6 +245,6 @@
       </div>
     </div>
 
-    <script src="./main.js?v=9"></script>
+    <script src="./main.js?v=10"></script>
   </body>
 </html>
