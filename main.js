@@ -296,25 +296,36 @@
 
     placeDoors(tiles, rooms, rng);
 
-    // ── Escolher sala de início ANTES de trancar portas ────────────────────
-    // (para garantir que nenhuma porta da sala inicial fica trancada)
     const startRoom = choose(rng, rooms);
 
-    // Portas da sala inicial — nunca podem ser trancadas
-    const startRoomDoorIndices = new Set();
+    // nearDoor calculado ANTES de trancar — cobre todos os DoorClosed actuais (estável para spawn)
+    const nearDoor = doorExclusions(tiles);
+    const playerStart = safeFloor(rng, startRoom, nearDoor);
+
+    // Escolher downRoom e upRoom ANTES de trancar portas — assim podemos protegê-las upfront
+    const otherRooms = rooms.filter(r => r !== startRoom);
+    otherRooms.sort((a, b) => manhattan({ x: b.cx, y: b.cy }, playerStart) - manhattan({ x: a.cx, y: a.cy }, playerStart));
+    const downRoom = otherRooms[0] || startRoom;
+    const upRoom = depth === 1
+      ? startRoom
+      : otherRooms[Math.min(roll(rng, 1, Math.min(3, otherRooms.length - 1)), otherRooms.length - 1)] || startRoom;
+
+    // Portas de startRoom E upRoom são imunes a trancamento — cobre qualquer porta adjacente a qualquer uma das salas
+    const protectedDoors = new Set();
     for (let i = 0; i < tiles.length; i++) {
       if (tiles[i] !== Tile.DoorClosed) continue;
       const px = i % LEVEL_W, py = (i / LEVEL_W) | 0;
-      // Uma porta "pertence" à sala inicial se ela ou um vizinho imediato está dentro da sala
-      if (posInRoom({ x: px, y: py }, startRoom)) { startRoomDoorIndices.add(i); continue; }
+      if (posInRoom({ x: px, y: py }, startRoom) || posInRoom({ x: px, y: py }, upRoom)) {
+        protectedDoors.add(i); continue;
+      }
       for (const n of neighbors4({ x: px, y: py })) {
-        if (posInRoom(n, startRoom)) { startRoomDoorIndices.add(i); break; }
+        if (posInRoom(n, startRoom) || posInRoom(n, upRoom)) { protectedDoors.add(i); break; }
       }
     }
 
     const doorIndices = [];
     for (let i = 0; i < tiles.length; i++) {
-      if (tiles[i] === Tile.DoorClosed && !startRoomDoorIndices.has(i)) doorIndices.push(i);
+      if (tiles[i] === Tile.DoorClosed && !protectedDoors.has(i)) doorIndices.push(i);
     }
     const numLocked = Math.min(doorIndices.length, clamp(Math.floor(depth / 3), 1, 3));
     for (let i = 0; i < numLocked; i++) {
@@ -324,33 +335,41 @@
       doorIndices[idxToSwap] = temp;
       tiles[doorIndices[i]] = Tile.DoorLocked;
     }
+    let numLockedFinal = numLocked;
 
-    // Exclusões: tiles adjacentes a portas
-    const nearDoor = doorExclusions(tiles);
-
-    const playerStart = safeFloor(rng, startRoom, nearDoor);
-
-    const otherRooms = rooms.filter(r => r !== startRoom);
-    otherRooms.sort((a, b) => manhattan({ x: b.cx, y: b.cy }, playerStart) - manhattan({ x: a.cx, y: a.cy }, playerStart));
-    const downRoom = otherRooms[0] || startRoom;
-    // No nível 1, o jogador começa na sala das escadas de saída (up)
-    // Noutros níveis: numa sala intermédia
-    const upRoom = depth === 1
-      ? startRoom  // o startRoom já é a sala onde o jogador começa — vamos colocar o Up aqui
-      : otherRooms[Math.min(roll(rng, 1, Math.min(3, otherRooms.length - 1)), otherRooms.length - 1)] || startRoom;
-
-    // Garantir que upRoom não fica isolada por portas trancadas.
-    // O jogador chega aqui ao descer do piso superior — não pode ficar preso.
-    let numLockedAdjusted = numLocked;
+    // BFS de verificação: a protecção por adjacência pode falhar quando a porta está no extremo oposto
+    // do corredor (perimeter de outra sala). Detecta e desbloqueia qualquer porta que isole upRoom.
     if (depth > 1) {
-      for (let i = 0; i < tiles.length; i++) {
-        if (tiles[i] !== Tile.DoorLocked) continue;
-        const px = i % LEVEL_W, py = (i / LEVEL_W) | 0;
-        let adj = posInRoom({ x: px, y: py }, upRoom);
-        if (!adj) for (const n of neighbors4({ x: px, y: py })) if (posInRoom(n, upRoom)) { adj = true; break; }
-        if (adj) { tiles[i] = Tile.DoorClosed; numLockedAdjusted--; }
+      const vis = new Uint8Array(LEVEL_W * LEVEL_H);
+      const si = idx(upRoom.cx, upRoom.cy);
+      vis[si] = 1;
+      const bq = [si]; let bqh = 0;
+      while (bqh < bq.length) {
+        const cur = bq[bqh++];
+        const bx = cur % LEVEL_W, by = (cur / LEVEL_W) | 0;
+        for (const n of neighbors4({ x: bx, y: by })) {
+          if (!inBounds(n.x, n.y)) continue;
+          const ni = idx(n.x, n.y);
+          if (vis[ni]) continue;
+          const t = tiles[ni];
+          if (t === Tile.Wall || t === Tile.DoorLocked) continue;
+          vis[ni] = 1; bq.push(ni);
+        }
       }
-      numLockedAdjusted = Math.max(0, numLockedAdjusted);
+      let canEscape = false;
+      for (const r of rooms) {
+        if (r !== upRoom && vis[idx(r.cx, r.cy)]) { canEscape = true; break; }
+      }
+      if (!canEscape) {
+        for (let i = 0; i < tiles.length; i++) {
+          if (tiles[i] !== Tile.DoorLocked) continue;
+          const px = i % LEVEL_W, py = (i / LEVEL_W) | 0;
+          let nearReach = vis[i];
+          if (!nearReach) for (const n of neighbors4({ x: px, y: py }))
+            if (inBounds(n.x, n.y) && vis[idx(n.x, n.y)]) { nearReach = true; break; }
+          if (nearReach) { tiles[i] = Tile.DoorClosed; numLockedFinal--; }
+        }
+      }
     }
 
     const stairExclude = new Set([...nearDoor, idx(playerStart.x, playerStart.y)]);
@@ -373,10 +392,12 @@
 
     const items = [];
     const itemCount = clamp(2 + Math.floor(depth * 0.1), 2, 5);
-    // Safe zone BFS for keys
+    // Safe zone BFS — começa em `up` para depth > 1 (é onde o jogador entra ao descer)
+    // Garante que todas as chaves estão acessíveis a partir do ponto de entrada real
     const safeZone = [];
     const visited = new Uint8Array(LEVEL_W * LEVEL_H);
-    const q = [idx(playerStart.x, playerStart.y)];
+    const safeStart = depth === 1 ? playerStart : up;
+    const q = [idx(safeStart.x, safeStart.y)];
     visited[q[0]] = 1;
     let qh = 0;
     while (qh < q.length) {
@@ -398,7 +419,7 @@
 
     // Spawn keys in safe zone
     if (safeZone.length > 0) {
-      for (let i = 0; i < numLockedAdjusted; i++) {
+      for (let i = 0; i < numLockedFinal; i++) {
         let pos = null;
         for (let t = 0; t < 50; t++) {
           const p = choose(rng, safeZone);
