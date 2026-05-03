@@ -376,6 +376,8 @@ body{
   font-weight: 700;
   color: #fff;
 }
+.help h3{margin:14px 0 6px;font-size:13px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--accent);opacity:.8;}
+.help h3:first-child{margin-top:0;}
 .help ul{margin:0;padding-left:20px;color:var(--muted);font-size:14px; line-height: 1.6;}
 .help li{margin:6px 0}
 .help b { color: var(--accent); font-weight: 600; }

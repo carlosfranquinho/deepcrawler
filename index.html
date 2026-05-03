@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./styles.css?v=13" />
+    <link rel="stylesheet" href="./styles.css?v=14" />
     <link rel="stylesheet" href="./monsters.css?v=11" />
   </head>
   <body>
@@ -179,30 +179,64 @@
     </div>
 
     <div id="helpModal" class="modal" role="dialog" aria-modal="true" hidden>
-      <div class="modalBox">
+      <div class="modalBox" style="width:min(560px,92vw);max-height:85vh;overflow-y:auto;">
         <h2>Como jogar</h2>
         <div class="help">
+
+          <h3>Controlos — PC</h3>
           <ul>
-            <li><b>Mover</b>: Setas ou WASD</li>
-            <li><b>Esperar</b>: Espaço</li>
-            <li><b>Abrir porta</b>: Andar contra ela</li>
-            <li><b>Descer</b>: Pisar em <b>&gt;</b></li>
-            <li><b>Subir</b>: Pisar em <b>&lt;</b></li>
+            <li><b>Mover (cardinais)</b>: Setas, WASD ou Numpad 8/2/4/6</li>
+            <li><b>Mover (diagonais)</b>: Numpad 7/9/1/3 ou Y/U/N</li>
+            <li><b>Esperar</b>: Espaço ou Numpad 5</li>
             <li><b>Atacar</b>: Andar contra um inimigo</li>
             <li><b>Beber poção</b>: <b>B</b></li>
             <li><b>Ler pergaminho</b>: <b>L</b></li>
             <li><b>Usar item</b>: Clica no inventário ou <b>1–9</b></li>
           </ul>
-          <p class="muted" style="text-align: left; margin-top: 12px;">
-            Cada tecla é um turno: <b>tu ages</b>, depois <b>os inimigos agem</b>.
-            A masmorra é infinita: novos pisos são gerados ao descer.
-          </p>
-          <p class="muted" style="text-align: left;">
+
+          <h3>O Mapa</h3>
+          <ul>
+            <li><b>&gt;</b> Escadas abaixo — desceres um piso</li>
+            <li><b>&lt;</b> Escadas acima — subires (no piso −1, sais da masmorra)</li>
+            <li><b>+</b> Porta fechada — abre ao andar contra ela</li>
+            <li><b>X</b> Porta trancada — precisas de uma <b>Chave</b></li>
+            <li><b>%</b> Cadáver — inofensivo e pisável</li>
+          </ul>
+
+          <h3>Itens</h3>
+          <ul>
+            <li><b>Poção</b> (<b>B</b> ou clica): cura HP; 20% de chance de maldição</li>
+            <li><b>Pergaminho</b> (<b>L</b> ou clica): efeito aleatório — XP, revelar mapa, eliminar sala, carisma, armadura…</li>
+            <li><b>Amuleto</b> (clica): magia de aura — carisma, armadura, teleporte…</li>
+            <li><b>Espada</b>: +1/+1 ATK (automático ao pisar; evolui o nome da arma)</li>
+            <li><b>Armadura</b>: +1 armadura (automático ao pisar)</li>
+            <li><b>Chave</b>: desbloqueia uma porta <b>X</b> (consumida automaticamente)</li>
+            <li><b>Baú</b>: abre ao pisar — dá ouro (mais valioso em pisos profundos)</li>
+          </ul>
+
+          <h3>Arquétipos</h3>
+          <ul>
+            <li>😠 <b>Guerreiro</b> — Crítico: 20% de duplo dano</li>
+            <li>😈 <b>Ladrão</b> — Gazua: arrombas fechaduras em 2 tentativas</li>
+            <li>🧐 <b>Mago</b> — Sentido Arcano: itens mágicos nunca te amaldiçoam</li>
+            <li>😇 <b>Paladino</b> — Regeneração Sagrada: +1 HP a cada 8 turnos</li>
+            <li>🤬 <b>Bárbaro</b> — Fúria: +3 ATK quando HP ≤ 40%</li>
+            <li>🤪 <b>Turista</b> — Última Sorte: sobrevives 1 golpe fatal por piso</li>
+          </ul>
+
+          <h3>Estatísticas</h3>
+          <p class="muted" style="text-align:left;margin:0 0 8px;">
             <b>Carisma</b>: cada ponto dá 10% de chance de esquivar ataques inimigos.<br>
-            <b>Armadura</b>: reduz o dano recebido (máx. 5), mas nunca abaixo de 1.
+            <b>Armadura</b>: reduz o dano recebido (máx. 5), nunca abaixo de 1.<br>
+            <b>Subir de nível</b>: +2 HP máximo, +1/+1 ATK.
           </p>
+          <p class="muted" style="text-align:left;margin:0;">
+            Cada tecla é um turno: <b>tu ages</b>, depois <b>os inimigos agem</b>.
+            A masmorra cresce com a profundidade e não tem fundo.
+          </p>
+
         </div>
-        <button id="closeHelpBtn" class="btn">Fechar</button>
+        <button id="closeHelpBtn" class="btn" style="margin-top:16px;">Fechar</button>
       </div>
     </div>
 
